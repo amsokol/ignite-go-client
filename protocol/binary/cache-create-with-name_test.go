@@ -6,7 +6,7 @@ import (
 )
 
 func TestCacheCreateWithName(t *testing.T) {
-	conn, err := GetTestConnection()
+	conn, err := Connect100("tcp", "127.0.0.1:10800")
 	if err != nil {
 		t.Error(err)
 		return
