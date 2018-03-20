@@ -63,6 +63,11 @@ func (i *Int) Read(r io.Reader) error {
 	return nil
 }
 
+// Value return golang value of String object
+func (i *Int) Value() int {
+	return int(i.v)
+}
+
 // NewInt creates Int object
 func NewInt(i int, meta bool) *Int {
 	return &Int{v: int32(i), meta: meta}
