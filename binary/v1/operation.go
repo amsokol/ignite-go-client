@@ -1,4 +1,8 @@
-package binary
+package ignite
+
+import (
+	"bytes"
+)
 
 const (
 	// Cache Configuration
@@ -11,15 +15,13 @@ const (
 	opCacheDestroy                      = 1056
 )
 
-const (
-	// StatusSuccess means success
-	StatusSuccess = 0
-)
+// Operation allows to prepare operation to execute
+type Operation struct {
+	Code int16
+	UID  int64
+	Data bytes.Buffer
+}
 
-// Result is the operation execution result
-type Result struct {
-	// Status code (0 for success, otherwise error code)
-	Status int
-	// Error message (present only when status is not 0)
-	Message string
+func (o *Operation) Write(data ...interface{}) error {
+	return write(&o.Data, data...)
 }

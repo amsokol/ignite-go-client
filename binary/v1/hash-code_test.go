@@ -1,4 +1,4 @@
-package binary
+package ignite
 
 import "testing"
 
@@ -9,7 +9,7 @@ func Test_hashCode(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want int
+		want int32
 	}{
 		{
 			name: "success test",

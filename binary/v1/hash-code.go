@@ -1,6 +1,6 @@
-package binary
+package ignite
 
-func hashCode(s string) int {
+func hashCode(s string) int32 {
 	if len(s) == 0 {
 		return 1
 	}
@@ -9,5 +9,5 @@ func hashCode(s string) int {
 	for i := 0; i < len(s); i++ {
 		h = 31*h + uint32(s[i])
 	}
-	return int(int32(h))
+	return int32(h)
 }
