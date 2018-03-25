@@ -19,9 +19,12 @@ func write(w io.Writer, data ...interface{}) error {
 			if err = binary.Write(w, binary.LittleEndian, byte(typeString)); err == nil {
 				s := []byte(v)
 				// String data length
-				if err = binary.Write(w, binary.LittleEndian, int32(len(s))); err == nil {
-					// String data
-					err = binary.Write(w, binary.LittleEndian, s)
+				length := int32(len(s))
+				if err = binary.Write(w, binary.LittleEndian, length); err == nil {
+					if length > 0 {
+						// String data
+						err = binary.Write(w, binary.LittleEndian, s)
+					}
 				}
 			}
 		default:
@@ -50,10 +53,14 @@ func read(r io.Reader, data ...interface{}) error {
 				// String data length
 				var length int32
 				if err = binary.Read(r, binary.LittleEndian, &length); err == nil {
-					s := make([]byte, length)
-					// String data
-					if err = binary.Read(r, binary.LittleEndian, &s); err == nil {
-						*v = string(s)
+					if length > 0 {
+						s := make([]byte, length)
+						// String data
+						if err = binary.Read(r, binary.LittleEndian, &s); err == nil {
+							*v = string(s)
+						}
+					} else {
+						*v = ""
 					}
 				}
 			}
