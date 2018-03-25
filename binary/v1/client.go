@@ -1,6 +1,7 @@
 package ignite
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net"
@@ -10,14 +11,6 @@ const (
 	// StatusSuccess means success
 	StatusSuccess = 0
 )
-
-// Response is struct of response data
-type Response struct {
-	Len     int32
-	UID     int64
-	Status  int32
-	Message string
-}
 
 // Client is interface to communicate with Apache Ignite cluster.
 // Client is not thread-safe.
@@ -30,7 +23,6 @@ type Client interface {
 	Begin(length int32, code int16, uid int64) error
 	Write(data ...interface{}) error
 	Commit() (Response, error)
-	Read(data ...interface{}) error
 
 	Close() error
 
@@ -39,6 +31,7 @@ type Client interface {
 	CacheDestroy(name string, status *int32) error
 	CacheGetOrCreateWithName(name string, status *int32) error
 	CacheGetNames(status *int32) ([]string, error)
+	CacheGetConfiguration(name string, flag byte, status *int32) (*CacheConfiguration, error)
 }
 
 type client struct {
@@ -95,21 +88,31 @@ func (c *client) Write(data ...interface{}) error {
 // Commit request and return response
 func (c *client) Commit() (Response, error) {
 	var r Response
-	if err := read(c.conn, &r.Len, &r.UID, &r.Status); err != nil {
+
+	// read response message length
+	if err := read(c.conn, &r.Len); err != nil {
+		return r, fmt.Errorf("failed to read response message length: %s", err.Error())
+	}
+
+	// read response message
+	b := make([]byte, r.Len, r.Len)
+	if err := read(c.conn, &b); err != nil {
+		return r, fmt.Errorf("failed to read response message: %s", err.Error())
+	}
+	r.Data = bytes.NewReader(b)
+
+	// read response header
+	if err := r.Read(&r.UID, &r.Status); err != nil {
 		return r, fmt.Errorf("failed to read response header: %s", err.Error())
 	}
+
 	if r.Status != StatusSuccess {
 		// Response status
-		if err := read(c.conn, &r.Message); err != nil {
+		if err := r.Read(&r.Message); err != nil {
 			return r, fmt.Errorf("failed to read error message: %s", err.Error())
 		}
 	}
 	return r, nil
-}
-
-// Read response data
-func (c *client) Read(data ...interface{}) error {
-	return read(c.conn, data...)
 }
 
 // NewClient100 connects to the Apache Ignite cluster by protocol version v1.0.0
