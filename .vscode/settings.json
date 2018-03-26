@@ -5,6 +5,7 @@
         "Onheap",
         "Parellelism",
         "Wrapf",
-        "amsokol"
+        "amsokol",
+        "uuid"
     ]
 }
