@@ -84,192 +84,192 @@ func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfiguration
 	count := 0
 
 	if cc.AtomicityMode != nil {
-		if err := o.Write(cacheConfigurationAtomicityModeCode, *cc.AtomicityMode); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationAtomicityModeCode, *cc.AtomicityMode); err != nil {
 			return fmt.Errorf("failed to write AtomicityMode property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.Backups != nil {
-		if err := o.Write(cacheConfigurationBackupsCode, *cc.Backups); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationBackupsCode, *cc.Backups); err != nil {
 			return fmt.Errorf("failed to write Backups property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.CacheMode != nil {
-		if err := o.Write(cacheConfigurationCacheModeCode, *cc.CacheMode); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationCacheModeCode, *cc.CacheMode); err != nil {
 			return fmt.Errorf("failed to write CacheMode property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.CopyOnRead != nil {
-		if err := o.Write(cacheConfigurationCopyOnReadCode, *cc.CopyOnRead); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationCopyOnReadCode, *cc.CopyOnRead); err != nil {
 			return fmt.Errorf("failed to write CopyOnRead property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.DataRegionName != nil {
-		if err := o.Write(cacheConfigurationDataRegionNameCode, *cc.DataRegionName); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationDataRegionNameCode, *cc.DataRegionName); err != nil {
 			return fmt.Errorf("failed to write DataRegionName property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.EagerTTL != nil {
-		if err := o.Write(cacheConfigurationEagerTTLCode, *cc.EagerTTL); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationEagerTTLCode, *cc.EagerTTL); err != nil {
 			return fmt.Errorf("failed to write EagerTTL property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.EnableStatistics != nil {
-		if err := o.Write(cacheConfigurationEnableStatisticsCode, *cc.EnableStatistics); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationEnableStatisticsCode, *cc.EnableStatistics); err != nil {
 			return fmt.Errorf("failed to write EnableStatistics property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.GroupName != nil {
-		if err := o.Write(cacheConfigurationGroupNameCode, *cc.GroupName); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationGroupNameCode, *cc.GroupName); err != nil {
 			return fmt.Errorf("failed to write GroupName property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.LockTimeout != nil {
-		if err := o.Write(cacheConfigurationLockTimeoutCode, *cc.LockTimeout); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationLockTimeoutCode, *cc.LockTimeout); err != nil {
 			return fmt.Errorf("failed to write LockTimeout property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.MaxConcurrentAsyncOperations != nil {
-		if err := o.Write(cacheConfigurationMaxConcurrentAsyncOperationsCode, *cc.MaxConcurrentAsyncOperations); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationMaxConcurrentAsyncOperationsCode, *cc.MaxConcurrentAsyncOperations); err != nil {
 			return fmt.Errorf("failed to write MaxConcurrentAsyncOperations property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.MaxQueryIterators != nil {
-		if err := o.Write(cacheConfigurationMaxQueryIteratorsCode, *cc.MaxQueryIterators); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationMaxQueryIteratorsCode, *cc.MaxQueryIterators); err != nil {
 			return fmt.Errorf("failed to write MaxQueryIterators property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.Name != nil {
-		if err := o.Write(cacheConfigurationNameCode, *cc.Name); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationNameCode, *cc.Name); err != nil {
 			return fmt.Errorf("failed to write Name property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.OnheapCacheEnabled != nil {
-		if err := o.Write(cacheConfigurationOnheapCacheEnabledCode, *cc.OnheapCacheEnabled); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationOnheapCacheEnabledCode, *cc.OnheapCacheEnabled); err != nil {
 			return fmt.Errorf("failed to write OnheapCacheEnabled property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.PartitionLossPolicy != nil {
-		if err := o.Write(cacheConfigurationPartitionLossPolicyCode, *cc.PartitionLossPolicy); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationPartitionLossPolicyCode, *cc.PartitionLossPolicy); err != nil {
 			return fmt.Errorf("failed to write PartitionLossPolicy property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.QueryDetailMetricsSize != nil {
-		if err := o.Write(cacheConfigurationQueryDetailMetricsSizeCode, *cc.QueryDetailMetricsSize); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationQueryDetailMetricsSizeCode, *cc.QueryDetailMetricsSize); err != nil {
 			return fmt.Errorf("failed to write QueryDetailMetricsSize property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.QueryParellelism != nil {
-		if err := o.Write(cacheConfigurationQueryParellelismCode, *cc.QueryParellelism); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationQueryParellelismCode, *cc.QueryParellelism); err != nil {
 			return fmt.Errorf("failed to write QueryParellelism property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.ReadFromBackup != nil {
-		if err := o.Write(cacheConfigurationReadFromBackupCode, *cc.ReadFromBackup); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationReadFromBackupCode, *cc.ReadFromBackup); err != nil {
 			return fmt.Errorf("failed to write ReadFromBackup property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.RebalanceBatchSize != nil {
-		if err := o.Write(cacheConfigurationRebalanceBatchSizeCode, *cc.RebalanceBatchSize); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationRebalanceBatchSizeCode, *cc.RebalanceBatchSize); err != nil {
 			return fmt.Errorf("failed to write RebalanceBatchSize property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.RebalanceBatchesPrefetchCount != nil {
-		if err := o.Write(cacheConfigurationRebalanceBatchesPrefetchCountCode, *cc.RebalanceBatchesPrefetchCount); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationRebalanceBatchesPrefetchCountCode, *cc.RebalanceBatchesPrefetchCount); err != nil {
 			return fmt.Errorf("failed to write RebalanceBatchesPrefetchCount property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.RebalanceDelay != nil {
-		if err := o.Write(cacheConfigurationRebalanceDelayCode, *cc.RebalanceDelay); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationRebalanceDelayCode, *cc.RebalanceDelay); err != nil {
 			return fmt.Errorf("failed to write RebalanceDelay property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.RebalanceMode != nil {
-		if err := o.Write(cacheConfigurationRebalanceModeCode, *cc.RebalanceMode); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationRebalanceModeCode, *cc.RebalanceMode); err != nil {
 			return fmt.Errorf("failed to write RebalanceMode property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.RebalanceOrder != nil {
-		if err := o.Write(cacheConfigurationRebalanceOrderCode, *cc.RebalanceOrder); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationRebalanceOrderCode, *cc.RebalanceOrder); err != nil {
 			return fmt.Errorf("failed to write RebalanceOrder property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.RebalanceThrottle != nil {
-		if err := o.Write(cacheConfigurationRebalanceThrottleCode, *cc.RebalanceThrottle); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationRebalanceThrottleCode, *cc.RebalanceThrottle); err != nil {
 			return fmt.Errorf("failed to write RebalanceThrottle property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.RebalanceTimeout != nil {
-		if err := o.Write(cacheConfigurationRebalanceTimeoutCode, *cc.RebalanceTimeout); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationRebalanceTimeoutCode, *cc.RebalanceTimeout); err != nil {
 			return fmt.Errorf("failed to write RebalanceTimeout property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.SQLEscapeAll != nil {
-		if err := o.Write(cacheConfigurationSQLEscapeAllCode, *cc.SQLEscapeAll); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationSQLEscapeAllCode, *cc.SQLEscapeAll); err != nil {
 			return fmt.Errorf("failed to write SQLEscapeAll property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.SQLIndexInlineMaxSize != nil {
-		if err := o.Write(cacheConfigurationSQLIndexInlineMaxSizeCode, *cc.SQLIndexInlineMaxSize); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationSQLIndexInlineMaxSizeCode, *cc.SQLIndexInlineMaxSize); err != nil {
 			return fmt.Errorf("failed to write SQLIndexInlineMaxSize property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.SQLSchema != nil {
-		if err := o.Write(cacheConfigurationSQLSchemaCode, *cc.SQLSchema); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationSQLSchemaCode, *cc.SQLSchema); err != nil {
 			return fmt.Errorf("failed to write SQLSchema property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.WriteSynchronizationMode != nil {
-		if err := o.Write(cacheConfigurationWriteSynchronizationModeCode, *cc.WriteSynchronizationMode); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationWriteSynchronizationModeCode, *cc.WriteSynchronizationMode); err != nil {
 			return fmt.Errorf("failed to write WriteSynchronizationMode property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.WriteSynchronizationMode != nil {
-		if err := o.Write(cacheConfigurationWriteSynchronizationModeCode, *cc.WriteSynchronizationMode); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationWriteSynchronizationModeCode, *cc.WriteSynchronizationMode); err != nil {
 			return fmt.Errorf("failed to write WriteSynchronizationMode property: %s", err.Error())
 		}
 		count++
 	}
 	if cc.CacheKeyConfigurations != nil && len(cc.CacheKeyConfigurations) > 0 {
-		if err := o.Write(cacheConfigurationCacheKeyConfigurationsCode, int32(len(cc.CacheKeyConfigurations))); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationCacheKeyConfigurationsCode, int32(len(cc.CacheKeyConfigurations))); err != nil {
 			return fmt.Errorf("failed to write CacheKeyConfigurations code and count: %s", err.Error())
 		}
 		for i, v := range cc.CacheKeyConfigurations {
-			if err := o.Write(v.TypeName, v.AffinityKeyFieldName); err != nil {
+			if err := o.WritePrimitives(v.TypeName, v.AffinityKeyFieldName); err != nil {
 				return fmt.Errorf("failed to write CacheKeyConfiguration with index %d: %s", i, err.Error())
 			}
 		}
 		count++
 	}
 	if cc.QueryEntities != nil && len(cc.QueryEntities) > 0 {
-		if err := o.Write(cacheConfigurationQueryEntitiesCode, int32(len(cc.QueryEntities))); err != nil {
+		if err := o.WritePrimitives(cacheConfigurationQueryEntitiesCode, int32(len(cc.QueryEntities))); err != nil {
 			return fmt.Errorf("failed to write QueryEntities code and count: %s", err.Error())
 		}
 		for i, v := range cc.QueryEntities {
@@ -277,14 +277,14 @@ func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfiguration
 			if v.QueryFields != nil {
 				l = int32(len(v.QueryFields))
 			}
-			if err := o.Write(v.KeyTypeName, v.ValueTypeName, v.TableName, v.KeyFieldName, v.ValueFieldName,
+			if err := o.WritePrimitives(v.KeyTypeName, v.ValueTypeName, v.TableName, v.KeyFieldName, v.ValueFieldName,
 				l); err != nil {
 				return fmt.Errorf("failed to write QueryEntity with index %d: %s", i, err.Error())
 			}
 			if l > 0 {
 				// write QueryFields
 				for j, v2 := range v.QueryFields {
-					if err := o.Write(v2.Name, v2.TypeName, v2.IsKeyField, v2.IsNotNullConstraintField); err != nil {
+					if err := o.WritePrimitives(v2.Name, v2.TypeName, v2.IsKeyField, v2.IsNotNullConstraintField); err != nil {
 						return fmt.Errorf("failed to write QueryField with index %d: %s", j, err.Error())
 					}
 				}
@@ -294,12 +294,12 @@ func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfiguration
 			if v.FieldNameAliases != nil {
 				l = int32(len(v.FieldNameAliases))
 			}
-			if err := o.Write(l); err != nil {
+			if err := o.WritePrimitives(l); err != nil {
 				return fmt.Errorf("failed to write FieldNameAliases count: %s", err.Error())
 			}
 			if l > 0 {
 				for j, v2 := range v.FieldNameAliases {
-					if err := o.Write(v2.Name, v2.Alias); err != nil {
+					if err := o.WritePrimitives(v2.Name, v2.Alias); err != nil {
 						return fmt.Errorf("failed to write FieldNameAlias with index %d: %s", j, err.Error())
 					}
 				}
@@ -309,12 +309,12 @@ func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfiguration
 			if v.QueryIndexes != nil {
 				l = int32(len(v.QueryIndexes))
 			}
-			if err := o.Write(l); err != nil {
+			if err := o.WritePrimitives(l); err != nil {
 				return fmt.Errorf("failed to write QueryIndexes count: %s", err.Error())
 			}
 			if l > 0 {
 				for j, v2 := range v.QueryIndexes {
-					if err := o.Write(v2.Name, v2.Type, v2.InlineSize); err != nil {
+					if err := o.WritePrimitives(v2.Name, v2.Type, v2.InlineSize); err != nil {
 						return fmt.Errorf("failed to write QueryIndex with index %d: %s", j, err.Error())
 					}
 					// write Fields
@@ -322,12 +322,12 @@ func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfiguration
 					if v2.Fields != nil {
 						l = int32(len(v2.Fields))
 					}
-					if err := o.Write(l); err != nil {
+					if err := o.WritePrimitives(l); err != nil {
 						return fmt.Errorf("failed to write Fields count: %s", err.Error())
 					}
 					if l > 0 {
 						for k, v3 := range v2.Fields {
-							if err := o.Write(v3.Name, v3.IsDescensing); err != nil {
+							if err := o.WritePrimitives(v3.Name, v3.IsDescensing); err != nil {
 								return fmt.Errorf("failed to write Field with index %d: %s", k, err.Error())
 							}
 						}

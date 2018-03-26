@@ -28,11 +28,14 @@ type Client interface {
 
 	// Cache Configuration methods
 	CacheCreateWithName(name string, status *int32) error
-	CacheDestroy(name string, status *int32) error
 	CacheGetOrCreateWithName(name string, status *int32) error
 	CacheGetNames(status *int32) ([]string, error)
 	CacheGetConfiguration(name string, flag byte, status *int32) (*CacheConfiguration, error)
 	CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error
+	CacheDestroy(name string, status *int32) error
+
+	// Key-Value Queries
+	CachePut(cache string, binary bool, key interface{}, value interface{}, status *int32) error
 }
 
 type client struct {
@@ -54,7 +57,7 @@ func (c *client) Close() error {
 func (c *client) Exec(code int16, uid int64, data ...interface{}) (Response, error) {
 	o := c.Prepare(code, uid)
 	// write data
-	if err := o.Write(data...); err != nil {
+	if err := o.WritePrimitives(data...); err != nil {
 		return Response{}, fmt.Errorf("failed to write request data to operation: %s", err.Error())
 	}
 	return c.Call(o)
@@ -86,12 +89,12 @@ func (c *client) Call(o *Operation) (Response, error) {
 
 // Start request
 func (c *client) Begin(length int32, code int16, uid int64) error {
-	return write(c.conn, length, code, uid)
+	return writePrimitives(c.conn, length, code, uid)
 }
 
 // Write request data
 func (c *client) Write(data ...interface{}) error {
-	return write(c.conn, data...)
+	return writePrimitives(c.conn, data...)
 }
 
 // Commit request and return response
@@ -142,7 +145,7 @@ func NewClient100(network, address string) (Client, error) {
 // after connection establishment.
 func handshake(rw io.ReadWriter, major int16, minor int16, patch int16) error {
 	// Send handshake request
-	if err := write(rw,
+	if err := writePrimitives(rw,
 		// Message length
 		int32(8),
 		// Handshake operation
