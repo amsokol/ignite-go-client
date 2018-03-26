@@ -19,7 +19,6 @@ type Client interface {
 
 	Prepare(code int16, uid int64) *Operation
 	Call(o *Operation) (Response, error)
-	CallEx(prefix []interface{}, o *Operation) (Response, error)
 
 	Begin(length int32, code int16, uid int64) error
 	Write(data ...interface{}) error
@@ -66,25 +65,21 @@ func (c *client) Prepare(code int16, uid int64) *Operation {
 }
 
 func (c *client) Call(o *Operation) (Response, error) {
-	return c.CallEx(nil, o)
-}
-
-func (c *client) CallEx(prefix []interface{}, o *Operation) (Response, error) {
 	// send request header
-	if err := c.Begin(int32(2+8+o.Data.Len()), o.Code, o.UID); err != nil {
+	if err := c.Begin(int32(2+8+o.Prefix.Len()+o.Data.Len()), o.Code, o.UID); err != nil {
 		return Response{}, fmt.Errorf("failed to send request header: %s", err.Error())
 	}
-	if prefix != nil {
-		// send prefix of body
-		for _, v := range prefix {
-			if err := c.Write(v); err != nil {
-				return Response{}, fmt.Errorf("failed to send request prefix: %s", err.Error())
-			}
+	if o.Prefix.Len() > 0 {
+		// send request prefix of body
+		if err := c.Write(o.Prefix.Bytes()); err != nil {
+			return Response{}, fmt.Errorf("failed to send request prefix of body: %s", err.Error())
 		}
 	}
-	// send request body
-	if err := c.Write(o.Data.Bytes()); err != nil {
-		return Response{}, fmt.Errorf("failed to send request body: %s", err.Error())
+	if o.Data.Len() > 0 {
+		// send request body
+		if err := c.Write(o.Data.Bytes()); err != nil {
+			return Response{}, fmt.Errorf("failed to send request body: %s", err.Error())
+		}
 	}
 	return c.Commit()
 }

@@ -72,10 +72,15 @@ type CacheConfigurationRefs struct {
 	QueryEntities                 []QueryEntity
 }
 
+// CacheCreateWithConfiguration creates cache with provided configuration. An exception is thrown if the name is already in use.
 func (c *client) CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error {
+	return c.cacheCreateWithConfiguration(opCacheCreateWithConfiguration, cc, status)
+}
+
+func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfigurationRefs, status *int32) error {
 	uid := rand.Int63()
 
-	o := c.Prepare(opCacheCreateWithConfiguration, uid)
+	o := c.Prepare(code, uid)
 	count := 0
 
 	if cc.AtomicityMode != nil {
@@ -338,8 +343,10 @@ func (c *client) CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status
 	}
 
 	// execute
-	prefix := []interface{}{int32(o.Data.Len()), int16(count)}
-	r, err := c.CallEx(prefix, o)
+	if err := o.WritePrefix(int32(o.Data.Len()), int16(count)); err != nil {
+		return fmt.Errorf("failed to write message data length and property count: %s", err.Error())
+	}
+	r, err := c.Call(o)
 	if err != nil {
 		return fmt.Errorf("failed to execute operation: %s", err.Error())
 	}
