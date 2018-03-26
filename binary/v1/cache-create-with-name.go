@@ -8,9 +8,13 @@ import (
 // CacheCreateWithName Creates a cache with a given name.
 // Cache template can be applied if there is a '*' in the cache name.
 func (c *client) CacheCreateWithName(name string, status *int32) error {
+	return c.cacheCreateWithName(opCacheCreateWithName, name, status)
+}
+
+func (c *client) cacheCreateWithName(code int16, name string, status *int32) error {
 	uid := rand.Int63()
 
-	r, err := c.Exec(opCacheCreateWithName, uid, name)
+	r, err := c.Exec(code, uid, name)
 	if err != nil {
 		return fmt.Errorf("failed to execute operation: %s", err.Error())
 	}
