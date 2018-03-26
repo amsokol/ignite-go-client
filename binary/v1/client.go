@@ -19,6 +19,7 @@ type Client interface {
 
 	Prepare(code int16, uid int64) *Operation
 	Call(o *Operation) (Response, error)
+	CallEx(prefix []interface{}, o *Operation) (Response, error)
 
 	Begin(length int32, code int16, uid int64) error
 	Write(data ...interface{}) error
@@ -32,6 +33,7 @@ type Client interface {
 	CacheGetOrCreateWithName(name string, status *int32) error
 	CacheGetNames(status *int32) ([]string, error)
 	CacheGetConfiguration(name string, flag byte, status *int32) (*CacheConfiguration, error)
+	CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error
 }
 
 type client struct {
@@ -64,9 +66,21 @@ func (c *client) Prepare(code int16, uid int64) *Operation {
 }
 
 func (c *client) Call(o *Operation) (Response, error) {
+	return c.CallEx(nil, o)
+}
+
+func (c *client) CallEx(prefix []interface{}, o *Operation) (Response, error) {
 	// send request header
 	if err := c.Begin(int32(2+8+o.Data.Len()), o.Code, o.UID); err != nil {
 		return Response{}, fmt.Errorf("failed to send request header: %s", err.Error())
+	}
+	if prefix != nil {
+		// send prefix of body
+		for _, v := range prefix {
+			if err := c.Write(v); err != nil {
+				return Response{}, fmt.Errorf("failed to send request prefix: %s", err.Error())
+			}
+		}
 	}
 	// send request body
 	if err := c.Write(o.Data.Bytes()); err != nil {
