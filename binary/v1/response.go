@@ -14,6 +14,12 @@ type Response struct {
 	Data *bytes.Reader
 }
 
-func (r *Response) Read(data ...interface{}) error {
-	return read(r.Data, data...)
+// ReadPrimitives reads primitives from buffered response data
+func (r *Response) ReadPrimitives(data ...interface{}) error {
+	return readPrimitives(r.Data, data...)
+}
+
+// ReadObjects reads objects from buffered response data
+func (r *Response) ReadObjects(count int) ([]interface{}, error) {
+	return readObjects(r.Data, count)
 }

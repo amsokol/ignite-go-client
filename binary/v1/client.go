@@ -102,25 +102,25 @@ func (c *client) Commit() (Response, error) {
 	var r Response
 
 	// read response message length
-	if err := read(c.conn, &r.Len); err != nil {
+	if err := readPrimitives(c.conn, &r.Len); err != nil {
 		return r, fmt.Errorf("failed to read response message length: %s", err.Error())
 	}
 
 	// read response message
 	b := make([]byte, r.Len, r.Len)
-	if err := read(c.conn, &b); err != nil {
+	if err := readPrimitives(c.conn, &b); err != nil {
 		return r, fmt.Errorf("failed to read response message: %s", err.Error())
 	}
 	r.Data = bytes.NewReader(b)
 
 	// read response header
-	if err := r.Read(&r.UID, &r.Status); err != nil {
+	if err := r.ReadPrimitives(&r.UID, &r.Status); err != nil {
 		return r, fmt.Errorf("failed to read response header: %s", err.Error())
 	}
 
 	if r.Status != StatusSuccess {
 		// Response status
-		if err := r.Read(&r.Message); err != nil {
+		if err := r.ReadPrimitives(&r.Message); err != nil {
 			return r, fmt.Errorf("failed to read error message: %s", err.Error())
 		}
 	}
@@ -161,12 +161,12 @@ func handshake(rw io.ReadWriter, major int16, minor int16, patch int16) error {
 	// Receive handshake response
 	var length int32
 	var res byte
-	if err := read(rw, &length, &res); err != nil {
+	if err := readPrimitives(rw, &length, &res); err != nil {
 		return fmt.Errorf("failed to read handshake response (length and result): %s", err.Error())
 	}
 	if res != 1 {
 		var msg string
-		if err := read(rw, &major, &minor, &patch, &msg); err != nil {
+		if err := readPrimitives(rw, &major, &minor, &patch, &msg); err != nil {
 			return fmt.Errorf("failed to read handshake response (supported protocol version and error message): %s",
 				err.Error())
 		}

@@ -25,7 +25,7 @@ func (c *client) CacheGetNames(status *int32) ([]string, error) {
 
 	// get cache count
 	var count int32
-	if err := r.Read(&count); err != nil {
+	if err := r.ReadPrimitives(&count); err != nil {
 		return []string{}, fmt.Errorf("failed to read cache count: %s", err.Error())
 	}
 
@@ -33,7 +33,7 @@ func (c *client) CacheGetNames(status *int32) ([]string, error) {
 	names := make([]string, 0, int(count))
 	for i := 0; i < int(count); i++ {
 		var name string
-		if err := r.Read(&name); err != nil {
+		if err := r.ReadPrimitives(&name); err != nil {
 			return []string{}, fmt.Errorf("failed to read cache name with index %d, reason: %s", i, err.Error())
 		}
 		names = append(names, name)

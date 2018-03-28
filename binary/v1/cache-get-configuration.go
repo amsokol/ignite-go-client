@@ -150,7 +150,7 @@ func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*
 
 	var cc CacheConfiguration
 	var count, length int32
-	if err = r.Read(
+	if err = r.ReadPrimitives(
 		&length,
 		&cc.AtomicityMode,
 		&cc.Backups,
@@ -187,20 +187,20 @@ func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*
 	cc.CacheKeyConfigurations = make([]CacheKeyConfiguration, 0, int(count))
 	for i := 0; i < int(count); i++ {
 		var ckc CacheKeyConfiguration
-		if err = r.Read(&ckc.TypeName, &ckc.AffinityKeyFieldName); err != nil {
+		if err = r.ReadPrimitives(&ckc.TypeName, &ckc.AffinityKeyFieldName); err != nil {
 			return nil, fmt.Errorf("failed to read CacheKeyConfiguration data: %s", err.Error())
 		}
 		cc.CacheKeyConfigurations = append(cc.CacheKeyConfigurations, ckc)
 	}
 
-	if err = r.Read(&count); err != nil {
+	if err = r.ReadPrimitives(&count); err != nil {
 		return nil, fmt.Errorf("failed to read QueryEntity count: %s", err.Error())
 	}
 	cc.QueryEntities = make([]QueryEntity, 0, int(count))
 	for i := 0; i < int(count); i++ {
 		var qe QueryEntity
 		var count2 int32
-		if err = r.Read(
+		if err = r.ReadPrimitives(
 			&qe.KeyTypeName,
 			&qe.ValueTypeName,
 			&qe.TableName,
@@ -214,7 +214,7 @@ func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*
 		qe.QueryFields = make([]QueryField, 0, int(count2))
 		for j := 0; j < int(count2); j++ {
 			var qf QueryField
-			if err = r.Read(
+			if err = r.ReadPrimitives(
 				&qf.Name,
 				&qf.TypeName,
 				&qf.IsKeyField,
@@ -225,14 +225,14 @@ func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*
 		}
 
 		// read FieldNameAliases
-		if err = r.Read(
+		if err = r.ReadPrimitives(
 			&count2); err != nil {
 			return nil, fmt.Errorf("failed to read FieldNameAlias count: %s", err.Error())
 		}
 		qe.FieldNameAliases = make([]FieldNameAlias, 0, int(count2))
 		for j := 0; j < int(count2); j++ {
 			var fna FieldNameAlias
-			if err = r.Read(
+			if err = r.ReadPrimitives(
 				&fna.Name,
 				&fna.Alias); err != nil {
 				return nil, fmt.Errorf("failed to read FieldNameAlias data: %s", err.Error())
@@ -241,7 +241,7 @@ func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*
 		}
 
 		// read QueryIndexes
-		if err = r.Read(
+		if err = r.ReadPrimitives(
 			&count2); err != nil {
 			return nil, fmt.Errorf("failed to read QueryIndex count: %s", err.Error())
 		}
@@ -249,7 +249,7 @@ func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*
 		for j := 0; j < int(count2); j++ {
 			var qi QueryIndex
 			var count3 int32
-			if err = r.Read(
+			if err = r.ReadPrimitives(
 				&qi.Name,
 				&qi.Type,
 				&qi.InlineSize,
@@ -261,7 +261,7 @@ func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*
 			qi.Fields = make([]Field, 0, int(count3))
 			for k := 0; k < int(count3); k++ {
 				var f Field
-				if err = r.Read(
+				if err = r.ReadPrimitives(
 					&f.Name,
 					&f.IsDescensing); err != nil {
 					return nil, fmt.Errorf("failed to read Field data: %s", err.Error())
