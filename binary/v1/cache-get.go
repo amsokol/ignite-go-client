@@ -5,6 +5,7 @@ import (
 	"math/rand"
 )
 
+// CacheGet retrieves a value from cache by key.
 func (c *client) CacheGet(cache string, binary bool, key interface{}, status *int32) (interface{}, error) {
 	uid := rand.Int63()
 
