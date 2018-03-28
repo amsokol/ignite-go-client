@@ -78,6 +78,10 @@ func (c *client) CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status
 }
 
 func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfigurationRefs, status *int32) error {
+	if status != nil {
+		*status = StatusSuccess
+	}
+
 	uid := rand.Int63()
 
 	o := c.Prepare(code, uid)

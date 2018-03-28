@@ -7,6 +7,10 @@ import (
 
 // CachePutAll puts a value with a given key to cache (overwriting existing value if any).
 func (c *client) CachePutAll(cache string, binary bool, data map[interface{}]interface{}, status *int32) error {
+	if status != nil {
+		*status = StatusSuccess
+	}
+
 	uid := rand.Int63()
 
 	o := c.Prepare(opCachePutAll, uid)

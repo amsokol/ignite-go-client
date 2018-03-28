@@ -7,6 +7,10 @@ import (
 
 // CacheGetNames returns existing cache names.
 func (c *client) CacheGetNames(status *int32) ([]string, error) {
+	if status != nil {
+		*status = StatusSuccess
+	}
+
 	uid := rand.Int63()
 
 	r, err := c.Exec(opCacheGetNames, uid)

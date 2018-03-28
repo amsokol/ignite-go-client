@@ -7,6 +7,10 @@ import (
 
 // CacheGetAll retrieves multiple key-value pairs from cache.
 func (c *client) CacheGetAll(cache string, binary bool, keys []interface{}, status *int32) (map[interface{}]interface{}, error) {
+	if status != nil {
+		*status = StatusSuccess
+	}
+
 	uid := rand.Int63()
 
 	o := c.Prepare(opCacheGetAll, uid)

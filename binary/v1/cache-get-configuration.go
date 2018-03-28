@@ -132,6 +132,10 @@ type FieldNameAlias struct {
 }
 
 func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*CacheConfiguration, error) {
+	if status != nil {
+		*status = StatusSuccess
+	}
+
 	uid := rand.Int63()
 
 	r, err := c.Exec(opCacheGetConfiguration, uid, hashCode(name), flag)

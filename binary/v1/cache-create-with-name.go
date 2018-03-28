@@ -12,6 +12,10 @@ func (c *client) CacheCreateWithName(name string, status *int32) error {
 }
 
 func (c *client) cacheCreateWithName(code int16, name string, status *int32) error {
+	if status != nil {
+		*status = StatusSuccess
+	}
+
 	uid := rand.Int63()
 
 	r, err := c.Exec(code, uid, name)

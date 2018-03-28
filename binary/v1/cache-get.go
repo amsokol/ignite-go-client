@@ -7,6 +7,10 @@ import (
 
 // CacheGet retrieves a value from cache by key.
 func (c *client) CacheGet(cache string, binary bool, key interface{}, status *int32) (interface{}, error) {
+	if status != nil {
+		*status = StatusSuccess
+	}
+
 	uid := rand.Int63()
 
 	o := c.Prepare(opCacheGet, uid)
