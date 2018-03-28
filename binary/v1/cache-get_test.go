@@ -1,12 +1,13 @@
 package ignite
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
 )
 
-func Test_client_CachePut(t *testing.T) {
+func Test_client_CacheGet(t *testing.T) {
 	// get test data
 	c, err := getTestClient()
 	if err != nil {
@@ -17,14 +18,11 @@ func Test_client_CachePut(t *testing.T) {
 		t.Fatalf("failed to create test cache: %s", err.Error())
 	}
 	defer c.CacheDestroy("TestCache1", nil)
-
-	testClientCachePut(t, c)
-}
-
-func testClientCachePut(t *testing.T, c *client) {
 	var status int32
-	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
 
+	// put test values
+	testClientCachePut(t, c)
+	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
 	// uid1, _ := uuid.Parse("626a9d86-5221-4faf-81ee-85a8751330fa")
 	// uid2, _ := uuid.Parse("db6cd032-47ce-43c6-8d9a-8fab6e45f9ee")
 
@@ -32,13 +30,13 @@ func testClientCachePut(t *testing.T, c *client) {
 		cache  string
 		binary bool
 		key    interface{}
-		value  interface{}
 		status *int32
 	}
 	tests := []struct {
 		name    string
 		c       *client
 		args    args
+		want    interface{}
 		wantErr bool
 	}{
 		{
@@ -48,9 +46,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key1",
-				value:  byte(123),
 				status: &status,
 			},
+			want: byte(123),
 		},
 		{
 			name: "success test 2",
@@ -59,9 +57,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key2",
-				value:  int16(1234),
 				status: &status,
 			},
+			want: int16(1234),
 		},
 		{
 			name: "success test 3",
@@ -70,9 +68,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key3",
-				value:  int32(1234),
 				status: &status,
 			},
+			want: int32(1234),
 		},
 		{
 			name: "success test 4",
@@ -81,9 +79,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key4",
-				value:  int64(123456789),
 				status: &status,
 			},
+			want: int64(123456789),
 		},
 		{
 			name: "success test 5",
@@ -92,9 +90,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key5",
-				value:  float32(1.123),
 				status: &status,
 			},
+			want: float32(1.123),
 		},
 		{
 			name: "success test 6",
@@ -103,9 +101,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key6",
-				value:  float64(1.123456),
 				status: &status,
 			},
+			want: float64(1.123456),
 		},
 		{
 			name: "success test 7",
@@ -114,9 +112,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key7",
-				value:  Char('W'),
 				status: &status,
 			},
+			want: Char('W'),
 		},
 		{
 			name: "success test 8",
@@ -125,9 +123,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key8",
-				value:  true,
 				status: &status,
 			},
+			want: true,
 		},
 		{
 			name: "success test 9",
@@ -136,9 +134,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key9",
-				value:  "value",
 				status: &status,
 			},
+			want: "value",
 		},
 		{
 			name: "success test 10",
@@ -147,9 +145,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key10",
-				value:  uid,
 				status: &status,
 			},
+			want: uid,
 		},
 		{
 			name: "success test 11",
@@ -158,9 +156,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key11",
-				value:  Date(12345678),
 				status: &status,
 			},
+			want: Date(12345678),
 		},
 		{
 			name: "success test 12",
@@ -169,9 +167,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key12",
-				value:  []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 				status: &status,
 			},
+			want: []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			name: "success test 13",
@@ -180,9 +178,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key13",
-				value:  []int16{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 				status: &status,
 			},
+			want: []int16{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			name: "success test 14",
@@ -191,9 +189,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key14",
-				value:  []int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 				status: &status,
 			},
+			want: []int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			name: "success test 15",
@@ -202,9 +200,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key15",
-				value:  []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 				status: &status,
 			},
+			want: []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			name: "success test 16",
@@ -213,9 +211,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key16",
-				value:  []float32{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
 				status: &status,
 			},
+			want: []float32{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
 		},
 		{
 			name: "success test 17",
@@ -224,9 +222,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key17",
-				value:  []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
 				status: &status,
 			},
+			want: []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
 		},
 		{
 			name: "success test 18",
@@ -235,9 +233,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key18",
-				value:  []Char{'a', 'b', 'c'},
 				status: &status,
 			},
+			want: []Char{'a', 'b', 'c'},
 		},
 		{
 			name: "success test 19",
@@ -246,9 +244,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key19",
-				value:  []bool{true, false},
 				status: &status,
 			},
+			want: []bool{true, false},
 		},
 		{
 			name: "success test 20",
@@ -257,9 +255,9 @@ func testClientCachePut(t *testing.T, c *client) {
 				cache:  "TestCache1",
 				binary: false,
 				key:    "key20",
-				value:  []string{"abc", "def"},
 				status: &status,
 			},
+			want: []string{"abc", "def"},
 		},
 		/*
 			{
@@ -269,9 +267,9 @@ func testClientCachePut(t *testing.T, c *client) {
 					cache:  "TestCache1",
 					binary: false,
 					key:    "key21",
-					value:  []uuid.UUID{uid1, uid2},
 					status: &status,
 				},
+				want: []uuid.UUID{uid1, uid2},
 			},
 		*/
 		/*
@@ -282,16 +280,32 @@ func testClientCachePut(t *testing.T, c *client) {
 					cache:  "TestCache1",
 					binary: false,
 					key:    "key22",
-					value:  []Date{12345, 67890},
 					status: &status,
 				},
+				want: []Date{12345, 67890},
 			},
 		*/
+		{
+			name: "success test NULL",
+			c:    c,
+			args: args{
+				cache:  "TestCache1",
+				binary: false,
+				key:    "key-does-not-exist",
+				status: &status,
+			},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.c.CachePut(tt.args.cache, tt.args.binary, tt.args.key, tt.args.value, tt.args.status); (err != nil) != tt.wantErr {
-				t.Errorf("client.CachePut() error = %v, wantErr %v", err, tt.wantErr)
+			got, err := tt.c.CacheGet(tt.args.cache, tt.args.binary, tt.args.key, tt.args.status)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheGet() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("client.CacheGet() = %v, want %v", got, tt.want)
 			}
 		})
 	}
