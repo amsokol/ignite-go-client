@@ -38,5 +38,4 @@ func (c *client) CachePut(cache string, binary bool, key interface{}, value inte
 	}
 
 	return nil
-
 }
