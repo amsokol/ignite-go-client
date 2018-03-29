@@ -39,6 +39,8 @@ type Client interface {
 	CachePutAll(cache string, binary bool, data map[interface{}]interface{}, status *int32) error
 	CacheGet(cache string, binary bool, key interface{}, status *int32) (interface{}, error)
 	CacheGetAll(cache string, binary bool, keys []interface{}, status *int32) (map[interface{}]interface{}, error)
+	CacheContainsKey(cache string, binary bool, key interface{}, status *int32) (bool, error)
+	CacheContainsKeys(cache string, binary bool, keys []interface{}, status *int32) (bool, error)
 }
 
 type client struct {
