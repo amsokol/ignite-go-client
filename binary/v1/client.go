@@ -44,6 +44,7 @@ type Client interface {
 	CacheGetAndPut(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
 	CacheGetAndReplace(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
 	CacheGetAndRemove(cache string, binary bool, key interface{}, status *int32) (interface{}, error)
+	CachePutIfAbsent(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
 }
 
 type client struct {
