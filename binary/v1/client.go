@@ -155,6 +155,10 @@ type Client interface {
 
 	// CacheRemoveKey removes an entry with a given key, notifying listeners and cache writers.
 	CacheRemoveKey(cache string, binary bool, key interface{}, status *int32) (bool, error)
+
+	// CacheRemoveIfEquals removes an entry with a given key if provided value is equal to actual value,
+	// notifying listeners and cache writers.
+	CacheRemoveIfEquals(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
 }
 
 type client struct {
