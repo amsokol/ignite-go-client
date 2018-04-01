@@ -162,6 +162,9 @@ type Client interface {
 
 	// CacheGetSize gets the number of entries in cache.
 	CacheGetSize(cache string, binary bool, count int, modes []byte, status *int32) (int64, error)
+
+	// CacheRemoveKeys removes entries with given keys, notifying listeners and cache writers.
+	CacheRemoveKeys(cache string, binary bool, keys []interface{}, status *int32) error
 }
 
 type client struct {
