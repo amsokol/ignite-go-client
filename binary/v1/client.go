@@ -15,24 +15,24 @@ const (
 // Client is interface to communicate with Apache Ignite cluster.
 // Client is not thread-safe.
 type Client interface {
-	Exec(code int16, uid int64, data ...interface{}) (Response, error)
+	Exec(code int16, uid int64, primitives ...interface{}) (Response, error)
 
 	Prepare(code int16, uid int64) *Operation
 	Call(o *Operation) (Response, error)
 
 	Begin(length int32, code int16, uid int64) error
-	Write(data ...interface{}) error
+	Write(primitives ...interface{}) error
 	Commit() (Response, error)
 
 	Close() error
 
 	// Cache Configuration methods
-	CacheCreateWithName(name string, status *int32) error
-	CacheGetOrCreateWithName(name string, status *int32) error
+	CacheCreateWithName(cache string, status *int32) error
+	CacheGetOrCreateWithName(cache string, status *int32) error
 	CacheGetNames(status *int32) ([]string, error)
-	CacheGetConfiguration(name string, flag byte, status *int32) (*CacheConfiguration, error)
+	CacheGetConfiguration(cache string, flag byte, status *int32) (*CacheConfiguration, error)
 	CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error
-	CacheDestroy(name string, status *int32) error
+	CacheDestroy(cache string, status *int32) error
 
 	// Key-Value Queries
 	CachePut(cache string, binary bool, key interface{}, value interface{}, status *int32) error
@@ -106,8 +106,8 @@ func (c *client) Begin(length int32, code int16, uid int64) error {
 }
 
 // Write request data
-func (c *client) Write(data ...interface{}) error {
-	return writePrimitives(c.conn, data...)
+func (c *client) Write(primitives ...interface{}) error {
+	return writePrimitives(c.conn, primitives...)
 }
 
 // Commit request and return response

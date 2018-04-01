@@ -18,7 +18,7 @@ func Test_client_CacheGetConfiguration(t *testing.T) {
 	defer c.CacheDestroy("TestCache1", nil)
 
 	type args struct {
-		name   string
+		cache  string
 		flag   byte
 		status *int32
 	}
@@ -33,7 +33,7 @@ func Test_client_CacheGetConfiguration(t *testing.T) {
 			name: "success test",
 			c:    c,
 			args: args{
-				name:   "TestCache1",
+				cache:  "TestCache1",
 				flag:   0,
 				status: &status,
 			},
@@ -42,7 +42,7 @@ func Test_client_CacheGetConfiguration(t *testing.T) {
 			name: "failed test",
 			c:    c,
 			args: args{
-				name:   "TestCache2",
+				cache:  "TestCache2",
 				flag:   0,
 				status: &status,
 			},
@@ -51,7 +51,7 @@ func Test_client_CacheGetConfiguration(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.c.CacheGetConfiguration(tt.args.name, tt.args.flag, tt.args.status)
+			_, err := tt.c.CacheGetConfiguration(tt.args.cache, tt.args.flag, tt.args.status)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("client.CacheGetConfiguration() error = %v, wantErr %v", err, tt.wantErr)
 				return

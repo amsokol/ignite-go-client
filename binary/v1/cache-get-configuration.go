@@ -131,14 +131,15 @@ type FieldNameAlias struct {
 	Alias string
 }
 
-func (c *client) CacheGetConfiguration(name string, flag byte, status *int32) (*CacheConfiguration, error) {
+// CacheGetConfiguration gets configuration for the given cache.
+func (c *client) CacheGetConfiguration(cache string, flag byte, status *int32) (*CacheConfiguration, error) {
 	if status != nil {
 		*status = StatusSuccess
 	}
 
 	uid := rand.Int63()
 
-	r, err := c.Exec(opCacheGetConfiguration, uid, hashCode(name), flag)
+	r, err := c.Exec(opCacheGetConfiguration, uid, hashCode(cache), flag)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute operation: %s", err.Error())
 	}

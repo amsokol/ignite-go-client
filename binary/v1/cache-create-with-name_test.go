@@ -12,7 +12,7 @@ func Test_client_CacheCreateWithName(t *testing.T) {
 	var status int32
 
 	type args struct {
-		name   string
+		cache  string
 		status *int32
 	}
 	tests := []struct {
@@ -25,7 +25,7 @@ func Test_client_CacheCreateWithName(t *testing.T) {
 			name: "success test",
 			c:    c,
 			args: args{
-				name:   "TestCache1",
+				cache:  "TestCache1",
 				status: &status,
 			},
 		},
@@ -33,7 +33,7 @@ func Test_client_CacheCreateWithName(t *testing.T) {
 			name: "failed test",
 			c:    c,
 			args: args{
-				name:   "TestCache1",
+				cache:  "TestCache1",
 				status: &status,
 			},
 			wantErr: true,
@@ -41,7 +41,7 @@ func Test_client_CacheCreateWithName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.c.CacheCreateWithName(tt.args.name, tt.args.status); (err != nil) != tt.wantErr {
+			if err := tt.c.CacheCreateWithName(tt.args.cache, tt.args.status); (err != nil) != tt.wantErr {
 				t.Errorf("client.CacheCreateWithName() status = %d, error = %v, wantErr %v",
 					*tt.args.status, err, tt.wantErr)
 			}

@@ -5,15 +5,15 @@ import (
 	"math/rand"
 )
 
-// CacheDestroy destroys cache with a given name
-func (c *client) CacheDestroy(name string, status *int32) error {
+// CacheDestroy destroys cache with a given name.
+func (c *client) CacheDestroy(cache string, status *int32) error {
 	if status != nil {
 		*status = StatusSuccess
 	}
 
 	uid := rand.Int63()
 
-	r, err := c.Exec(opCacheDestroy, uid, hashCode(name))
+	r, err := c.Exec(opCacheDestroy, uid, hashCode(cache))
 	if err != nil {
 		return fmt.Errorf("failed to execute operation: %s", err.Error())
 	}
