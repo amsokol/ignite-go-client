@@ -165,6 +165,9 @@ type Client interface {
 
 	// CacheRemoveKeys removes entries with given keys, notifying listeners and cache writers.
 	CacheRemoveKeys(cache string, binary bool, keys []interface{}, status *int32) error
+
+	// CacheRemoveAll destroys cache with a given name.
+	CacheRemoveAll(cache string, binary bool, status *int32) error
 }
 
 type client struct {
