@@ -5,7 +5,7 @@ import (
 	"math/rand"
 )
 
-// CacheGetAndPut puts a value with a given key to cache, returning previous value for that key,
+// CacheGetAndReplace puts a value with a given key to cache, returning previous value for that key,
 // if and only if there is a value currently mapped for that key.
 func (c *client) CacheGetAndReplace(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error) {
 	if status != nil {

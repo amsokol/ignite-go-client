@@ -72,7 +72,8 @@ type CacheConfigurationRefs struct {
 	QueryEntities                 []QueryEntity
 }
 
-// CacheCreateWithConfiguration creates cache with provided configuration. An exception is thrown if the name is already in use.
+// CacheCreateWithConfiguration creates cache with provided configuration.
+// An error is returned if the name is already in use.
 func (c *client) CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error {
 	return c.cacheCreateWithConfiguration(opCacheCreateWithConfiguration, cc, status)
 }

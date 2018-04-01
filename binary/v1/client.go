@@ -30,6 +30,7 @@ type Client interface {
 	// uid - request ID.
 	// Operation is not thread-safe.
 	Prepare(code int16, uid int64) Operation
+
 	// Call executes Operation
 	// Arguments:
 	// o - Operation to execute.
@@ -47,6 +48,7 @@ type Client interface {
 	// nil in case of success.
 	// error object in case of error.
 	Begin(length int32, code int16, uid int64) error
+
 	// Write writes primitives directly to connection with server.
 	// Arguments:
 	// primitives - primitives to write.
@@ -54,6 +56,7 @@ type Client interface {
 	// nil in case of success.
 	// error object in case of error.
 	Write(primitives ...interface{}) error
+
 	// Commit finishes the request and returns response from server.
 	// Returns:
 	// Response, nil in case of success.
@@ -71,11 +74,27 @@ type Client interface {
 	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations
 	// Each method returns Apache Ignite error code if you provide reference to status arg.
 	// Provide nil instead of reference if you don't need it.
+
+	// CacheCreateWithName Creates a cache with a given name.
+	// Cache template can be applied if there is a '*' in the cache name.
 	CacheCreateWithName(cache string, status *int32) error
+
+	// CacheGetOrCreateWithName creates a cache with a given name.
+	// Cache template can be applied if there is a '*' in the cache name.
+	// Does nothing if the cache exists.
 	CacheGetOrCreateWithName(cache string, status *int32) error
+
+	// CacheGetNames returns existing cache names.
 	CacheGetNames(status *int32) ([]string, error)
+
+	// CacheGetConfiguration gets configuration for the given cache.
 	CacheGetConfiguration(cache string, flag byte, status *int32) (*CacheConfiguration, error)
+
+	// CacheCreateWithConfiguration creates cache with provided configuration.
+	// An error is returned if the name is already in use.
 	CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error
+
+	// CacheDestroy destroys cache with a given name.
 	CacheDestroy(cache string, status *int32) error
 
 	// Key-Value Queries
@@ -83,19 +102,49 @@ type Client interface {
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations
 	// Each method returns Apache Ignite error code if you provide reference to status arg.
 	// Provide nil instead of reference if you don't need it.
+
+	// CachePut puts a value with a given key to cache (overwriting existing value if any).
 	CachePut(cache string, binary bool, key interface{}, value interface{}, status *int32) error
+
+	// CachePutAll puts a value with a given key to cache (overwriting existing value if any).
 	CachePutAll(cache string, binary bool, data map[interface{}]interface{}, status *int32) error
+
+	// CacheGet retrieves a value from cache by key.
 	CacheGet(cache string, binary bool, key interface{}, status *int32) (interface{}, error)
+
+	// CacheGetAll retrieves multiple key-value pairs from cache.
 	CacheGetAll(cache string, binary bool, keys []interface{}, status *int32) (map[interface{}]interface{}, error)
+
+	// CacheContainsKey returns a value indicating whether given key is present in cache.
 	CacheContainsKey(cache string, binary bool, key interface{}, status *int32) (bool, error)
+
+	// CacheContainsKeys returns a value indicating whether all given keys are present in cache.
 	CacheContainsKeys(cache string, binary bool, keys []interface{}, status *int32) (bool, error)
+
+	// CacheGetAndPut puts a value with a given key to cache, and returns the previous value for that key.
 	CacheGetAndPut(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
+
+	// CacheGetAndReplace puts a value with a given key to cache, returning previous value for that key,
+	// if and only if there is a value currently mapped for that key.
 	CacheGetAndReplace(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
+
+	// CacheGetAndRemove removes the cache entry with specified key, returning the value.
 	CacheGetAndRemove(cache string, binary bool, key interface{}, status *int32) (interface{}, error)
+
+	// CachePutIfAbsent puts a value with a given key to cache only if the key does not already exist.
 	CachePutIfAbsent(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
+
+	// CacheGetAndPutIfAbsent puts a value with a given key to cache only if the key does not already exist.
 	CacheGetAndPutIfAbsent(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
+
+	// CacheReplace puts a value with a given key to cache only if the key already exists.
 	CacheReplace(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
+
+	// CacheReplaceIfEquals puts a value with a given key to cache only if
+	// the key already exists and value equals provided value.
 	CacheReplaceIfEquals(cache string, binary bool, key interface{}, valueCompare interface{}, valueNew interface{}, status *int32) (bool, error)
+
+	// CacheClear clears the cache without notifying listeners or cache writers.
 	CacheClear(cache string, binary bool, status *int32) error
 }
 
