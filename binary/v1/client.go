@@ -149,6 +149,9 @@ type Client interface {
 
 	// CacheClearKey clears the cache key without notifying listeners or cache writers.
 	CacheClearKey(cache string, binary bool, key interface{}, status *int32) error
+
+	// CacheClearKeys clears the cache keys without notifying listeners or cache writers.
+	CacheClearKeys(cache string, binary bool, keys []interface{}, status *int32) error
 }
 
 type client struct {
