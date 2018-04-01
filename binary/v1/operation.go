@@ -42,22 +42,22 @@ const (
 type Operation struct {
 	Code   int16
 	UID    int64
-	Prefix bytes.Buffer
-	Data   bytes.Buffer
+	Prefix *bytes.Buffer
+	Data   *bytes.Buffer
 }
 
 // WritePrefix writes promitives to the prefix buffer.
 // Prefix is sent to the server before data.
 func (o *Operation) WritePrefix(data ...interface{}) error {
-	return writePrimitives(&o.Prefix, data...)
+	return writePrimitives(o.Prefix, data...)
 }
 
 // WritePrimitives writes primitives to the data buffer
 func (o *Operation) WritePrimitives(data ...interface{}) error {
-	return writePrimitives(&o.Data, data...)
+	return writePrimitives(o.Data, data...)
 }
 
 // WriteObjects writes objects to the data buffer
 func (o *Operation) WriteObjects(data ...interface{}) error {
-	return writeObjects(&o.Data, data...)
+	return writeObjects(o.Data, data...)
 }

@@ -15,10 +15,25 @@ const (
 // Client is interface to communicate with Apache Ignite cluster.
 // Client is not thread-safe.
 type Client interface {
+	// Exec executes request with primitives.
+	// code - code of operation.
+	// uid - request ID.
+	// primitives - primitives to send.
 	Exec(code int16, uid int64, primitives ...interface{}) (Response, error)
 
-	Prepare(code int16, uid int64) *Operation
-	Call(o *Operation) (Response, error)
+	// Prepare returns Operation.
+	// Arguments:
+	// code - code of operation.
+	// uid - request ID.
+	// Operation is not thread-safe.
+	Prepare(code int16, uid int64) Operation
+	// Call executes Operation
+	// Arguments:
+	// o - Operation to execute.
+	// Returns:
+	// Response, nil in case of success.
+	// Empty Response, error object in case of error
+	Call(o Operation) (Response, error)
 
 	Begin(length int32, code int16, uid int64) error
 	Write(primitives ...interface{}) error
@@ -57,7 +72,7 @@ type client struct {
 	Client
 }
 
-// Close closes connection
+// Close closes connection.
 func (c *client) Close() error {
 	if c.conn != nil {
 		defer func() { c.conn = nil }()
@@ -66,7 +81,10 @@ func (c *client) Close() error {
 	return nil
 }
 
-// Exec executes request
+// Exec executes request with primitives.
+// code - code of operation.
+// uid - request ID.
+// primitives - primitives to send.
 func (c *client) Exec(code int16, uid int64, primitives ...interface{}) (Response, error) {
 	o := c.Prepare(code, uid)
 	// write data
@@ -76,11 +94,22 @@ func (c *client) Exec(code int16, uid int64, primitives ...interface{}) (Respons
 	return c.Call(o)
 }
 
-func (c *client) Prepare(code int16, uid int64) *Operation {
-	return &Operation{Code: code, UID: uid}
+// Prepare returns Operation.
+// Arguments:
+// code - code of operation.
+// uid - request ID.
+// Operation is not thread-safe.
+func (c *client) Prepare(code int16, uid int64) Operation {
+	return Operation{Code: code, UID: uid, Prefix: &bytes.Buffer{}, Data: &bytes.Buffer{}}
 }
 
-func (c *client) Call(o *Operation) (Response, error) {
+// Call executes Operation
+// Arguments:
+// o - Operation to execute.
+// Returns:
+// Response, nil in case of success.
+// Empty Response, error object in case of error
+func (c *client) Call(o Operation) (Response, error) {
 	// send request header
 	if err := c.Begin(int32(2+8+o.Prefix.Len()+o.Data.Len()), o.Code, o.UID); err != nil {
 		return Response{}, fmt.Errorf("failed to send request header: %s", err.Error())
