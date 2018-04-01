@@ -66,11 +66,11 @@ func (c *client) Close() error {
 }
 
 // Exec executes request
-func (c *client) Exec(code int16, uid int64, data ...interface{}) (Response, error) {
+func (c *client) Exec(code int16, uid int64, primitives ...interface{}) (Response, error) {
 	o := c.Prepare(code, uid)
 	// write data
-	if err := o.WritePrimitives(data...); err != nil {
-		return Response{}, fmt.Errorf("failed to write request data to operation: %s", err.Error())
+	if err := o.WritePrimitives(primitives...); err != nil {
+		return Response{}, fmt.Errorf("failed to write request primitives to operation: %s", err.Error())
 	}
 	return c.Call(o)
 }
