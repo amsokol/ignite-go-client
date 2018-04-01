@@ -19,6 +19,9 @@ type Client interface {
 	// code - code of operation.
 	// uid - request ID.
 	// primitives - primitives to send.
+	// Returns:
+	// Response, nil in case of success.
+	// Empty Response, error object in case of error.
 	Exec(code int16, uid int64, primitives ...interface{}) (Response, error)
 
 	// Prepare returns Operation.
@@ -32,16 +35,42 @@ type Client interface {
 	// o - Operation to execute.
 	// Returns:
 	// Response, nil in case of success.
-	// Empty Response, error object in case of error
+	// Empty Response, error object in case of error.
 	Call(o Operation) (Response, error)
 
+	// Begin starts request by writing data directly to connection with server.
+	// Arguments:
+	// length - length in bytes of request message.
+	// code - code of operation.
+	// uid - request ID.
+	// Returns:
+	// nil in case of success.
+	// error object in case of error.
 	Begin(length int32, code int16, uid int64) error
+	// Write writes primitives directly to connection with server.
+	// Arguments:
+	// primitives - primitives to write.
+	// Returns:
+	// nil in case of success.
+	// error object in case of error.
 	Write(primitives ...interface{}) error
+	// Commit finishes the request and returns response from server.
+	// Returns:
+	// Response, nil in case of success.
+	// Empty Response, error object in case of error.
 	Commit() (Response, error)
 
+	// Close closes connection.
+	// Returns:
+	// nil in case of success.
+	// error object in case of error.
 	Close() error
 
 	// Cache Configuration methods
+	// See for details:
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations
+	// Each method returns Apache Ignite error code if you provide reference to status arg.
+	// Provide nil instead of reference if you don't need it.
 	CacheCreateWithName(cache string, status *int32) error
 	CacheGetOrCreateWithName(cache string, status *int32) error
 	CacheGetNames(status *int32) ([]string, error)
@@ -50,6 +79,10 @@ type Client interface {
 	CacheDestroy(cache string, status *int32) error
 
 	// Key-Value Queries
+	// See for details:
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations
+	// Each method returns Apache Ignite error code if you provide reference to status arg.
+	// Provide nil instead of reference if you don't need it.
 	CachePut(cache string, binary bool, key interface{}, value interface{}, status *int32) error
 	CachePutAll(cache string, binary bool, data map[interface{}]interface{}, status *int32) error
 	CacheGet(cache string, binary bool, key interface{}, status *int32) (interface{}, error)
@@ -73,6 +106,9 @@ type client struct {
 }
 
 // Close closes connection.
+// Returns:
+// nil in case of success.
+// error object in case of error.
 func (c *client) Close() error {
 	if c.conn != nil {
 		defer func() { c.conn = nil }()
@@ -85,6 +121,9 @@ func (c *client) Close() error {
 // code - code of operation.
 // uid - request ID.
 // primitives - primitives to send.
+// Returns:
+// Response, nil in case of success.
+// Empty Response, error object in case of error.
 func (c *client) Exec(code int16, uid int64, primitives ...interface{}) (Response, error) {
 	o := c.Prepare(code, uid)
 	// write data
@@ -129,17 +168,32 @@ func (c *client) Call(o Operation) (Response, error) {
 	return c.Commit()
 }
 
-// Start request
+// Begin starts request by writing data directly to connection with server.
+// Arguments:
+// length - length in bytes of request message.
+// code - code of operation.
+// uid - request ID.
+// Returns:
+// nil in case of success.
+// error object in case of error.
 func (c *client) Begin(length int32, code int16, uid int64) error {
 	return writePrimitives(c.conn, length, code, uid)
 }
 
-// Write request data
+// Write writes primitives directly to connection with server.
+// Arguments:
+// primitives - primitives to write.
+// Returns:
+// nil in case of success.
+// error object in case of error.
 func (c *client) Write(primitives ...interface{}) error {
 	return writePrimitives(c.conn, primitives...)
 }
 
-// Commit request and return response
+// Commit finishes the request and returns response from server.
+// Returns:
+// Response, nil in case of success.
+// Empty Response, error object in case of error.
 func (c *client) Commit() (Response, error) {
 	var r Response
 
