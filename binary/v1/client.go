@@ -159,6 +159,9 @@ type Client interface {
 	// CacheRemoveIfEquals removes an entry with a given key if provided value is equal to actual value,
 	// notifying listeners and cache writers.
 	CacheRemoveIfEquals(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
+
+	// CacheGetSize gets the number of entries in cache.
+	CacheGetSize(cache string, binary bool, count int, modes []byte, status *int32) (int64, error)
 }
 
 type client struct {
