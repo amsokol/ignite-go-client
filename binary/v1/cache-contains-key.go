@@ -19,7 +19,7 @@ func (c *client) CacheContainsKey(cache string, binary bool, key interface{}, st
 		return false, fmt.Errorf("failed to write cache id and binary flag: %s", err.Error())
 	}
 	if err := o.WriteObjects(key); err != nil {
-		return false, fmt.Errorf("failed to write cache key and value: %s", err.Error())
+		return false, fmt.Errorf("failed to write cache key: %s", err.Error())
 	}
 
 	// execute
