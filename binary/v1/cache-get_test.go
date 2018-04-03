@@ -158,7 +158,7 @@ func Test_client_CacheGet(t *testing.T) {
 				key:    "key11",
 				status: &status,
 			},
-			want: Time2IgniteDate(tm),
+			want: NativeTime2Date(tm),
 		},
 		{
 			name: "success test 12",
@@ -305,7 +305,7 @@ func Test_client_CacheGet(t *testing.T) {
 				key:    "key36",
 				status: &status,
 			},
-			want: Time2IgniteTime(tm),
+			want: NativeTime2Time(tm),
 		},
 		{
 			name: "success test NULL",

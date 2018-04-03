@@ -81,8 +81,8 @@ type Date int64
 // Time is Apache Ignite Time type
 type Time int64
 
-// Time2IgniteTime converts Golang time.Time to Apache Ignite Time
-func Time2IgniteTime(t time.Time) Time {
+// NativeTime2Time converts Golang time.Time to Apache Ignite Time
+func NativeTime2Time(t time.Time) Time {
 	t1 := t.UTC()
 	t2 := time.Date(1970, 1, 1, t1.Hour(), t1.Minute(), t1.Second(), t1.Nanosecond(), time.UTC)
 	t3 := t2.Unix() * 1000
@@ -90,21 +90,21 @@ func Time2IgniteTime(t time.Time) Time {
 	return Time(t3)
 }
 
-// IgniteTime2Time converts Apache Ignite Time to Golang time.Time
-func IgniteTime2Time(t Time) time.Time {
+// Time2NativeTime converts Apache Ignite Time to Golang time.Time
+func Time2NativeTime(t Time) time.Time {
 	return time.Unix(int64(t)/1000, (int64(t)%1000)*int64(time.Millisecond)).UTC()
 }
 
-// Time2IgniteDate converts Golang time.Time to Apache Ignite Date
-func Time2IgniteDate(t time.Time) Date {
+// NativeTime2Date converts Golang time.Time to Apache Ignite Date
+func NativeTime2Date(t time.Time) Date {
 	t1 := t.UTC()
 	t2 := t1.Unix() * 1000
 	t2 += int64(t1.Nanosecond()) / int64(time.Millisecond)
 	return Date(t2)
 }
 
-// IgniteDate2Time converts Apache Ignite Date to Golang time.Time
-func IgniteDate2Time(t Date) time.Time {
+// Date2NativeTime converts Apache Ignite Date to Golang time.Time
+func Date2NativeTime(t Date) time.Time {
 	return time.Unix(int64(t)/1000, (int64(t)%1000)*int64(time.Millisecond)).UTC()
 }
 
