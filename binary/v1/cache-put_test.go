@@ -2,6 +2,7 @@ package ignite
 
 import (
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -287,6 +288,18 @@ func testClientCachePut(t *testing.T, c *client) {
 				},
 			},
 		*/
+		{
+			name: "success test 33",
+			c:    c,
+			args: args{
+				cache:  "TestCache1",
+				binary: false,
+				key:    "key33",
+				value: time.Date(2018, 4, 3, 14, 25, 32,
+					int(time.Millisecond*123+time.Microsecond*456+789), time.UTC),
+				status: &status,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

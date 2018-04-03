@@ -3,6 +3,7 @@ package ignite
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -285,6 +286,18 @@ func Test_client_CacheGet(t *testing.T) {
 				want: []Date{12345, 67890},
 			},
 		*/
+		{
+			name: "success test 33",
+			c:    c,
+			args: args{
+				cache:  "TestCache1",
+				binary: false,
+				key:    "key33",
+				status: &status,
+			},
+			want: time.Date(2018, 4, 3, 14, 25, 32,
+				int(time.Millisecond*123+time.Microsecond*456+789), time.UTC),
+		},
 		{
 			name: "success test NULL",
 			c:    c,

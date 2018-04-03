@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -70,7 +71,7 @@ const (
 	// TODO: Enum Array = 29
 	// TODO: Decimal = 30
 	// TODO: Decimal Array = 31
-	// TODO: Timestamp = 33
+	typeTimestamp byte = 33
 	// TODO: Timestamp Array = 34
 	// TODO: Time = 36
 	// TODO: Time Array = 37
@@ -253,6 +254,16 @@ func writeObject(w io.Writer, object interface{}) error {
 			}
 		}
 	*/
+	case time.Time:
+		if err = binary.Write(w, binary.LittleEndian, typeTimestamp); err == nil {
+			high := int64(v.Unix() * 1000) // Unix time in milliseconds
+			low := v.Nanosecond()
+			high += int64(low / int(time.Millisecond))
+			low = low % int(time.Millisecond)
+			if err = binary.Write(w, binary.LittleEndian, int64(high)); err == nil {
+				err = binary.Write(w, binary.LittleEndian, int32(low))
+			}
+		}
 	default:
 		err = fmt.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
 	}
@@ -549,6 +560,18 @@ func readObject(r io.Reader) (interface{}, error) {
 			o = append(o, Date(v))
 		}
 		return o, nil
+	case typeTimestamp:
+		var high int64
+		if err := readPrimitives(r, &high); err != nil {
+			return nil, fmt.Errorf("failed to read Timestamp high value: %s", err.Error())
+		}
+		var low int32
+		if err := readPrimitives(r, &low); err != nil {
+			return nil, fmt.Errorf("failed to read Timestamp low value: %s", err.Error())
+		}
+		low = int32((high%1000)*int64(time.Millisecond)) + low
+		high = high / 1000
+		return time.Unix(high, int64(low)).UTC(), nil
 	case typeNULL:
 		return nil, nil
 	default:

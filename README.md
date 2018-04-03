@@ -12,10 +12,10 @@
 Project is in active development:
 
 1. Develop "[Cache Configuration](https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations)" methods (Completed)
-2. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
-3. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (In progress)
-4. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (Not started)
-5. Develop SQL driver (Not started)
+1. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
+1. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (In progress)
+1. Develop SQL driver (Not started)
+1. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (Not started)
 
 *Not all types are supported. See [type mapping](#type-mapping) for detail.
 
@@ -68,7 +68,7 @@ See "_test.go" files for details. Examples will be added soon.
 | Enum array         | Not supported. Need help.                                              |
 | Decimal            | Not supported. Need help.                                              |
 | Decimal array      | Not supported. Need help.                                              |
-| Timestamp          | Not supported. Need help.                                              |
+| Timestamp          | time.Time                                                              |
 | Timestamp array    | Not supported. Need help.                                              |
 | Time               | Not supported. Need help.                                              |
 | Time array         | Not supported. Need help.                                              |
