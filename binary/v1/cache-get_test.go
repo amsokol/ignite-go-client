@@ -24,8 +24,7 @@ func Test_client_CacheGet(t *testing.T) {
 	// put test values
 	testClientCachePut(t, c)
 	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
-	// uid1, _ := uuid.Parse("626a9d86-5221-4faf-81ee-85a8751330fa")
-	// uid2, _ := uuid.Parse("db6cd032-47ce-43c6-8d9a-8fab6e45f9ee")
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 
 	type args struct {
 		cache  string
@@ -159,7 +158,7 @@ func Test_client_CacheGet(t *testing.T) {
 				key:    "key11",
 				status: &status,
 			},
-			want: Date(12345678),
+			want: Time2IgniteDate(tm),
 		},
 		{
 			name: "success test 12",
@@ -295,8 +294,18 @@ func Test_client_CacheGet(t *testing.T) {
 				key:    "key33",
 				status: &status,
 			},
-			want: time.Date(2018, 4, 3, 14, 25, 32,
-				int(time.Millisecond*123+time.Microsecond*456+789), time.UTC),
+			want: tm,
+		},
+		{
+			name: "success test 36",
+			c:    c,
+			args: args{
+				cache:  "TestCache1",
+				binary: false,
+				key:    "key36",
+				status: &status,
+			},
+			want: Time2IgniteTime(tm),
 		},
 		{
 			name: "success test NULL",

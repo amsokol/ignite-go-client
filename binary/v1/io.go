@@ -10,13 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// Date is Unix time, the number of MILLISECONDS elapsed
-// since January 1, 1970 UTC.
-type Date int64
-
-// Char is UTF32 symbol type
-type Char rune
-
 const (
 	// Supported standard types and their type codes are as follows:
 	typeByte   byte = 1
@@ -73,10 +66,47 @@ const (
 	// TODO: Decimal Array = 31
 	typeTimestamp byte = 33
 	// TODO: Timestamp Array = 34
-	// TODO: Time = 36
+	typeTime byte = 36
 	// TODO: Time Array = 37
 	typeNULL byte = 101
 )
+
+// Char is UTF32 symbol type
+type Char rune
+
+// Date is Unix time, the number of MILLISECONDS elapsed
+// since January 1, 1970 UTC.
+type Date int64
+
+// Time is Apache Ignite Time type
+type Time int64
+
+// Time2IgniteTime converts Golang time.Time to Apache Ignite Time
+func Time2IgniteTime(t time.Time) Time {
+	t1 := t.UTC()
+	t2 := time.Date(1970, 1, 1, t1.Hour(), t1.Minute(), t1.Second(), t1.Nanosecond(), time.UTC)
+	t3 := t2.Unix() * 1000
+	t3 += int64(t2.Nanosecond()) / int64(time.Millisecond)
+	return Time(t3)
+}
+
+// IgniteTime2Time converts Apache Ignite Time to Golang time.Time
+func IgniteTime2Time(t Time) time.Time {
+	return time.Unix(int64(t)/1000, (int64(t)%1000)*int64(time.Millisecond)).UTC()
+}
+
+// Time2IgniteDate converts Golang time.Time to Apache Ignite Date
+func Time2IgniteDate(t time.Time) Date {
+	t1 := t.UTC()
+	t2 := t1.Unix() * 1000
+	t2 += int64(t1.Nanosecond()) / int64(time.Millisecond)
+	return Date(t2)
+}
+
+// IgniteDate2Time converts Apache Ignite Date to Golang time.Time
+func IgniteDate2Time(t Date) time.Time {
+	return time.Unix(int64(t)/1000, (int64(t)%1000)*int64(time.Millisecond)).UTC()
+}
 
 func writePrimitives(w io.Writer, primitives ...interface{}) error {
 	var err error
@@ -263,6 +293,10 @@ func writeObject(w io.Writer, object interface{}) error {
 			if err = binary.Write(w, binary.LittleEndian, int64(high)); err == nil {
 				err = binary.Write(w, binary.LittleEndian, int32(low))
 			}
+		}
+	case Time:
+		if err = binary.Write(w, binary.LittleEndian, typeTime); err == nil {
+			err = binary.Write(w, binary.LittleEndian, int64(v))
 		}
 	default:
 		err = fmt.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
@@ -572,6 +606,12 @@ func readObject(r io.Reader) (interface{}, error) {
 		low = int32((high%1000)*int64(time.Millisecond)) + low
 		high = high / 1000
 		return time.Unix(high, int64(low)).UTC(), nil
+	case typeTime:
+		var o int64
+		if err := readPrimitives(r, &o); err != nil {
+			return nil, fmt.Errorf("failed to read Time object value: %s", err.Error())
+		}
+		return Time(o), nil
 	case typeNULL:
 		return nil, nil
 	default:

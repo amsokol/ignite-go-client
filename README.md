@@ -70,6 +70,6 @@ See "_test.go" files for details. Examples will be added soon.
 | Decimal array      | Not supported. Need help.                                              |
 | Timestamp          | time.Time                                                              |
 | Timestamp array    | Not supported. Need help.                                              |
-| Time               | Not supported. Need help.                                              |
+| Time               | ignite.Time                                                            |
 | Time array         | Not supported. Need help.                                              |
 | NULL               | nil                                                                    |
