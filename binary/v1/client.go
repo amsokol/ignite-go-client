@@ -77,24 +77,35 @@ type Client interface {
 
 	// CacheCreateWithName Creates a cache with a given name.
 	// Cache template can be applied if there is a '*' in the cache name.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_create_with_name
 	CacheCreateWithName(cache string, status *int32) error
 
 	// CacheGetOrCreateWithName creates a cache with a given name.
 	// Cache template can be applied if there is a '*' in the cache name.
 	// Does nothing if the cache exists.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_or_create_with_name
 	CacheGetOrCreateWithName(cache string, status *int32) error
 
 	// CacheGetNames returns existing cache names.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_names
 	CacheGetNames(status *int32) ([]string, error)
 
 	// CacheGetConfiguration gets configuration for the given cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_configuration
 	CacheGetConfiguration(cache string, flag byte, status *int32) (*CacheConfiguration, error)
 
 	// CacheCreateWithConfiguration creates cache with provided configuration.
 	// An error is returned if the name is already in use.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_create_with_configuration
 	CacheCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error
 
+	// CacheGetOrCreateWithConfiguration creates cache with provided configuration.
+	// Does nothing if the name is already in use.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_or_create_with_configuration
+	CacheGetOrCreateWithConfiguration(cc *CacheConfigurationRefs, status *int32) error
+
 	// CacheDestroy destroys cache with a given name.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_destroy
 	CacheDestroy(cache string, status *int32) error
 
 	// Key-Value Queries
@@ -104,70 +115,117 @@ type Client interface {
 	// Provide nil instead of reference if you don't need it.
 
 	// CachePut puts a value with a given key to cache (overwriting existing value if any).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put
 	CachePut(cache string, binary bool, key interface{}, value interface{}, status *int32) error
 
 	// CachePutAll puts a value with a given key to cache (overwriting existing value if any).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put_all
 	CachePutAll(cache string, binary bool, data map[interface{}]interface{}, status *int32) error
 
 	// CacheGet retrieves a value from cache by key.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get
 	CacheGet(cache string, binary bool, key interface{}, status *int32) (interface{}, error)
 
 	// CacheGetAll retrieves multiple key-value pairs from cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_all
 	CacheGetAll(cache string, binary bool, keys []interface{}, status *int32) (map[interface{}]interface{}, error)
 
 	// CacheContainsKey returns a value indicating whether given key is present in cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_contains_key
 	CacheContainsKey(cache string, binary bool, key interface{}, status *int32) (bool, error)
 
 	// CacheContainsKeys returns a value indicating whether all given keys are present in cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_contains_keys
 	CacheContainsKeys(cache string, binary bool, keys []interface{}, status *int32) (bool, error)
 
 	// CacheGetAndPut puts a value with a given key to cache, and returns the previous value for that key.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_put
 	CacheGetAndPut(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
 
 	// CacheGetAndReplace puts a value with a given key to cache, returning previous value for that key,
 	// if and only if there is a value currently mapped for that key.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_replace
 	CacheGetAndReplace(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
 
 	// CacheGetAndRemove removes the cache entry with specified key, returning the value.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_remove
 	CacheGetAndRemove(cache string, binary bool, key interface{}, status *int32) (interface{}, error)
 
 	// CachePutIfAbsent puts a value with a given key to cache only if the key does not already exist.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put_if_absent
 	CachePutIfAbsent(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
 
 	// CacheGetAndPutIfAbsent puts a value with a given key to cache only if the key does not already exist.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_put_if_absent
 	CacheGetAndPutIfAbsent(cache string, binary bool, key interface{}, value interface{}, status *int32) (interface{}, error)
 
 	// CacheReplace puts a value with a given key to cache only if the key already exists.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_replace
 	CacheReplace(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
 
 	// CacheReplaceIfEquals puts a value with a given key to cache only if
 	// the key already exists and value equals provided value.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_replace_if_equals
 	CacheReplaceIfEquals(cache string, binary bool, key interface{}, valueCompare interface{}, valueNew interface{}, status *int32) (bool, error)
 
 	// CacheClear clears the cache without notifying listeners or cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_clear
 	CacheClear(cache string, binary bool, status *int32) error
 
 	// CacheClearKey clears the cache key without notifying listeners or cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_clear_key
 	CacheClearKey(cache string, binary bool, key interface{}, status *int32) error
 
 	// CacheClearKeys clears the cache keys without notifying listeners or cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_clear_keys
 	CacheClearKeys(cache string, binary bool, keys []interface{}, status *int32) error
 
 	// CacheRemoveKey removes an entry with a given key, notifying listeners and cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_key
 	CacheRemoveKey(cache string, binary bool, key interface{}, status *int32) (bool, error)
 
 	// CacheRemoveIfEquals removes an entry with a given key if provided value is equal to actual value,
 	// notifying listeners and cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_if_equals
 	CacheRemoveIfEquals(cache string, binary bool, key interface{}, value interface{}, status *int32) (bool, error)
 
 	// CacheGetSize gets the number of entries in cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_size
 	CacheGetSize(cache string, binary bool, count int, modes []byte, status *int32) (int64, error)
 
 	// CacheRemoveKeys removes entries with given keys, notifying listeners and cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_keys
 	CacheRemoveKeys(cache string, binary bool, keys []interface{}, status *int32) error
 
 	// CacheRemoveAll destroys cache with a given name.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_all
 	CacheRemoveAll(cache string, binary bool, status *int32) error
+
+	// SQL and Scan Queries
+	// See for details:
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations
+	// Each method returns Apache Ignite error code if you provide reference to status arg.
+	// Provide nil instead of reference if you don't need it.
+
+	// QuerySQL executes an SQL query over data stored in the cluster. The query returns the whole record (key and value).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql
+	QuerySQL(cache string, binary bool, data QuerySQLData, status *int32) (QuerySQLResult, error)
+
+	// QuerySQLCursorGetPage retrieves the next SQL query cursor page by cursor id from QuerySQL.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_cursor_get_page
+	QuerySQLCursorGetPage(id int64, status *int32) (QuerySQLPage, error)
+
+	// QuerySQLFields performs SQL fields query.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields
+	QuerySQLFields(cache string, binary bool, data QuerySQLFieldsData, status *int32) (QuerySQLFieldsResult, error)
+
+	// QuerySQLFieldsCursorGetPage retrieves the next query result page by cursor id from QuerySQLFields.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields_cursor_get_page
+	QuerySQLFieldsCursorGetPage(id int64, fieldCount int, status *int32) (QuerySQLFieldsPage, error)
+
+	// ResourceClose closes a resource, such as query cursor.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_resource_close
+	ResourceClose(id int64, status *int32) error
 }
 
 type client struct {

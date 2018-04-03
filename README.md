@@ -21,19 +21,40 @@ Project is in active development:
 
 ### How to install
 
-```bash
-# go get -u github.com/amsokol/ignite-go-client
+```shell
+go get -u github.com/amsokol/ignite-go-client
 ```
 
 or use go [dep](https://golang.github.io/dep/) tool:
 
-```bash
-# dep ensure -add github.com/amsokol/ignite-go-client
+```shell
+dep ensure -add github.com/amsokol/ignite-go-client
 ```
 
 ### How to use
 
 See "_test.go" files for details. Examples will be added soon.
+
+### How to run tests
+
+1. Download `Apache Ignite 2.4+` from [official site](https://ignite.apache.org/download.cgi#binaries)
+1. Extract distributive to any folder
+1. `cd` to `test-data` folder with `configuration-for-tests.xml` file
+1. Start Ignite server with `configuration-for-tests.xml` configuration file:
+
+```bash
+# For Windows:
+<path_with_ignite>\bin\ignite.bat .\configuration-for-tests.xml
+
+# For Linux:
+<path_with_ignite>/bin/ignite.sh ./configuration-for-tests.xml
+```
+
+1. Run tests into the root folder of this project:
+
+```shell
+# go test ./...
+```
 
 ### Type mapping
 

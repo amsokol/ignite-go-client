@@ -36,6 +36,15 @@ const (
 	opCacheRemoveKeys        = 1018
 	opCacheRemoveAll         = 1019
 	opCacheGetSize           = 1020
+
+	// SQL and Scan Queries
+	opQuerySQL                    = 2002
+	opQuerySQLCursorGetPage       = 2003
+	opQuerySQLFields              = 2004
+	opQuerySQLFieldsCursorGetPage = 2005
+	opQueryScan                   = 2000
+	opQueryScanCursorGetPage      = 2001
+	opResourceClose               = 0
 )
 
 // Operation allows to prepare operation to execute
