@@ -13,11 +13,12 @@ Project is in active development:
 
 1. Develop "[Cache Configuration](https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations)" methods (Completed)
 1. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
-1. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (In progress)
-1. Develop SQL driver (Not started)
+1. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (Completed**)
+1. Develop SQL driver (**In progress**)
 1. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (Not started)
 
-*Not all types are supported. See [type mapping](#type-mapping) for detail.
+*Not all types are supported. See **[type mapping](#type-mapping)** for detail.\
+**Not all operations are supported. See **[table](#sql-and-scan-queries-supported-operations)** for detail.
 
 ### How to install
 
@@ -70,7 +71,7 @@ See "_test.go" files for details. Examples will be added soon.
 | bool               | bool                                                                   |
 | String             | string                                                                 |
 | UUID (Guid)        | uuid.UUID ([UUID library from Google](https://github.com/google/uuid)) |
-| date               | ignite.Date                                                            |
+| date*              | ignite.Date                                                            |
 | byte array         | []byte                                                                 |
 | short array        | []int16                                                                |
 | int array          | []int32                                                                |
@@ -91,6 +92,24 @@ See "_test.go" files for details. Examples will be added soon.
 | Decimal array      | Not supported. Need help.                                              |
 | Timestamp          | time.Time                                                              |
 | Timestamp array    | Not supported. Need help.                                              |
-| Time               | ignite.Time                                                            |
+| Time**             | ignite.Time                                                            |
 | Time array         | Not supported. Need help.                                              |
 | NULL               | nil                                                                    |
+
+*`date` is outdated type. It's recommended to use `Timestamp` type.
+If you still need `date` type use `ignite.NativeTime2Date` and `ignite.Date2NativeTime` functions to convert between Golang `time.Time` and `ignite.Date` types.
+
+**`Time` is outdated type. It's recommended to use `Timestamp` type.
+If you still need `Time` type use `ignite.NativeTime2Date` and `ignite.Date2NativeTime` functions to convert between Golang `time.Time` and `ignite.Time` types.
+
+### SQL and Scan Queries supported operations
+
+| Operation                           | Status of implementation                                |
+|-------------------------------------|---------------------------------------------------------|
+| OP_QUERY_SQL                        | Done without unit test. Need help to develop unit test. |
+| OP_QUERY_SQL_CURSOR_GET_PAGE        | Done without unit test. Need help to develop unit test. |
+| OP_QUERY_SQL_FIELDS                 | Done.                                                   |
+| OP_QUERY_SQL_FIELDS_CURSOR_GET_PAGE | Done.                                                   |
+| OP_QUERY_SCAN                       | Not started. Need help.                                 |
+| OP_QUERY_SCAN_CURSOR_GET_PAGE       | Not started. Need help.                                 |
+| OP_RESOURCE_CLOSE                   | Done.                                                   |
