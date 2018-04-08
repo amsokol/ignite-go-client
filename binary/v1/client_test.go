@@ -1,14 +1,19 @@
 package ignite
 
 import (
+	"context"
 	"io"
 	"testing"
 )
 
-func TestNewClient100(t *testing.T) {
+func TestNewClient(t *testing.T) {
 	type args struct {
+		ctx     context.Context
 		network string
 		address string
+		major   int16
+		minor   int16
+		patch   int16
 	}
 	tests := []struct {
 		name    string
@@ -18,14 +23,19 @@ func TestNewClient100(t *testing.T) {
 		{
 			name: "success test",
 			args: args{
+				ctx:     context.Background(),
 				network: "tcp",
 				address: "127.0.0.1:10800",
+				major:   1,
+				minor:   0,
+				patch:   0,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewClient100(tt.args.network, tt.args.address)
+			got, err := NewClient(tt.args.ctx, tt.args.network, tt.args.address,
+				tt.args.major, tt.args.minor, tt.args.patch)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewClient100() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -4,52 +4,55 @@ import (
 	"bytes"
 )
 
+// OperationCode is operation code type
+type OperationCode = int16
+
 const (
 	// Cache Configuration
-	opCacheGetNames                     = 1050
-	opCacheCreateWithName               = 1051
-	opCacheGetOrCreateWithName          = 1052
-	opCacheCreateWithConfiguration      = 1053
-	opCacheGetOrCreateWithConfiguration = 1054
-	opCacheGetConfiguration             = 1055
-	opCacheDestroy                      = 1056
+	OpCacheGetNames                     = 1050
+	OpCacheCreateWithName               = 1051
+	OpCacheGetOrCreateWithName          = 1052
+	OpCacheCreateWithConfiguration      = 1053
+	OpCacheGetOrCreateWithConfiguration = 1054
+	OpCacheGetConfiguration             = 1055
+	OpCacheDestroy                      = 1056
 
 	// Key-Value Queries
-	opCacheGet               = 1000
-	opCachePut               = 1001
-	opCachePutIfAbsent       = 1002
-	opCacheGetAll            = 1003
-	opCachePutAll            = 1004
-	opCacheGetAndPut         = 1005
-	opCacheGetAndReplace     = 1006
-	opCacheGetAndRemove      = 1007
-	opCacheGetAndPutIfAbsent = 1008
-	opCacheReplace           = 1009
-	opCacheReplaceIfEquals   = 1010
-	opCacheContainsKey       = 1011
-	opCacheContainsKeys      = 1012
-	opCacheClear             = 1013
-	opCacheClearKey          = 1014
-	opCacheClearKeys         = 1015
-	opCacheRemoveKey         = 1016
-	opCacheRemoveIfEquals    = 1017
-	opCacheRemoveKeys        = 1018
-	opCacheRemoveAll         = 1019
-	opCacheGetSize           = 1020
+	OpCacheGet               = 1000
+	OpCachePut               = 1001
+	OpCachePutIfAbsent       = 1002
+	OpCacheGetAll            = 1003
+	OpCachePutAll            = 1004
+	OpCacheGetAndPut         = 1005
+	OpCacheGetAndReplace     = 1006
+	OpCacheGetAndRemove      = 1007
+	OpCacheGetAndPutIfAbsent = 1008
+	OpCacheReplace           = 1009
+	OpCacheReplaceIfEquals   = 1010
+	OpCacheContainsKey       = 1011
+	OpCacheContainsKeys      = 1012
+	OpCacheClear             = 1013
+	OpCacheClearKey          = 1014
+	OpCacheClearKeys         = 1015
+	OpCacheRemoveKey         = 1016
+	OpCacheRemoveIfEquals    = 1017
+	OpCacheRemoveKeys        = 1018
+	OpCacheRemoveAll         = 1019
+	OpCacheGetSize           = 1020
 
 	// SQL and Scan Queries
-	opQuerySQL                    = 2002
-	opQuerySQLCursorGetPage       = 2003
-	opQuerySQLFields              = 2004
-	opQuerySQLFieldsCursorGetPage = 2005
-	opQueryScan                   = 2000
-	opQueryScanCursorGetPage      = 2001
-	opResourceClose               = 0
+	OpQuerySQL                    = 2002
+	OpQuerySQLCursorGetPage       = 2003
+	OpQuerySQLFields              = 2004
+	OpQuerySQLFieldsCursorGetPage = 2005
+	OpQueryScan                   = 2000
+	OpQueryScanCursorGetPage      = 2001
+	OpResourceClose               = 0
 )
 
 // Operation allows to prepare operation to execute
 type Operation struct {
-	Code   int16
+	Code   OperationCode
 	UID    int64
 	Prefix *bytes.Buffer
 	Data   *bytes.Buffer
