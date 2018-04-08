@@ -113,3 +113,20 @@ If you still need `Time` type use `ignite.NativeTime2Date` and `ignite.Date2Nati
 | OP_QUERY_SCAN                       | Not started. Need help.                                 |
 | OP_QUERY_SCAN_CURSOR_GET_PAGE       | Not started. Need help.                                 |
 | OP_RESOURCE_CLOSE                   | Done.                                                   |
+
+### Error handling
+
+In case of operation execution error you can get original status and error message from Apache Ignite server.\
+Example:
+
+```go
+if err := client.CachePut("TestCache", false, "key", "value"); err != nil {
+    // try to cast to *IgniteError type
+    original, ok := err.(*IgniteError)
+    if ok {
+        // log Apache Ignite status and message
+        log.Printf("[%d] %s", original.IgniteStatus, original.IgniteMessage)
+    }
+    return err
+}
+```
