@@ -430,7 +430,7 @@ func handshake(rw io.ReadWriter, major int16, minor int16, patch int16) error {
 // clientFinalizer is memory leak spy
 func clientFinalizer(c *client) {
 	if c.IsConnected() {
-		debug.MemoryLeakLogger.Printf("client \"%s\" is not closed", c.debugID)
+		debug.ResourceLeakLogger.Printf("client \"%s\" is not closed", c.debugID)
 		c.Close()
 	}
 }
