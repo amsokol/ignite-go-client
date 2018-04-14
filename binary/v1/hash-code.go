@@ -1,6 +1,7 @@
 package ignite
 
-func hashCode(s string) int32 {
+// HashCode calculates Java hash code for string
+func HashCode(s string) int32 {
 	if len(s) == 0 {
 		return 1
 	}

@@ -218,9 +218,17 @@ type Client interface {
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields
 	QuerySQLFields(cache string, binary bool, data QuerySQLFieldsData) (QuerySQLFieldsResult, error)
 
+	// QuerySQLFieldsRaw is equal to QuerySQLFields but return raw Response object.
+	// Used for SQL driver to reduce memory allocations.
+	QuerySQLFieldsRaw(cache string, binary bool, data QuerySQLFieldsData) (Response, error)
+
 	// QuerySQLFieldsCursorGetPage retrieves the next query result page by cursor id from QuerySQLFields.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields_cursor_get_page
 	QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQLFieldsPage, error)
+
+	// QuerySQLFieldsCursorGetPageRaw is equal to QuerySQLFieldsCursorGetPage but return raw Response object.
+	// Used for SQL driver to reduce memory allocations.
+	QuerySQLFieldsCursorGetPageRaw(id int64) (Response, error)
 
 	// ResourceClose closes a resource, such as query cursor.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_resource_close

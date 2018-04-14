@@ -12,7 +12,7 @@ import (
 func (c *client) CacheGet(cache string, binary bool, key interface{}) (interface{}, error) {
 	o := c.Prepare(OpCacheGet)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key); err != nil {
@@ -41,7 +41,7 @@ func (c *client) CacheGet(cache string, binary bool, key interface{}) (interface
 func (c *client) CacheGetAll(cache string, binary bool, keys []interface{}) (map[interface{}]interface{}, error) {
 	o := c.Prepare(OpCacheGetAll)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary, int32(len(keys))); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary, int32(len(keys))); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache id, binary flag and key count")
 	}
 	for i, k := range keys {
@@ -80,7 +80,7 @@ func (c *client) CacheGetAll(cache string, binary bool, keys []interface{}) (map
 func (c *client) CachePut(cache string, binary bool, key interface{}, value interface{}) error {
 	o := c.Prepare(OpCachePut)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, value); err != nil {
@@ -100,7 +100,7 @@ func (c *client) CachePut(cache string, binary bool, key interface{}, value inte
 func (c *client) CachePutAll(cache string, binary bool, data map[interface{}]interface{}) error {
 	o := c.Prepare(OpCachePutAll)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary, int32(len(data))); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary, int32(len(data))); err != nil {
 		return errors.Wrapf(err, "failed to write cache id, binary flag and pairs count")
 	}
 	for k, v := range data {
@@ -122,7 +122,7 @@ func (c *client) CachePutAll(cache string, binary bool, data map[interface{}]int
 func (c *client) CacheContainsKey(cache string, binary bool, key interface{}) (bool, error) {
 	o := c.Prepare(OpCacheContainsKey)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key); err != nil {
@@ -151,7 +151,7 @@ func (c *client) CacheContainsKey(cache string, binary bool, key interface{}) (b
 func (c *client) CacheContainsKeys(cache string, binary bool, keys []interface{}) (bool, error) {
 	o := c.Prepare(OpCacheContainsKeys)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary, int32(len(keys))); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary, int32(len(keys))); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache id, binary flag and key count")
 	}
 	for i, k := range keys {
@@ -182,7 +182,7 @@ func (c *client) CacheContainsKeys(cache string, binary bool, keys []interface{}
 func (c *client) CacheGetAndPut(cache string, binary bool, key interface{}, value interface{}) (interface{}, error) {
 	o := c.Prepare(OpCacheGetAndPut)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, value); err != nil {
@@ -212,7 +212,7 @@ func (c *client) CacheGetAndPut(cache string, binary bool, key interface{}, valu
 func (c *client) CacheGetAndReplace(cache string, binary bool, key interface{}, value interface{}) (interface{}, error) {
 	o := c.Prepare(OpCacheGetAndReplace)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, value); err != nil {
@@ -241,7 +241,7 @@ func (c *client) CacheGetAndReplace(cache string, binary bool, key interface{}, 
 func (c *client) CacheGetAndRemove(cache string, binary bool, key interface{}) (interface{}, error) {
 	o := c.Prepare(OpCacheGetAndRemove)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key); err != nil {
@@ -270,7 +270,7 @@ func (c *client) CacheGetAndRemove(cache string, binary bool, key interface{}) (
 func (c *client) CachePutIfAbsent(cache string, binary bool, key interface{}, value interface{}) (bool, error) {
 	o := c.Prepare(OpCachePutIfAbsent)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, value); err != nil {
@@ -299,7 +299,7 @@ func (c *client) CachePutIfAbsent(cache string, binary bool, key interface{}, va
 func (c *client) CacheGetAndPutIfAbsent(cache string, binary bool, key interface{}, value interface{}) (interface{}, error) {
 	o := c.Prepare(OpCacheGetAndPutIfAbsent)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, value); err != nil {
@@ -328,7 +328,7 @@ func (c *client) CacheGetAndPutIfAbsent(cache string, binary bool, key interface
 func (c *client) CacheReplace(cache string, binary bool, key interface{}, value interface{}) (bool, error) {
 	o := c.Prepare(OpCacheReplace)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, value); err != nil {
@@ -358,7 +358,7 @@ func (c *client) CacheReplace(cache string, binary bool, key interface{}, value 
 func (c *client) CacheReplaceIfEquals(cache string, binary bool, key interface{}, valueCompare interface{}, valueNew interface{}) (bool, error) {
 	o := c.Prepare(OpCacheReplaceIfEquals)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, valueCompare, valueNew); err != nil {
@@ -385,7 +385,7 @@ func (c *client) CacheReplaceIfEquals(cache string, binary bool, key interface{}
 
 // CacheClear clears the cache without notifying listeners or cache writers.
 func (c *client) CacheClear(cache string, binary bool) error {
-	r, err := c.Exec(OpCacheClear, hashCode(cache), binary)
+	r, err := c.Exec(OpCacheClear, HashCode(cache), binary)
 	if err != nil {
 		return errors.Wrapf(err, "failed to execute OP_CACHE_CLEAR operation")
 	}
@@ -396,7 +396,7 @@ func (c *client) CacheClear(cache string, binary bool) error {
 func (c *client) CacheClearKey(cache string, binary bool, key interface{}) error {
 	o := c.Prepare(OpCacheClearKey)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key); err != nil {
@@ -415,7 +415,7 @@ func (c *client) CacheClearKey(cache string, binary bool, key interface{}) error
 func (c *client) CacheClearKeys(cache string, binary bool, keys []interface{}) error {
 	o := c.Prepare(OpCacheClearKeys)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary, int32(len(keys))); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary, int32(len(keys))); err != nil {
 		return errors.Wrapf(err, "failed to write cache id, binary flag and key count")
 	}
 	for i, k := range keys {
@@ -437,7 +437,7 @@ func (c *client) CacheClearKeys(cache string, binary bool, keys []interface{}) e
 func (c *client) CacheRemoveKey(cache string, binary bool, key interface{}) (bool, error) {
 	o := c.Prepare(OpCacheRemoveKey)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key); err != nil {
@@ -467,7 +467,7 @@ func (c *client) CacheRemoveKey(cache string, binary bool, key interface{}) (boo
 func (c *client) CacheRemoveIfEquals(cache string, binary bool, key interface{}, value interface{}) (bool, error) {
 	o := c.Prepare(OpCacheRemoveIfEquals)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache id and binary flag")
 	}
 	if err := o.WriteObjects(key, value); err != nil {
@@ -496,7 +496,7 @@ func (c *client) CacheRemoveIfEquals(cache string, binary bool, key interface{},
 func (c *client) CacheGetSize(cache string, binary bool, count int, modes []byte) (int64, error) {
 	o := c.Prepare(OpCacheGetSize)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary, int32(count)); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary, int32(count)); err != nil {
 		return 0, errors.Wrapf(err, "failed to write cache id, binary flag and mode count")
 	}
 	if modes != nil || len(modes) > 0 {
@@ -533,7 +533,7 @@ func (c *client) CacheGetSize(cache string, binary bool, count int, modes []byte
 func (c *client) CacheRemoveKeys(cache string, binary bool, keys []interface{}) error {
 	o := c.Prepare(OpCacheRemoveKeys)
 	// prepare data
-	if err := o.WritePrimitives(hashCode(cache), binary, int32(len(keys))); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary, int32(len(keys))); err != nil {
 		return errors.Wrapf(err, "failed to write cache id, binary flag and key count")
 	}
 	for i, k := range keys {
@@ -553,7 +553,7 @@ func (c *client) CacheRemoveKeys(cache string, binary bool, keys []interface{}) 
 
 // CacheRemoveAll destroys cache with a given name.
 func (c *client) CacheRemoveAll(cache string, binary bool) error {
-	r, err := c.Exec(OpCacheRemoveAll, hashCode(cache), binary)
+	r, err := c.Exec(OpCacheRemoveAll, HashCode(cache), binary)
 	if err != nil {
 		return errors.Wrapf(err, "failed to execute OP_CACHE_REMOVE_ALL operation")
 	}

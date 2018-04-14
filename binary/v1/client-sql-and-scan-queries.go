@@ -143,7 +143,7 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 
 	var res QuerySQLResult
 
-	if err := o.WritePrimitives(hashCode(cache), binary, data.Table, data.Query); err != nil {
+	if err := o.WritePrimitives(HashCode(cache), binary, data.Table, data.Query); err != nil {
 		return res, errors.Wrapf(err, "failed to write request data")
 	}
 
@@ -235,56 +235,11 @@ func (c *client) QuerySQLCursorGetPage(id int64) (QuerySQLPage, error) {
 
 // QuerySQLFields performs SQL fields query.
 func (c *client) QuerySQLFields(cache string, binary bool, data QuerySQLFieldsData) (QuerySQLFieldsResult, error) {
-	o := c.Prepare(OpQuerySQLFields)
-
 	var res QuerySQLFieldsResult
 
-	if err := o.WritePrimitives(hashCode(cache), binary); err != nil {
-		return res, errors.Wrapf(err, "failed to write request data")
-	}
-
-	if len(data.Schema) > 0 {
-		if err := o.WriteObjects(data.Schema); err != nil {
-			return res, errors.Wrapf(err, "failed to write schema for the query")
-		}
-	} else {
-		if err := o.WriteObjects(nil); err != nil {
-			return res, errors.Wrapf(err, "failed to write nil for schema for the query")
-		}
-	}
-
-	if err := o.WritePrimitives(int32(data.PageSize), int32(data.MaxRows), data.Query); err != nil {
-		return res, errors.Wrapf(err, "failed to write request data")
-	}
-
-	var l int32
-	if data.QueryArgs != nil {
-		l = int32(len(data.QueryArgs))
-	}
-	// write args
-	if err := o.WritePrimitives(l); err != nil {
-		return res, errors.Wrapf(err, "failed to write query arg count")
-	}
-	if l > 0 {
-		for i, v := range data.QueryArgs {
-			if err := o.WriteObjects(v); err != nil {
-				return res, errors.Wrapf(err, "failed to write query arg with index %d", i)
-			}
-		}
-	}
-
-	if err := o.WritePrimitives(data.StatementType, data.DistributedJoins, data.LocalQuery, data.ReplicatedOnly,
-		data.EnforceJoinOrder, data.Collocated, data.LazyQuery, data.Timeout, data.IncludeFieldNames); err != nil {
-		return res, errors.Wrapf(err, "failed to write request data")
-	}
-
-	// execute
-	r, err := c.Call(o)
+	r, err := c.QuerySQLFieldsRaw(cache, binary, data)
 	if err != nil {
 		return res, errors.Wrapf(err, "failed to execute OP_QUERY_SQL_FIELDS operation")
-	}
-	if err = r.CheckStatus(); err != nil {
-		return res, err
 	}
 
 	// read field names
@@ -325,16 +280,69 @@ func (c *client) QuerySQLFields(cache string, binary bool, data QuerySQLFieldsDa
 	return res, nil
 }
 
+func (c *client) QuerySQLFieldsRaw(cache string, binary bool, data QuerySQLFieldsData) (Response, error) {
+	o := c.Prepare(OpQuerySQLFields)
+
+	var r Response
+
+	if err := o.WritePrimitives(HashCode(cache), binary); err != nil {
+		return r, errors.Wrapf(err, "failed to write request data")
+	}
+
+	if len(data.Schema) > 0 {
+		if err := o.WriteObjects(data.Schema); err != nil {
+			return r, errors.Wrapf(err, "failed to write schema for the query")
+		}
+	} else {
+		if err := o.WriteObjects(nil); err != nil {
+			return r, errors.Wrapf(err, "failed to write nil for schema for the query")
+		}
+	}
+
+	if err := o.WritePrimitives(int32(data.PageSize), int32(data.MaxRows), data.Query); err != nil {
+		return r, errors.Wrapf(err, "failed to write request data")
+	}
+
+	var l int32
+	if data.QueryArgs != nil {
+		l = int32(len(data.QueryArgs))
+	}
+	// write args
+	if err := o.WritePrimitives(l); err != nil {
+		return r, errors.Wrapf(err, "failed to write query arg count")
+	}
+	if l > 0 {
+		for i, v := range data.QueryArgs {
+			if err := o.WriteObjects(v); err != nil {
+				return r, errors.Wrapf(err, "failed to write query arg with index %d", i)
+			}
+		}
+	}
+
+	if err := o.WritePrimitives(data.StatementType, data.DistributedJoins, data.LocalQuery, data.ReplicatedOnly,
+		data.EnforceJoinOrder, data.Collocated, data.LazyQuery, data.Timeout, data.IncludeFieldNames); err != nil {
+		return r, errors.Wrapf(err, "failed to write request data")
+	}
+
+	// execute
+	r, err := c.Call(o)
+	if err != nil {
+		return r, errors.Wrapf(err, "failed to execute OP_QUERY_SQL_FIELDS operation")
+	}
+	if err = r.CheckStatus(); err != nil {
+		return r, err
+	}
+
+	return r, nil
+}
+
 // QuerySQLFieldsCursorGetPage retrieves the next query result page by cursor id from QuerySQLFields.
 func (c *client) QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQLFieldsPage, error) {
 	var res QuerySQLFieldsPage
 
-	r, err := c.Exec(OpQuerySQLFieldsCursorGetPage, id)
+	r, err := c.QuerySQLFieldsCursorGetPageRaw(id)
 	if err != nil {
 		return res, errors.Wrapf(err, "failed to execute OP_QUERY_SQL_FIELDS_CURSOR_GET_PAGE operation")
-	}
-	if err = r.CheckStatus(); err != nil {
-		return res, err
 	}
 
 	// read data
@@ -354,6 +362,18 @@ func (c *client) QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQL
 	}
 
 	return res, nil
+}
+
+func (c *client) QuerySQLFieldsCursorGetPageRaw(id int64) (Response, error) {
+	r, err := c.Exec(OpQuerySQLFieldsCursorGetPage, id)
+	if err != nil {
+		return r, errors.Wrapf(err, "failed to execute OP_QUERY_SQL_FIELDS_CURSOR_GET_PAGE operation")
+	}
+	if err = r.CheckStatus(); err != nil {
+		return r, err
+	}
+
+	return r, nil
 }
 
 // ResourceClose closes a resource, such as query cursor.

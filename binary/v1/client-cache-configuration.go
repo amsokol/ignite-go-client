@@ -255,7 +255,7 @@ func (c *client) CacheGetNames() ([]string, error) {
 
 // CacheGetConfiguration gets configuration for the given cache.
 func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfiguration, error) {
-	r, err := c.Exec(OpCacheGetConfiguration, hashCode(cache), flag)
+	r, err := c.Exec(OpCacheGetConfiguration, HashCode(cache), flag)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_CONFIGURATION operation")
 	}
@@ -680,7 +680,7 @@ func (c *client) CacheGetOrCreateWithConfiguration(cc *CacheConfigurationRefs) e
 
 // CacheDestroy destroys cache with a given name.
 func (c *client) CacheDestroy(cache string) error {
-	r, err := c.Exec(OpCacheDestroy, hashCode(cache))
+	r, err := c.Exec(OpCacheDestroy, HashCode(cache))
 	if err != nil {
 		return errors.Wrapf(err, "failed to execute OP_CACHE_DESTROY operation")
 	}
