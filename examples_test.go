@@ -37,7 +37,7 @@ func Test_SQL_Driver(t *testing.T) {
 	log.Printf("deleted rows: %d", c)
 
 	// insert
-	res, err = db.ExecContext(ctx, "INSERT INTO Organization(_key, name) VALUES (1, 'Org 1')")
+	res, err = db.ExecContext(ctx, "INSERT INTO Organization(_key, name) VALUES (11, 'Org 11')")
 	if err != nil {
 		t.Fatalf("failed sql execute: %v", err)
 	}
@@ -51,9 +51,9 @@ func Test_SQL_Driver(t *testing.T) {
 		t.Fatalf("failed to prepare statement: %v", err)
 	}
 	res, err = stmt.ExecContext(ctx,
-		int64(2), "Org 2", time.Now(),
-		int64(3), "Org 3", time.Now(),
-		int64(4), "Org 4", time.Now())
+		int64(12), "Org 12", time.Now(),
+		int64(13), "Org 13", time.Now(),
+		int64(14), "Org 14", time.Now())
 	if err != nil {
 		t.Fatalf("failed sql execute: %v", err)
 	}
@@ -61,7 +61,7 @@ func Test_SQL_Driver(t *testing.T) {
 	log.Printf("inserted rows: %d", c)
 
 	// update
-	res, err = db.ExecContext(ctx, "UPDATE Organization SET foundDateTime=? WHERE _key=?", time.Now(), int64(1))
+	res, err = db.ExecContext(ctx, "UPDATE Organization SET foundDateTime=? WHERE _key=?", time.Now(), int64(11))
 	if err != nil {
 		t.Fatalf("failed sql execute: %v", err)
 	}
@@ -70,11 +70,11 @@ func Test_SQL_Driver(t *testing.T) {
 
 	// select
 	stmt, err = db.PrepareContext(ctx,
-		"SELECT _key, name, foundDateTime FROM Organization WHERE _key<? ORDER BY _key ASC")
+		"SELECT _key, name, foundDateTime FROM Organization WHERE _key>=? AND _key<? ORDER BY _key ASC")
 	if err != nil {
 		t.Fatalf("failed to prepare statement: %v", err)
 	}
-	rows, err := stmt.QueryContext(ctx, int64(4))
+	rows, err := stmt.QueryContext(ctx, int64(11), int64(14))
 	if err != nil {
 		t.Fatalf("failed sql query: %v", err)
 	}
