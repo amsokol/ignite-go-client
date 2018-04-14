@@ -1,6 +1,7 @@
 package ignitesql
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"fmt"
@@ -14,10 +15,32 @@ import (
 )
 
 // Driver is exported to allow it to be used directly.
-type Driver struct{}
+type Driver struct {
+	driver.Driver
+	driver.DriverContext
+}
+
+// OpenConnector must parse the name in the same format that Driver.
+// Open parses the name parameter.
+func (d *Driver) OpenConnector(name string) (driver.Connector, error) {
+	ci, err := d.parseURL(name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse connection name: %v", err)
+	}
+	return &connector{info: ci}, nil
+}
 
 // Open a Connection to the server.
-// url format: <protocol>://<host>:<port>/<schema>?param1=<value1>&param2=<value2>&paramN=<valueN>
+func (d *Driver) Open(name string) (driver.Conn, error) {
+	c, err := d.OpenConnector(name)
+	if err != nil {
+		return nil, err
+	}
+	return c.Connect(context.Background())
+}
+
+// parseURL parses connection name
+// url format: <protocol>://<host>:<port>/<cache>?param1=<value1>&param2=<value2>&paramN=<valueN>
 //
 // URL parts:
 // | Name               | Mandatory | Description                                   | Default value                   |
@@ -25,15 +48,16 @@ type Driver struct{}
 // | protocol           | no        | Connection protocol                           | tcp                             |
 // | host               | no        | Apache Ignite Cluster host name or IP address | 127.0.0.1                       |
 // | port               | no        | Max rows to return by query                   | 10800                           |
-// | schema             | no        | Database schema                               | "" (PUBLIC schema will be used) |
+// | cache              | yes       | Cache name                                    |                                 |
 //
 // URL parameters (param1,...paramN):
 // | Name               | Mandatory | Description                                                   | Default value                     |
 // |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
+// | schema             | no        | Database schema                                               | "" (PUBLIC schema will be used) |
 // | version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
 // | page-size          | no        | Query cursor page size                                        | 10000                             |
 // | max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
-// | timeout            | no        | Timeout to execute query                                      | 0 (disable timeout)               |
+// | timeout            | no        | Timeout in milliseconds to execute query                      | 0 (disable timeout)               |
 // | distributed-joins  | no        | Distributed joins (yes/no)                                    | no                                |
 // | local-query        | no        | Local query (yes/no)                                          | no                                |
 // | replicated-only    | no        | Whether query contains only replicated tables or not (yes/no) | no                                |
@@ -42,13 +66,13 @@ type Driver struct{}
 // | lazy-query         | no        | Lazy query execution (yes/no)                                 | no                                |
 //
 // url example: tcp://127.0.0.1:10800/?version=v1.0.0&page-size=100000
-func (d *Driver) Open(name string) (driver.Conn, error) {
+func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
+	var ci common.ConnInfo
+
 	u, err := url.Parse(name)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse connection name: %v", err)
+		return ci, fmt.Errorf("failed to parse connection name: %v", err)
 	}
-
-	var ci common.ConnectionInfo
 
 	if ci.Network = u.Scheme; len(ci.Network) == 0 {
 		ci.Network = "tcp"
@@ -63,7 +87,11 @@ func (d *Driver) Open(name string) (driver.Conn, error) {
 		ci.Address += ":" + u.Port()
 	}
 
-	ci.Schema = strings.Trim(u.Path, "/")
+	ci.Cache = strings.Trim(u.Path, "/")
+
+	// default values
+	ci.Version, _ = semver.NewVersion("1.0.0")
+	ci.PageSize = 10000
 
 	for k, v := range u.Query() {
 		var val string
@@ -71,50 +99,50 @@ func (d *Driver) Open(name string) (driver.Conn, error) {
 			val = strings.TrimSpace(v[0])
 		}
 		switch strings.ToLower(k) {
+		case "schema":
+			ci.Schema = val
 		case "version":
-			if len(val) == 0 {
-				val = "1.0.0"
+			if len(val) > 0 {
+				ci.Version, err = semver.NewVersion(val)
 			}
-			ci.Version, err = semver.NewVersion(val)
 		case "page-size":
-			if len(val) == 0 {
-				val = "10000"
+			if len(val) > 0 {
+				ci.PageSize, err = strconv.Atoi(val)
 			}
-			ci.PageSize, err = strconv.Atoi(val)
 		case "max-rows":
-			if len(val) == 0 {
-				val = "0"
+			if len(val) > 0 {
+				ci.MaxRows, err = strconv.Atoi(val)
 			}
-			ci.MaxRows, err = strconv.Atoi(val)
 		case "timeout":
-			if len(val) == 0 {
-				val = "0"
+			if len(val) > 0 {
+				ci.Timeout, err = strconv.ParseInt(val, 0, 64)
 			}
-			ci.Timeout, err = strconv.ParseInt(val, 0, 64)
 		case "distributed-joins":
-			ci.DistributedJoins, err = parseYesNo(val)
+			ci.DistributedJoins, err = d.parseYesNo(val)
 		case "local-query":
-			ci.LocalQuery, err = parseYesNo(val)
+			ci.LocalQuery, err = d.parseYesNo(val)
 		case "replicated-only":
-			ci.ReplicatedOnly, err = parseYesNo(val)
+			ci.ReplicatedOnly, err = d.parseYesNo(val)
 		case "enforce-join-order":
-			ci.EnforceJoinOrder, err = parseYesNo(val)
+			ci.EnforceJoinOrder, err = d.parseYesNo(val)
 		case "collocated":
-			ci.Collocated, err = parseYesNo(val)
+			ci.Collocated, err = d.parseYesNo(val)
 		case "lazy-query":
-			ci.LazyQuery, err = parseYesNo(val)
+			ci.LazyQuery, err = d.parseYesNo(val)
 		default:
-			return nil, fmt.Errorf("unknown connection parameter \"%s\" with value \"%v\"", k, v)
+			return ci, fmt.Errorf("unknown connection parameter \"%s\" with value \"%v\"", k, v)
 		}
 		if err != nil {
-			return nil, fmt.Errorf("unexpected parameter \"%s\" with value \"%s\": %v", k, val, err)
+			return ci, fmt.Errorf("unexpected parameter \"%s\" with value \"%s\": %v", k, val, err)
 		}
 	}
 
-	return nil, fmt.Errorf("not implemented")
+	ci.URL = name
+	return ci, nil
 }
 
-func parseYesNo(s string) (bool, error) {
+// parseYesNo parses boolean value (yes/no)
+func (d *Driver) parseYesNo(s string) (bool, error) {
 	switch strings.ToLower(strings.TrimSpace(s)) {
 	case "yes":
 		return true, nil

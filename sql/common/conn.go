@@ -4,11 +4,15 @@ import (
 	"github.com/Masterminds/semver"
 )
 
-// ConnectionInfo contains Apache Ignite cluster connection and query execution parameters
-type ConnectionInfo struct {
+// ConnInfo contains Apache Ignite cluster connection and query execution parameters
+type ConnInfo struct {
+	URL string
+
 	Network string
 
 	Address string
+
+	Cache string
 
 	Version *semver.Version
 
