@@ -249,7 +249,7 @@ func Test_conn_QueryContext(t *testing.T) {
 			c:    c,
 			args: args{
 				ctx:   context.Background(),
-				query: "SELECT _key, name, foundDateTime FROM Organization ORDER BY _key ASC",
+				query: "SELECT _key, name, foundDateTime FROM Organization WHERE _key ORDER BY _key>=1 AND _key<=4 ASC",
 			},
 			want: [][]driver.Value{
 				[]driver.Value{int64(1), "Org 1", tm},
@@ -270,17 +270,6 @@ func Test_conn_QueryContext(t *testing.T) {
 			},
 			want: [][]driver.Value{
 				[]driver.Value{int64(1), "Org 1", tm},
-			},
-		},
-		{
-			name: "success test 3",
-			c:    c,
-			args: args{
-				ctx:   context.Background(),
-				query: "SELECT 1",
-			},
-			want: [][]driver.Value{
-				[]driver.Value{int32(1)},
 			},
 		},
 	}
