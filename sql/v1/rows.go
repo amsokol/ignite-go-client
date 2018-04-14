@@ -79,7 +79,7 @@ func (r *rows) Next(dest []driver.Value) error {
 		r.rowsLeft = int(rowCount)
 	}
 	if len(r.fields) != len(dest) {
-		return errors.Wrapf(err, "destination slice size must be %d but got %d", len(r.fields), len(dest))
+		return errors.Errorf("destination slice size must be %d but got %d", len(r.fields), len(dest))
 	}
 	for i := 0; i < len(r.fields); i++ {
 		if dest[i], err = r.response.ReadObject(); err != nil {
