@@ -14,7 +14,7 @@ Project is in active development:
 1. Develop "[Cache Configuration](https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations)" methods (Completed)
 1. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
 1. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (Completed**)
-1. Develop SQL driver (**In progress**)
+1. Develop SQL driver (Completed)
 1. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (Not started)
 
 *Not all types are supported. See **[type mapping](#type-mapping)** for detail.\
@@ -32,9 +32,66 @@ or use go [dep](https://golang.github.io/dep/) tool:
 dep ensure -add github.com/amsokol/ignite-go-client
 ```
 
-### How to use
+### How to use client
 
 See "_test.go" files for details. Examples will be added soon.
+
+### How to use SQL driver
+
+Import driver SQL driver:
+
+```go
+import (
+    "database/sql"
+
+    _ "github.com/amsokol/ignite-go-client/sql"
+)
+```
+
+Connect to server:
+
+```go
+ctx := context.Background()
+
+// open connection
+db, err := sql.Open("ignite", "tcp://localhost:10800/TestDB?version=1.0.0&&page-size=10000&timeout=5000")
+if err != nil {
+    t.Fatalf("failed to open connection: %v", err)
+}
+defer db.Close()
+
+```
+
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go) for more.
+
+Connection URL format:
+
+```bash
+protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
+```
+
+**URL parts:**
+| Name               | Mandatory | Description                                   | Default value                   |
+|--------------------|-----------|-----------------------------------------------|---------------------------------|
+| protocol           | no        | Connection protocol                           | tcp                             |
+| host               | no        | Apache Ignite Cluster host name or IP address | 127.0.0.1                       |
+| port               | no        | Max rows to return by query                   | 10800                           |
+| cache              | yes       | Cache name                                    |                                 |
+
+**URL parameters (param1,...paramN):**
+| Name               | Mandatory | Description                                                   | Default value                     |
+|--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
+| schema             | no        | Database schema                                               | "" (PUBLIC schema will be used) |
+| version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
+| page-size          | no        | Query cursor page size                                        | 10000                             |
+| max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
+| timeout            | no        | Timeout in milliseconds to execute query                      | 0 (disable timeout)               |
+| distributed-joins  | no        | Distributed joins (yes/no)                                    | no                                |
+| local-query        | no        | Local query (yes/no)                                          | no                                |
+| replicated-only    | no        | Whether query contains only replicated tables or not (yes/no) | no                                |
+| enforce-join-order | no        | Enforce join order (yes/no)                                   | no                                |
+| collocated         | no        | Whether your data is co-located or not (yes/no)               | no                                |
+| lazy-query         | no        | Lazy query execution (yes/no)                                 | no                                |
 
 ### How to run tests
 
