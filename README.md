@@ -71,6 +71,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 ```
 
 **URL parts:**
+
 | Name               | Mandatory | Description                                   | Default value                   |
 |--------------------|-----------|-----------------------------------------------|---------------------------------|
 | protocol           | no        | Connection protocol                           | tcp                             |
