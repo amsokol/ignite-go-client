@@ -80,6 +80,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | cache              | yes       | Cache name                                    |                                 |
 
 **URL parameters (param1,...paramN):**
+
 | Name               | Mandatory | Description                                                   | Default value                     |
 |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
 | schema             | no        | Database schema                                               | "" (PUBLIC schema will be used) |
