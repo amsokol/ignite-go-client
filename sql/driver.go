@@ -4,39 +4,37 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/Masterminds/semver"
 
+	"github.com/amsokol/ignite-go-client/binary/errors"
 	"github.com/amsokol/ignite-go-client/sql/common"
+	"github.com/amsokol/ignite-go-client/sql/v1"
 )
 
 // Driver is exported to allow it to be used directly.
 type Driver struct {
 	driver.Driver
-	driver.DriverContext
-}
-
-// OpenConnector must parse the name in the same format that Driver.
-// Open parses the name parameter.
-func (d *Driver) OpenConnector(name string) (driver.Connector, error) {
-	ci, err := d.parseURL(name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse connection name: %v", err)
-	}
-	return &connector{info: ci}, nil
+	// driver.DriverContext
 }
 
 // Open a Connection to the server.
 func (d *Driver) Open(name string) (driver.Conn, error) {
-	c, err := d.OpenConnector(name)
+	ctx := context.Background()
+
+	ci, err := d.parseURL(name)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to parse connection name")
 	}
-	return c.Connect(context.Background())
+	switch ci.Version.Major() {
+	case 1:
+		return v1.Connect(ctx, ci)
+	default:
+		return nil, errors.Errorf("unsupported protocol version: %v", ci.Version)
+	}
 }
 
 // parseURL parses connection name
@@ -71,7 +69,7 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 
 	u, err := url.Parse(name)
 	if err != nil {
-		return ci, fmt.Errorf("failed to parse connection name: %v", err)
+		return ci, errors.Wrapf(err, "failed to parse connection name")
 	}
 
 	if ci.Network = u.Scheme; len(ci.Network) == 0 {
@@ -130,10 +128,10 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 		case "lazy-query":
 			ci.LazyQuery, err = d.parseYesNo(val)
 		default:
-			return ci, fmt.Errorf("unknown connection parameter \"%s\" with value \"%v\"", k, v)
+			return ci, errors.Errorf("unknown connection parameter \"%s\" with value \"%v\"", k, v)
 		}
 		if err != nil {
-			return ci, fmt.Errorf("unexpected parameter \"%s\" with value \"%s\": %v", k, val, err)
+			return ci, errors.Wrapf(err, "unexpected parameter \"%s\" with value \"%s\"", k, val)
 		}
 	}
 
@@ -149,7 +147,7 @@ func (d *Driver) parseYesNo(s string) (bool, error) {
 	case "no":
 		return false, nil
 	default:
-		return false, fmt.Errorf("invalid boolean value (expected \"yes\" or \"no\"): %s", s)
+		return false, errors.Errorf("invalid boolean value (expected \"yes\" or \"no\"): %s", s)
 	}
 }
 

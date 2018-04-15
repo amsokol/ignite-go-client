@@ -1,10 +1,12 @@
+// +build go1.10
+
 package ignitesql
 
 import (
 	"context"
 	"database/sql/driver"
-	"fmt"
 
+	"github.com/amsokol/ignite-go-client/binary/errors"
 	"github.com/amsokol/ignite-go-client/sql/common"
 	"github.com/amsokol/ignite-go-client/sql/v1"
 )
@@ -31,7 +33,7 @@ func (c *connector) Connect(ctx context.Context) (driver.Conn, error) {
 	case 1:
 		return v1.Connect(ctx, c.info)
 	default:
-		return nil, fmt.Errorf("unsupported protocol version: %v", c.info.Version)
+		return nil, errors.Errorf("unsupported protocol version: %v", c.info.Version)
 	}
 }
 
