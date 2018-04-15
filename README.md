@@ -2,6 +2,10 @@
 
 ## Apache Ignite (GridGain) v2.4+ client for Go programming language
 
+This library is production ready.
+
+Version is less than v1.0 because not all functionality is implemented yet (see [Road map](#road-map) for details). But the implemented functionality is production ready.
+
 ### Requirements
 
 - Apache Ignite v2.4+ (because of binary communication protocol is used)
@@ -9,7 +13,7 @@
 
 ### Road map
 
-Project is in active development:
+Project status:
 
 1. Develop "[Cache Configuration](https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations)" methods (Completed)
 1. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
@@ -17,7 +21,8 @@ Project is in active development:
 1. Develop SQL driver (Completed)
 1. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (Not started)
 
-*Not all types are supported. See **[type mapping](#type-mapping)** for detail.\
+*Not all types are supported. See **[type mapping](#type-mapping)** for detail.
+
 **Not all operations are supported. See **[table](#sql-and-scan-queries-supported-operations)** for detail.
 
 ### How to install
