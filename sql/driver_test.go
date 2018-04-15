@@ -94,7 +94,7 @@ func TestDriver_parseURL(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB?" +
+				name: "tcp://localhost:10800/TestDB2?" +
 					"schema=SCHEMA" +
 					"&version=1.1.1" +
 					"&page-size=100" +
@@ -108,7 +108,7 @@ func TestDriver_parseURL(t *testing.T) {
 					"&lazy-query=yes",
 			},
 			want: common.ConnInfo{
-				URL: "tcp://localhost:10800/TestDB?" +
+				URL: "tcp://localhost:10800/TestDB2?" +
 					"schema=SCHEMA" +
 					"&version=1.1.1" +
 					"&page-size=100" +
@@ -122,7 +122,7 @@ func TestDriver_parseURL(t *testing.T) {
 					"&lazy-query=yes",
 				Network:          "tcp",
 				Address:          "localhost:10800",
-				Cache:            "TestDB",
+				Cache:            "TestDB2",
 				Version:          ver1,
 				Schema:           "SCHEMA",
 				PageSize:         100,
@@ -140,13 +140,13 @@ func TestDriver_parseURL(t *testing.T) {
 			name: "success test 2",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost/TestDB",
+				name: "tcp://localhost/TestDB2",
 			},
 			want: common.ConnInfo{
-				URL:      "tcp://localhost/TestDB",
+				URL:      "tcp://localhost/TestDB2",
 				Network:  "tcp",
 				Address:  "localhost:10800",
-				Cache:    "TestDB",
+				Cache:    "TestDB2",
 				Version:  ver2,
 				PageSize: 10000,
 			},
@@ -155,13 +155,13 @@ func TestDriver_parseURL(t *testing.T) {
 			name: "failed test 3",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost/TestDB?invalid-param=true",
+				name: "tcp://localhost/TestDB2?invalid-param=true",
 			},
 			want: common.ConnInfo{
-				URL:      "tcp://localhost/TestDB",
+				URL:      "tcp://localhost/TestDB2",
 				Network:  "tcp",
 				Address:  "localhost:10800",
-				Cache:    "TestDB",
+				Cache:    "TestDB2",
 				Version:  ver2,
 				PageSize: 10000,
 			},
@@ -197,14 +197,14 @@ func TestDriver_Open(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB",
+				name: "tcp://localhost:10800/TestDB2",
 			},
 		},
 		{
 			name: "failed test 2",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB?invalid-param=true",
+				name: "tcp://localhost:10800/TestDB2?invalid-param=true",
 			},
 			wantErr: true,
 		},
@@ -240,14 +240,14 @@ func TestDriver_OpenConnector(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB",
+				name: "tcp://localhost:10800/TestDB2",
 			},
 		},
 		{
 			name: "failed test 2",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB?invalid-param=true",
+				name: "tcp://localhost:10800/TestDB2?invalid-param=true",
 			},
 			wantErr: true,
 		},

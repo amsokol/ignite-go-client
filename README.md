@@ -34,7 +34,7 @@ dep ensure -add github.com/amsokol/ignite-go-client
 
 ### How to use client
 
-See "_test.go" files for details. Examples will be added soon.
+See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for details. Examples will be added soon.
 
 ### How to use SQL driver
 
@@ -99,7 +99,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 1. Download `Apache Ignite 2.4+` from [official site](https://ignite.apache.org/download.cgi#binaries)
 1. Extract distributive to any folder
-1. `cd` to `test-data` folder with `configuration-for-tests.xml` file
+1. `cd` to `testdata` folder with `configuration-for-tests.xml` file
 1. Start Ignite server with `configuration-for-tests.xml` configuration file:
 
 ```bash
@@ -113,7 +113,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 1. Run tests into the root folder of this project:
 
 ```shell
-# go test ./...
+# go test -count=1 -parallel 1 ./...
 ```
 
 ### Type mapping

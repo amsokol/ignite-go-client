@@ -9,7 +9,7 @@ import (
 
 func Test_connector_Connect(t *testing.T) {
 	d := &Driver{}
-	ci, err := d.OpenConnector("tcp://localhost:10800/TestDB")
+	ci, err := d.OpenConnector("tcp://localhost:10800/TestDB2")
 	if err != nil {
 		t.Errorf("failed to open connector: %v", err)
 		return

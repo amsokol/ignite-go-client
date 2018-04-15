@@ -29,10 +29,10 @@ func TestConnect(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				ci: common.ConnInfo{
-					URL:      "tcp://localhost:10800/TestDB",
+					URL:      "tcp://localhost:10800/TestDB2",
 					Network:  "tcp",
 					Address:  "localhost:10800",
-					Cache:    "TestDB",
+					Cache:    "TestDB2",
 					Version:  ver,
 					PageSize: 10000,
 				},
@@ -59,10 +59,10 @@ func TestConnect(t *testing.T) {
 func Test_conn_Close(t *testing.T) {
 	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB",
+		URL:      "tcp://localhost:10800/TestDB2",
 		Network:  "tcp",
 		Address:  "localhost:10800",
-		Cache:    "TestDB",
+		Cache:    "TestDB2",
 		Version:  ver,
 		PageSize: 10000,
 	})
@@ -94,10 +94,10 @@ func Test_conn_Close(t *testing.T) {
 func Test_conn_ExecContext(t *testing.T) {
 	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB",
+		URL:      "tcp://localhost:10800/TestDB2",
 		Network:  "tcp",
 		Address:  "localhost:10800",
-		Cache:    "TestDB",
+		Cache:    "TestDB2",
 		Version:  ver,
 		PageSize: 10000,
 	})
@@ -107,8 +107,8 @@ func Test_conn_ExecContext(t *testing.T) {
 	}
 	c, _ := ci.(*conn)
 	defer c.Close()
-	defer c.client.CacheRemoveAll("TestDB", false)
-	_ = c.client.CacheRemoveAll("TestDB", false)
+	defer c.client.CacheRemoveAll("TestDB2", false)
+	_ = c.client.CacheRemoveAll("TestDB2", false)
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 
 	type args struct {
@@ -195,10 +195,10 @@ func Test_conn_ExecContext(t *testing.T) {
 func Test_conn_QueryContext(t *testing.T) {
 	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB",
+		URL:      "tcp://localhost:10800/TestDB2",
 		Network:  "tcp",
 		Address:  "localhost:10800",
-		Cache:    "TestDB",
+		Cache:    "TestDB2",
 		Version:  ver,
 		PageSize: 2, /* test server cursor */
 	})
@@ -208,8 +208,8 @@ func Test_conn_QueryContext(t *testing.T) {
 	}
 	c, _ := ci.(*conn)
 	defer c.Close()
-	defer c.client.CacheRemoveAll("TestDB", false)
-	_ = c.client.CacheRemoveAll("TestDB", false)
+	defer c.client.CacheRemoveAll("TestDB2", false)
+	_ = c.client.CacheRemoveAll("TestDB2", false)
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	_, err = c.ExecContext(context.Background(),
 		"INSERT INTO Organization(_key, name, foundDateTime) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)",
@@ -298,10 +298,10 @@ func Test_conn_QueryContext(t *testing.T) {
 func Test_conn_Ping(t *testing.T) {
 	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB",
+		URL:      "tcp://localhost:10800/TestDB2",
 		Network:  "tcp",
 		Address:  "localhost:10800",
-		Cache:    "TestDB",
+		Cache:    "TestDB2",
 		Version:  ver,
 		PageSize: 10000,
 	})

@@ -22,7 +22,7 @@ func Test_client_QuerySQL(t *testing.T) {
 	defer c.Close()
 	// insert test values
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
-	_, err = c.QuerySQLFields("TestDB", false, QuerySQLFieldsData{
+	_, err = c.QuerySQLFields("TestDB1", false, QuerySQLFieldsData{
 		PageSize: 10,
 		Query: "INSERT INTO Organization(_key, name, foundDateTime) VALUES" +
 			"(?, ?, ?)," +
@@ -36,7 +36,7 @@ func Test_client_QuerySQL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to insert test data: %s", err.Error())
 	}
-	defer c.CacheRemoveAll("TestDB", false)
+	defer c.CacheRemoveAll("TestDB1", false)
 
 	type args struct {
 		cache  string
@@ -55,7 +55,7 @@ func Test_client_QuerySQL(t *testing.T) {
 			name: "success test 1",
 			c:    c,
 			args: args{
-				cache: "TestDB",
+				cache: "TestDB1",
 				data: QuerySQLData{
 					Table:    "Organization",
 					Query:    `SELECT * FROM Organization ORDER BY name ASC`,
@@ -93,7 +93,7 @@ func Test_client_QuerySQLFields(t *testing.T) {
 		t.Fatalf("failed to open test connection: %s", err.Error())
 	}
 	defer c.Close()
-	defer c.CacheRemoveAll("TestDB", false)
+	defer c.CacheRemoveAll("TestDB1", false)
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 
 	type args struct {
@@ -112,7 +112,7 @@ func Test_client_QuerySQLFields(t *testing.T) {
 			name: "success test 1",
 			c:    c,
 			args: args{
-				cache: "TestDB",
+				cache: "TestDB1",
 				data: QuerySQLFieldsData{
 					PageSize: 10,
 					Query: "INSERT INTO Organization(_key, name, foundDateTime) VALUES" +
@@ -136,7 +136,7 @@ func Test_client_QuerySQLFields(t *testing.T) {
 			name: "success test 2",
 			c:    c,
 			args: args{
-				cache: "TestDB",
+				cache: "TestDB1",
 				data: QuerySQLFieldsData{
 					PageSize: 10,
 					Query: "INSERT INTO Person(_key, orgId, firstName, lastName, resume, salary) VALUES" +
@@ -164,7 +164,7 @@ func Test_client_QuerySQLFields(t *testing.T) {
 			name: "success test 3",
 			c:    c,
 			args: args{
-				cache: "TestDB",
+				cache: "TestDB1",
 				data: QuerySQLFieldsData{
 					PageSize: 10,
 					Query: "SELECT " +
@@ -221,7 +221,7 @@ func Test_client_QuerySQLFieldsCursorGetPage(t *testing.T) {
 
 	// insert test values
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
-	_, err = c.QuerySQLFields("TestDB", false, QuerySQLFieldsData{
+	_, err = c.QuerySQLFields("TestDB1", false, QuerySQLFieldsData{
 		PageSize: 10,
 		Query: "INSERT INTO Organization(_key, name, foundDateTime) VALUES" +
 			"(?, ?, ?)," +
@@ -235,9 +235,9 @@ func Test_client_QuerySQLFieldsCursorGetPage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to insert test data: %s", err.Error())
 	}
-	defer c.CacheRemoveAll("TestDB", false)
+	defer c.CacheRemoveAll("TestDB1", false)
 	// select test values
-	res, err := c.QuerySQLFields("TestDB", false, QuerySQLFieldsData{
+	res, err := c.QuerySQLFields("TestDB1", false, QuerySQLFieldsData{
 		PageSize: 2,
 		Query:    "SELECT name, foundDateTime FROM Organization ORDER BY name ASC",
 		Timeout:  10000,
@@ -296,7 +296,7 @@ func Test_client_ResourceClose(t *testing.T) {
 
 	// insert test values
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
-	_, err = c.QuerySQLFields("TestDB", false, QuerySQLFieldsData{
+	_, err = c.QuerySQLFields("TestDB1", false, QuerySQLFieldsData{
 		PageSize: 10,
 		Query: "INSERT INTO Organization(_key, name, foundDateTime) VALUES" +
 			"(?, ?, ?)," +
@@ -310,9 +310,9 @@ func Test_client_ResourceClose(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to insert test data: %s", err.Error())
 	}
-	defer c.CacheRemoveAll("TestDB", false)
+	defer c.CacheRemoveAll("TestDB1", false)
 	// select test values
-	res, err := c.QuerySQLFields("TestDB", false, QuerySQLFieldsData{
+	res, err := c.QuerySQLFields("TestDB1", false, QuerySQLFieldsData{
 		PageSize: 2,
 		Query:    "SELECT name, foundDateTime FROM Organization ORDER BY name ASC",
 		Timeout:  10000,

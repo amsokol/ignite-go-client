@@ -124,7 +124,7 @@ func Test_client_CacheGetNames(t *testing.T) {
 		{
 			name: "test success",
 			c:    c,
-			want: []string{"TestCache1", "TestCache2", "TestCache3", "TestDB"},
+			want: []string{"TestCache1", "TestCache2", "TestCache3", "TestDB1", "TestDB2", "TestDB3"},
 		},
 	}
 	for _, tt := range tests {
