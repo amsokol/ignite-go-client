@@ -159,7 +159,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 If you still need `date` type use `ignite.NativeTime2Date` and `ignite.Date2NativeTime` functions to convert between Golang `time.Time` and `ignite.Date` types.
 
 **`Time` is outdated type. It's recommended to use `Timestamp` type.
-If you still need `Time` type use `ignite.NativeTime2Date` and `ignite.Date2NativeTime` functions to convert between Golang `time.Time` and `ignite.Time` types.
+If you still need `Time` type use `ignite.NativeTime2Time` and `ignite.Time2NativeTime` functions to convert between Golang `time.Time` and `ignite.Time` types.
 
 ### SQL and Scan Queries supported operations
 
