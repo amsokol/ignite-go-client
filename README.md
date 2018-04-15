@@ -34,11 +34,35 @@ dep ensure -add github.com/amsokol/ignite-go-client
 
 ### How to use client
 
-See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for details. Examples will be added soon.
+Import client package:
+
+```go
+import (
+    "github.com/amsokol/ignite-go-client/binary/v1"
+)
+```
+
+Connect to server:
+
+```go
+ctx := context.Background()
+
+// connect
+c, err := ignite.NewClient(ctx, "tcp", "localhost:10800", 1, 0, 0)
+if err != nil {
+    t.Fatalf("failed connect to server: %v", err)
+}
+defer c.Close()
+
+```
+
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go) for more.
+
+See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for other examples.
 
 ### How to use SQL driver
 
-Import driver SQL driver:
+Import SQL driver:
 
 ```go
 import (

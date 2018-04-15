@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/amsokol/ignite-go-client/binary/v1"
 	_ "github.com/amsokol/ignite-go-client/sql"
 )
 
@@ -91,4 +92,38 @@ func Test_SQL_Driver(t *testing.T) {
 		}
 		log.Printf("key=%d, name=\"%s\", found=\"%v\"", key, name, tm)
 	}
+}
+
+func Test_Key_Value(t *testing.T) {
+	ctx := context.Background()
+
+	// connect
+	c, err := ignite.NewClient(ctx, "tcp", "localhost:10800", 1, 0, 0)
+	if err != nil {
+		t.Fatalf("failed connect to server: %v", err)
+	}
+	defer c.Close()
+
+	cache := "MyCache"
+
+	// create cache
+	if err = c.CacheCreateWithName(cache); err != nil {
+		t.Fatalf("failed to create cache: %v", err)
+	}
+	defer c.CacheDestroy(cache)
+
+	// put values
+	if err = c.CachePut(cache, false, "key1", "value1"); err != nil {
+		t.Fatalf("failed to put pair: %v", err)
+	}
+	if err = c.CachePut(cache, false, "key2", "value2"); err != nil {
+		t.Fatalf("failed to put pair: %v", err)
+	}
+
+	// get key value
+	v, err := c.CacheGet(cache, false, "key1")
+	if err != nil {
+		t.Fatalf("failed to get key value: %v", err)
+	}
+	log.Printf("key=\"%s\", value=\"%v\"", "key1", v)
 }
