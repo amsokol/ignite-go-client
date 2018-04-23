@@ -1,4 +1,4 @@
-# go-client
+# ignite-go-client
 
 ## Apache Ignite (GridGain) v2.4+ client for Go programming language
 
