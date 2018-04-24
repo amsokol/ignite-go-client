@@ -213,6 +213,86 @@ func Test_request_WriteOInt(t *testing.T) {
 	}
 }
 
+func Test_request_WriteBool(t *testing.T) {
+	type args struct {
+		v bool
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    newTestRequestObject(),
+			args: args{
+				v: true,
+			},
+			want: []byte{1}[:],
+		},
+		{
+			name: "2",
+			r:    newTestRequestObject(),
+			args: args{
+				v: false,
+			},
+			want: []byte{0}[:],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteBool(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteBool() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteByte() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteOBool(t *testing.T) {
+	type args struct {
+		v bool
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    newTestRequestObject(),
+			args: args{
+				v: true,
+			},
+			want: []byte{8, 1}[:],
+		},
+		{
+			name: "2",
+			r:    newTestRequestObject(),
+			args: args{
+				v: false,
+			},
+			want: []byte{8, 0}[:],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOBool(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOBool() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteByte() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOString(t *testing.T) {
 	type args struct {
 		v string
@@ -248,6 +328,42 @@ func Test_request_WriteOString(t *testing.T) {
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
 				t.Errorf("request.WriteOString() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteTo(t *testing.T) {
+	r := newTestRequestObject()
+	_ = r.WriteInt(1234567890)
+
+	tests := []struct {
+		name    string
+		r       *request
+		want    int64
+		wantW   []byte
+		wantErr bool
+	}{
+		{
+			name:  "1",
+			r:     r,
+			want:  4,
+			wantW: []byte{0xD2, 0x02, 0x96, 0x49},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := &bytes.Buffer{}
+			got, err := tt.r.WriteTo(w)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("request.WriteTo() = %v, want %v", got, tt.want)
+			}
+			if gotW := w.Bytes(); !reflect.DeepEqual(w.Bytes(), tt.wantW) {
+				t.Errorf("request.WriteTo() = %#v, want %#v", gotW, tt.wantW)
 			}
 		})
 	}

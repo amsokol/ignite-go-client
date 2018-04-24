@@ -23,17 +23,22 @@ type Request interface {
 	// WriteOInt writes "int" object value
 	WriteOInt(v int32) error
 
+	// WriteBool writes "bool" value
+	WriteBool(v bool) error
+	// WriteOBool writes "bool" object value
+	WriteOBool(v bool) error
+
 	// WriteOString writes "string" object value
 	// String is marshaled as object in all cases.
 	WriteOString(v string) error
 
-	// WriteTo is abstract function to write request data to io.Writer.
+	// WriteTo is function to write request data to io.Writer.
 	// Each child struct have to implement this function.
 	// Returns written bytes.
 	WriteTo(w io.Writer) (int64, error)
 }
 
-// request is abstract struct is implementing base message request functionality
+// request is struct is implementing base message request functionality
 type request struct {
 	payload *bytes.Buffer
 
@@ -79,6 +84,19 @@ func (r *request) WriteOInt(v int32) error {
 	return r.WriteInt(v)
 }
 
+// WriteBool writes "bool" value
+func (r *request) WriteBool(v bool) error {
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteOBool writes "bool" object value
+func (r *request) WriteOBool(v bool) error {
+	if err := r.WriteByte(typeBool); err != nil {
+		return err
+	}
+	return r.WriteBool(v)
+}
+
 // WriteOString writes "string" object value
 // String is marshalling as object in all cases.
 func (r *request) WriteOString(v string) error {
@@ -90,4 +108,11 @@ func (r *request) WriteOString(v string) error {
 		return err
 	}
 	return binary.Write(r.payload, binary.LittleEndian, s)
+}
+
+// WriteTo is function to write request data to io.Writer.
+// Each child struct have to implement this function.
+// Returns written bytes.
+func (r *request) WriteTo(w io.Writer) (int64, error) {
+	return r.payload.WriteTo(w)
 }

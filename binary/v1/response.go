@@ -29,17 +29,22 @@ type Response interface {
 	// ReadOInt reads "int" object value
 	ReadOInt() (int32, error)
 
+	// ReadBool reads "bool" value
+	ReadBool() (bool, error)
+	// ReadOBool reads "bool" object value
+	ReadOBool() (bool, error)
+
 	// ReadOString reads "string" object value
 	// String is marshaled as object in all cases.
-	ReadOString() (string, error)
+	ReadOString() (string, bool, error)
 
-	// ReadFrom is abstract function to read request data from io.Reader.
+	// ReadFrom is function to read request data from io.Reader.
 	// Each child struct have to implement this function.
 	// Returns written bytes.
 	ReadFrom(r io.Reader) (int64, error)
 }
 
-// response is abstract struct is implementing base message response functionality
+// response is struct is implementing base message response functionality
 type response struct {
 	message *bytes.Buffer
 
@@ -103,6 +108,34 @@ func (r *response) ReadOInt() (int32, error) {
 	return r.ReadInt()
 }
 
+// ReadBool reads "bool" value
+func (r *response) ReadBool() (bool, error) {
+	v, err := r.ReadByte()
+	if err != nil {
+		return false, err
+	}
+	switch v {
+	case 1:
+		return true, nil
+	case 0:
+		return false, nil
+	default:
+		return false, errors.Errorf("invalid bool value: %d", v)
+	}
+}
+
+// ReadOBool reads "bool" object value
+func (r *response) ReadOBool() (bool, error) {
+	t, err := r.ReadByte()
+	if err != nil {
+		return false, err
+	}
+	if t != typeBool {
+		return false, errors.Errorf(errInvalidType, typeBool, t)
+	}
+	return r.ReadBool()
+}
+
 // ReadOString reads "string" object value
 // String is marshaled as object in all cases.
 func (r *response) ReadOString() (string, bool, error) {
@@ -129,4 +162,11 @@ func (r *response) ReadOString() (string, bool, error) {
 	default:
 		return "", false, errors.Errorf(errInvalidType, typeString, t)
 	}
+}
+
+// ReadFrom is abstract function to read request data from io.Reader.
+// Each child struct have to implement this function.
+// Returns written bytes.
+func (r *response) ReadFrom(rr io.Reader) (int64, error) {
+	return r.message.ReadFrom(rr)
 }

@@ -216,6 +216,101 @@ func Test_response_ReadOInt(t *testing.T) {
 	}
 }
 
+func Test_response_ReadBool(t *testing.T) {
+	r1 := &testResponse{response: response{message: bytes.NewBuffer(
+		[]byte{1})}}
+	r2 := &testResponse{response: response{message: bytes.NewBuffer(
+		[]byte{0})}}
+	r3 := &testResponse{response: response{message: bytes.NewBuffer(
+		[]byte{2})}}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    &r1.response,
+			want: true,
+		},
+		{
+			name: "2",
+			r:    &r2.response,
+			want: false,
+		},
+		{
+			name:    "3",
+			r:       &r3.response,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadBool()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadBool() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadBool() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadOBool(t *testing.T) {
+	r1 := &testResponse{response: response{message: bytes.NewBuffer(
+		[]byte{8, 1})}}
+	r2 := &testResponse{response: response{message: bytes.NewBuffer(
+		[]byte{8, 0})}}
+	r3 := &testResponse{response: response{message: bytes.NewBuffer(
+		[]byte{8, 2})}}
+	r4 := &testResponse{response: response{message: bytes.NewBuffer(
+		[]byte{9, 1})}}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    &r1.response,
+			want: true,
+		},
+		{
+			name: "2",
+			r:    &r2.response,
+			want: false,
+		},
+		{
+			name:    "3",
+			r:       &r3.response,
+			wantErr: true,
+		},
+		{
+			name:    "4",
+			r:       &r4.response,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadOBool()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadOBool() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadOBool() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadOString(t *testing.T) {
 	r1 := &testResponse{response: response{message: bytes.NewBuffer(
 		[]byte{9, 0x0B, 0, 0, 0, 0x74, 0x65, 0x73, 0x74, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67})}}
