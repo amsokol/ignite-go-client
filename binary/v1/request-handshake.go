@@ -2,27 +2,17 @@ package ignite
 
 import (
 	"bytes"
-	"io"
 
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
-// RequestHandshake is interface of handshake message request
-type RequestHandshake interface {
-	Request
-}
-
-// request is struct of base message request functionality
+// requestHandshake is struct of base request functionality
 type requestHandshake struct {
 	request
 }
 
-func (r *requestHandshake) WriteTo(w io.Writer) (int64, error) {
-	return r.payload.WriteTo(w)
-}
-
 // NewRequestHandshake creates new handshake request object
-func NewRequestHandshake(major, minor, patch int) (RequestHandshake, error) {
+func NewRequestHandshake(major, minor, patch int) (Request, error) {
 	r := &requestHandshake{request: request{payload: &bytes.Buffer{}}}
 
 	if err := r.WriteInt(8); err != nil {
