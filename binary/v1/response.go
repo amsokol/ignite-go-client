@@ -59,7 +59,6 @@ type Response interface {
 	ReadOString() (string, bool, error)
 
 	// ReadFrom is function to read request data from io.Reader.
-	// Each child struct have to implement this function.
 	// Returns read bytes.
 	ReadFrom(r io.Reader) (int64, error)
 }
@@ -262,7 +261,6 @@ func (r *response) ReadOString() (string, bool, error) {
 }
 
 // ReadFrom is function to read request data from io.Reader.
-// Each child struct have to implement this function.
 // Returns read bytes.
 func (r *response) ReadFrom(rr io.Reader) (int64, error) {
 	// read response length
