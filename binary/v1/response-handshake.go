@@ -1,7 +1,6 @@
 package ignite
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/amsokol/ignite-go-client/binary/errors"
@@ -62,16 +61,12 @@ func (r *responseHandshake) Message() string {
 
 // NewResponseHandshake creates new handshake response object
 func NewResponseHandshake(r io.Reader) (ResponseHandshake, error) {
-	rr := &responseHandshake{response: response{message: &bytes.Buffer{}}}
+	rr := &responseHandshake{}
 
 	var err error
 
 	if _, err = rr.ReadFrom(r); err != nil {
 		return nil, errors.Wrapf(err, "failed to read message")
-	}
-
-	if _, err = rr.ReadInt(); err != nil {
-		return nil, errors.Wrapf(err, "failed to read message length")
 	}
 
 	rr.success, err = rr.ReadBool()
