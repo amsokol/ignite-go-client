@@ -6,98 +6,56 @@ import (
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
-// ResponseHandshake is interface of handshake message response
-type ResponseHandshake interface {
-	Response
-
+// ResponseHandshake is struct handshake response
+type ResponseHandshake struct {
 	// Success flag
-	Success() bool
-	// Server version major
-	Major() int
-	// Server version minor
-	Minor() int
-	// Server version patch
-	Patch() int
-	// Error message
-	Message() string
-}
-
-// responseHandshake is struct of base response functionality
-type responseHandshake struct {
-	// Success flag
-	success bool
+	Success bool
 	// Server version major, minor, patch
-	major, minor, patch int
+	Major, Minor, Patch int
 	// Error message
-	message string
+	Message string
 
 	response
 }
 
-// Success flag
-func (r *responseHandshake) Success() bool {
-	return r.success
-}
-
-// Server version major
-func (r *responseHandshake) Major() int {
-	return r.major
-}
-
-// Server version minor
-func (r *responseHandshake) Minor() int {
-	return r.minor
-}
-
-// Server version patch
-func (r *responseHandshake) Patch() int {
-	return r.patch
-}
-
-// Error message
-func (r *responseHandshake) Message() string {
-	return r.message
-}
-
-// NewResponseHandshake creates new handshake response object
-func NewResponseHandshake(r io.Reader) (ResponseHandshake, error) {
-	rr := &responseHandshake{}
-
-	var err error
-
-	if _, err = rr.ReadFrom(r); err != nil {
-		return nil, errors.Wrapf(err, "failed to read message")
-	}
-
-	rr.success, err = rr.ReadBool()
+// ReadFrom is function to read request data from io.Reader.
+// Returns read bytes.
+func (r *ResponseHandshake) ReadFrom(rr io.Reader) (int64, error) {
+	// read response
+	n, err := r.response.ReadFrom(rr)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read success flag")
+		return 0, errors.Wrapf(err, "failed to read response")
 	}
 
-	if !rr.success {
-		v, err := rr.ReadShort()
-		if err != nil {
-			return nil, errors.Wrapf(err, "failed to read server version major")
-		}
-		rr.major = int(v)
+	r.Success, err = r.ReadBool()
+	if err != nil {
+		return 0, errors.Wrapf(err, "failed to read success flag")
+	}
 
-		v, err = rr.ReadShort()
+	if !r.Success {
+		v, err := r.ReadShort()
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to read server version minor")
+			return 0, errors.Wrapf(err, "failed to read server version major")
 		}
-		rr.minor = int(v)
+		r.Major = int(v)
 
-		v, err = rr.ReadShort()
+		v, err = r.ReadShort()
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to read server version patch")
+			return 0, errors.Wrapf(err, "failed to read server version minor")
 		}
-		rr.patch = int(v)
+		r.Minor = int(v)
 
-		rr.message, _, err = rr.ReadOString()
+		v, err = r.ReadShort()
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to read error message")
+			return 0, errors.Wrapf(err, "failed to read server version patch")
+		}
+		r.Patch = int(v)
+
+		r.Message, _, err = r.ReadOString()
+		if err != nil {
+			return 0, errors.Wrapf(err, "failed to read error message")
 		}
 	}
 
-	return rr, nil
+	return n, nil
 }

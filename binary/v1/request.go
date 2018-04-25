@@ -55,7 +55,6 @@ type Request interface {
 	WriteOString(v string) error
 
 	// WriteTo is function to write request data to io.Writer.
-	// Each child struct have to implement this function.
 	// Returns written bytes.
 	WriteTo(w io.Writer) (int64, error)
 }
@@ -185,7 +184,6 @@ func (r *request) WriteOString(v string) error {
 }
 
 // WriteTo is function to write request data to io.Writer.
-// Each child struct have to implement this function.
 // Returns written bytes.
 func (r *request) WriteTo(w io.Writer) (int64, error) {
 	// write payload length

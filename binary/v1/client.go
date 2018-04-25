@@ -18,17 +18,29 @@ type Client interface {
 	// Connected return true if connection to the cluster is active
 	Connected() bool
 
+	// Do sends request and receives response
+	Do(req Request, res Response) error
+
 	// Close closes connection.
 	// Returns:
 	// nil in case of success.
 	// error object in case of error.
 	Close() error
+
+	// Cache Configuration methods
+	// See for details:
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations
+
+	// CacheCreateWithName Creates a cache with a given name.
+	// Cache template can be applied if there is a '*' in the cache name.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_create_with_name
+	CacheCreateWithName(cache string) error
 }
 
 type client struct {
 	debugID string
 	conn    net.Conn
-	lock    *sync.Mutex
+	mutex   *sync.Mutex
 
 	Client
 }
@@ -36,6 +48,22 @@ type client struct {
 // IsConnected return true if connection to the cluster is active
 func (c *client) Connected() bool {
 	return c.conn != nil
+}
+
+// Do sends request and receives response
+func (c *client) Do(req Request, res Response) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	// send request
+	if _, err := req.WriteTo(c.conn); err != nil {
+		return errors.Wrapf(err, "failed to send request to server")
+	}
+
+	// receive response
+	_, err := res.ReadFrom(c.conn)
+
+	return err
 }
 
 // Close closes connection.
@@ -62,33 +90,33 @@ func Connect(ctx context.Context, network, host string, port, major, minor, patc
 		return nil, errors.Wrapf(err, "failed to open connection")
 	}
 
-	// handshake
+	c := &client{conn: conn, debugID: strings.Join([]string{"network=", network, "', address='", address, "'"}, ""),
+		mutex: &sync.Mutex{}}
+	runtime.SetFinalizer(c, clientFinalizer)
+
+	// request
 	req, err := NewRequestHandshake(major, minor, patch)
 	if err != nil {
-		conn.Close()
+		c.Close()
 		return nil, errors.Wrapf(err, "failed to create handshake request")
 	}
-	_, err = req.WriteTo(conn)
-	if err != nil {
-		conn.Close()
-		return nil, errors.Wrapf(err, "failed to send handshake request")
+
+	// response
+	res := &ResponseHandshake{}
+
+	// make handshake
+	if err = c.Do(req, res); err != nil {
+		c.Close()
+		return nil, errors.Wrapf(err, "failed to make handshake")
 	}
-	res, err := NewResponseHandshake(conn)
-	if err != nil {
-		conn.Close()
-		return nil, errors.Wrapf(err, "failed to receive handshake response")
-	}
-	if !res.Success() {
-		conn.Close()
+
+	if !res.Success {
+		c.Close()
 		return nil, errors.Errorf("handshake failed: %s, server supported protocol version is v%d.%d.%d",
-			res.Message(), res.Major(), res.Minor(), res.Patch())
+			res.Message, res.Major, res.Minor, res.Patch)
 	}
 
 	// return connected client
-	c := &client{conn: conn, debugID: strings.Join([]string{"network=", network, "', address='", address, "'"}, ""),
-		lock: &sync.Mutex{}}
-	runtime.SetFinalizer(c, clientFinalizer)
-
 	return c, nil
 }
 

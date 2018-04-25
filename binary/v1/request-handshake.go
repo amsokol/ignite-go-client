@@ -6,14 +6,14 @@ import (
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
-// requestHandshake is struct of base request functionality
-type requestHandshake struct {
+// RequestHandshake is struct handshake request
+type RequestHandshake struct {
 	request
 }
 
 // NewRequestHandshake creates new handshake request object
-func NewRequestHandshake(major, minor, patch int) (Request, error) {
-	r := &requestHandshake{request: request{payload: &bytes.Buffer{}}}
+func NewRequestHandshake(major, minor, patch int) (*RequestHandshake, error) {
+	r := &RequestHandshake{request: request{payload: &bytes.Buffer{}}}
 
 	if err := r.WriteByte(1); err != nil {
 		return nil, errors.Wrapf(err, "failed to write handshake code")

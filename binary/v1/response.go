@@ -261,7 +261,7 @@ func (r *response) ReadOString() (string, bool, error) {
 	}
 }
 
-// ReadFrom is abstract function to read request data from io.Reader.
+// ReadFrom is function to read request data from io.Reader.
 // Each child struct have to implement this function.
 // Returns read bytes.
 func (r *response) ReadFrom(rr io.Reader) (int64, error) {
@@ -274,7 +274,7 @@ func (r *response) ReadFrom(rr io.Reader) (int64, error) {
 	// read response message
 	b := make([]byte, int(l))
 	if err := binary.Read(rr, binary.LittleEndian, &b); err != nil {
-		return 0, errors.Wrapf(err, "failed to read response length")
+		return 0, errors.Wrapf(err, "failed to read response data")
 	}
 	r.message = bytes.NewReader(b)
 
