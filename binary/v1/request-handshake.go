@@ -15,9 +15,6 @@ type requestHandshake struct {
 func NewRequestHandshake(major, minor, patch int) (Request, error) {
 	r := &requestHandshake{request: request{payload: &bytes.Buffer{}}}
 
-	if err := r.WriteInt(8); err != nil {
-		return nil, errors.Wrapf(err, "failed to write handshake request payload length")
-	}
 	if err := r.WriteByte(1); err != nil {
 		return nil, errors.Wrapf(err, "failed to write handshake code")
 	}

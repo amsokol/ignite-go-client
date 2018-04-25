@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
+
+	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
 // Request is interface of base message request functionality
@@ -22,6 +24,26 @@ type Request interface {
 	WriteInt(v int32) error
 	// WriteOInt writes "int" object value
 	WriteOInt(v int32) error
+
+	// WriteLong writes "long" value
+	WriteLong(v int64) error
+	// WriteOLong writes "long" object value
+	WriteOLong(v int64) error
+
+	// WriteFloat writes "float" value
+	WriteFloat(v float32) error
+	// WriteOFloat writes "float" object value
+	WriteOFloat(v float32) error
+
+	// WriteDouble writes "double" value
+	WriteDouble(v float64) error
+	// WriteODouble writes "double" object value
+	WriteODouble(v float64) error
+
+	// WriteChar writes "char" value
+	WriteChar(v rune) error
+	// WriteOChar writes "char" object value
+	WriteOChar(v Char) error
 
 	// WriteBool writes "bool" value
 	WriteBool(v bool) error
@@ -84,6 +106,58 @@ func (r *request) WriteOInt(v int32) error {
 	return r.WriteInt(v)
 }
 
+// WriteLong writes "long" value
+func (r *request) WriteLong(v int64) error {
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteOLong writes "long" object value
+func (r *request) WriteOLong(v int64) error {
+	if err := r.WriteByte(typeLong); err != nil {
+		return err
+	}
+	return r.WriteLong(v)
+}
+
+// WriteFloat writes "float" value
+func (r *request) WriteFloat(v float32) error {
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteOFloat writes "float" object value
+func (r *request) WriteOFloat(v float32) error {
+	if err := r.WriteByte(typeFloat); err != nil {
+		return err
+	}
+	return r.WriteFloat(v)
+}
+
+// WriteDouble writes "double" value
+func (r *request) WriteDouble(v float64) error {
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteODouble writes "double" object value
+func (r *request) WriteODouble(v float64) error {
+	if err := r.WriteByte(typeDouble); err != nil {
+		return err
+	}
+	return r.WriteDouble(v)
+}
+
+// WriteChar writes "char" value
+func (r *request) WriteChar(v rune) error {
+	return binary.Write(r.payload, binary.LittleEndian, int16(v))
+}
+
+// WriteOChar writes "char" object value
+func (r *request) WriteOChar(v Char) error {
+	if err := r.WriteByte(typeChar); err != nil {
+		return err
+	}
+	return r.WriteChar(rune(v))
+}
+
 // WriteBool writes "bool" value
 func (r *request) WriteBool(v bool) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
@@ -114,5 +188,11 @@ func (r *request) WriteOString(v string) error {
 // Each child struct have to implement this function.
 // Returns written bytes.
 func (r *request) WriteTo(w io.Writer) (int64, error) {
+	// write payload length
+	l := int32(r.payload.Len())
+	if err := binary.Write(w, binary.LittleEndian, &l); err != nil {
+		return 0, errors.Wrapf(err, "failed to write request length")
+	}
+	// write payload
 	return r.payload.WriteTo(w)
 }

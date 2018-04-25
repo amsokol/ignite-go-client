@@ -60,3 +60,6 @@ const (
 	// TODO: Time Array = 37
 	typeNULL byte = 101
 )
+
+// Char is Apache Ignite "char" type
+type Char rune
