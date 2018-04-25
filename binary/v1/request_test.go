@@ -433,13 +433,16 @@ func Test_request_WriteChar(t *testing.T) {
 			args: args{
 				v: 'A',
 			},
-			want: []byte{1}[:],
+			want: []byte{0x41, 0x0}[:],
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.r.WriteChar(tt.args.v); (err != nil) != tt.wantErr {
 				t.Errorf("request.WriteChar() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteODouble() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
@@ -464,13 +467,16 @@ func Test_request_WriteOChar(t *testing.T) {
 			args: args{
 				v: 'A',
 			},
-			want: []byte{7, 1}[:],
+			want: []byte{7, 0x41, 0x0}[:],
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.r.WriteOChar(tt.args.v); (err != nil) != tt.wantErr {
 				t.Errorf("request.WriteOChar() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteODouble() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
