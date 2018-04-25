@@ -63,19 +63,19 @@ func TestResponseHandshake_ReadFrom(t *testing.T) {
 				t.Errorf("ResponseHandshake.ReadFrom() = %v, want %v", got, tt.want)
 			}
 			if tt.r.Success != tt.wantSuccess {
-				t.Errorf("NewResponseHandshake() success = %v, want %v", tt.r.Success, tt.wantSuccess)
+				t.Errorf("ResponseHandshake.ReadFrom() success = %v, want %v", tt.r.Success, tt.wantSuccess)
 			}
 			if tt.r.Major != tt.wantMajor {
-				t.Errorf("NewResponseHandshake() major = %v, want %v", tt.r.Major, tt.wantMajor)
+				t.Errorf("ResponseHandshake.ReadFrom() major = %v, want %v", tt.r.Major, tt.wantMajor)
 			}
 			if tt.r.Minor != tt.wantMinor {
-				t.Errorf("NewResponseHandshake() minor = %v, want %v", tt.r.Minor, tt.wantMinor)
+				t.Errorf("ResponseHandshake.ReadFrom() minor = %v, want %v", tt.r.Minor, tt.wantMinor)
 			}
 			if tt.r.Patch != tt.wantPatch {
-				t.Errorf("NewResponseHandshake() patch = %v, want %v", tt.r.Patch, tt.wantPatch)
+				t.Errorf("ResponseHandshake.ReadFrom() patch = %v, want %v", tt.r.Patch, tt.wantPatch)
 			}
 			if tt.r.Message != tt.wantMessage {
-				t.Errorf("NewResponseHandshake() message = %v, want %v", tt.r.Message, tt.wantMessage)
+				t.Errorf("ResponseHandshake.ReadFrom() message = %v, want %v", tt.r.Message, tt.wantMessage)
 			}
 		})
 	}
