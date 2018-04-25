@@ -24,10 +24,30 @@ type Response interface {
 	// ReadOShort reads "short" object value
 	ReadOShort() (int16, error)
 
-	// ReadInt reads "int32" value
+	// ReadInt reads "int" value
 	ReadInt() (int32, error)
 	// ReadOInt reads "int" object value
 	ReadOInt() (int32, error)
+
+	// ReadLong reads "long" value
+	ReadLong() (int64, error)
+	// ReadOLong reads "long" object value
+	ReadOLong() (int64, error)
+
+	// ReadFloat reads "float" value
+	ReadFloat() (float32, error)
+	// ReadOFloat reads "float" object value
+	ReadOFloat() (float32, error)
+
+	// ReadDouble reads "double" value
+	ReadDouble() (float64, error)
+	// ReadODouble reads "double" object value
+	ReadODouble() (float64, error)
+
+	// ReadChar reads "char" value
+	ReadChar() (rune, error)
+	// ReadOChar reads "char" object value
+	ReadOChar() (Char, error)
 
 	// ReadBool reads "bool" value
 	ReadBool() (bool, error)
@@ -106,6 +126,83 @@ func (r *response) ReadOInt() (int32, error) {
 		return 0, errors.Errorf(errInvalidType, typeInt, t)
 	}
 	return r.ReadInt()
+}
+
+// ReadLong reads "long" value
+func (r *response) ReadLong() (int64, error) {
+	var v int64
+	err := binary.Read(r.message, binary.LittleEndian, &v)
+	return v, err
+}
+
+// ReadOLong reads "Long" object value
+func (r *response) ReadOLong() (int64, error) {
+	t, err := r.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	if t != typeLong {
+		return 0, errors.Errorf(errInvalidType, typeLong, t)
+	}
+	return r.ReadLong()
+}
+
+// ReadFloat reads "float" value
+func (r *response) ReadFloat() (float32, error) {
+	var v float32
+	err := binary.Read(r.message, binary.LittleEndian, &v)
+	return v, err
+}
+
+// ReadOFloat reads "float" object value
+func (r *response) ReadOFloat() (float32, error) {
+	t, err := r.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	if t != typeFloat {
+		return 0, errors.Errorf(errInvalidType, typeFloat, t)
+	}
+	return r.ReadFloat()
+}
+
+// ReadDouble reads "Double" value
+func (r *response) ReadDouble() (float64, error) {
+	var v float64
+	err := binary.Read(r.message, binary.LittleEndian, &v)
+	return v, err
+}
+
+// ReadODouble reads "Double" object value
+func (r *response) ReadODouble() (float64, error) {
+	t, err := r.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	if t != typeDouble {
+		return 0, errors.Errorf(errInvalidType, typeDouble, t)
+	}
+	return r.ReadDouble()
+}
+
+// ReadChar reads "char" value
+func (r *response) ReadChar() (rune, error) {
+	var v int16
+	err := binary.Read(r.message, binary.LittleEndian, &v)
+	return rune(v), err
+}
+
+// ReadOChar reads "char" object value
+func (r *response) ReadOChar() (Char, error) {
+	t, err := r.ReadByte()
+	if err != nil {
+		return 0, err
+	}
+	if t != typeChar {
+		return 0, errors.Errorf(errInvalidType, typeChar, t)
+	}
+	c, err := r.ReadChar()
+	return Char(c), err
 }
 
 // ReadBool reads "bool" value

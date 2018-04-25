@@ -3,6 +3,7 @@ package ignite
 import (
 	"bytes"
 	"io"
+	"reflect"
 	"testing"
 )
 
@@ -193,6 +194,262 @@ func Test_response_ReadOInt(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("response.ReadOInt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadLong(t *testing.T) {
+	r := &response{message: bytes.NewBuffer([]byte{0x15, 0x81, 0xE9, 0x7D, 0xF4, 0x10, 0x22, 0x11})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    int64
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r,
+			want: 1234567890123456789,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadLong()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadLong() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadLong() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadOLong(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{4, 0x15, 0x81, 0xE9, 0x7D, 0xF4, 0x10, 0x22, 0x11})}
+	r2 := &response{message: bytes.NewBuffer([]byte{0, 0x15, 0x81, 0xE9, 0x7D, 0xF4, 0x10, 0x22, 0x11})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    int64
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: 1234567890123456789,
+		},
+		{
+			name:    "2",
+			r:       r2,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadOLong()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadOLong() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadOLong() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadFloat(t *testing.T) {
+	r := &response{message: bytes.NewBuffer([]byte{0x65, 0x20, 0xf1, 0x47})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    float32
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r,
+			want: 123456.789,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadFloat()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadFloat() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadFloat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadOFloat(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{5, 0x65, 0x20, 0xf1, 0x47})}
+	r2 := &response{message: bytes.NewBuffer([]byte{0, 0x65, 0x20, 0xf1, 0x47})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    float32
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: 123456.789,
+		},
+		{
+			name:    "2",
+			r:       r2,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadOFloat()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadOFloat() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadOFloat() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadDouble(t *testing.T) {
+	r := &response{message: bytes.NewBuffer([]byte{0xad, 0x69, 0x7e, 0x54, 0x34, 0x6f, 0x9d, 0x41})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    float64
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r,
+			want: 123456789.12345,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadDouble()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadDouble() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadDouble() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadODouble(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{6, 0xad, 0x69, 0x7e, 0x54, 0x34, 0x6f, 0x9d, 0x41})}
+	r2 := &response{message: bytes.NewBuffer([]byte{0, 0xad, 0x69, 0x7e, 0x54, 0x34, 0x6f, 0x9d, 0x41})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    float64
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: 123456789.12345,
+		},
+		{
+			name:    "2",
+			r:       r2,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadODouble()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadODouble() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadODouble() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadChar(t *testing.T) {
+	r := &response{message: bytes.NewBuffer([]byte{0x41, 0x0})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    rune
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r,
+			want: 'A',
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadChar()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadChar() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("response.ReadChar() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadOChar(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{7, 0x41, 0x0})}
+	r2 := &response{message: bytes.NewBuffer([]byte{0, 0x41, 0x0})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    Char
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: 'A',
+		},
+		{
+			name:    "2",
+			r:       r2,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadOChar()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadOChar() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadOChar() = %v, want %v", got, tt.want)
 			}
 		})
 	}
