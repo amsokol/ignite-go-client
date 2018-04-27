@@ -617,7 +617,7 @@ func Test_response_ReadFrom(t *testing.T) {
 			args: args{
 				rr: rr,
 			},
-			want: 1,
+			want: 4 + 1,
 		},
 	}
 	for _, tt := range tests {

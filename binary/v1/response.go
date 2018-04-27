@@ -276,5 +276,5 @@ func (r *response) ReadFrom(rr io.Reader) (int64, error) {
 	}
 	r.message = bytes.NewReader(b)
 
-	return int64(l), nil
+	return 4 + int64(l), nil
 }

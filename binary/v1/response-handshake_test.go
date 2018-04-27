@@ -35,7 +35,7 @@ func TestResponseHandshake_ReadFrom(t *testing.T) {
 			args: args{
 				rr: rr1,
 			},
-			want:        1,
+			want:        4 + 1,
 			wantSuccess: true,
 		},
 		{
@@ -44,7 +44,7 @@ func TestResponseHandshake_ReadFrom(t *testing.T) {
 			args: args{
 				rr: rr2,
 			},
-			want:        23,
+			want:        4 + 23,
 			wantSuccess: false,
 			wantMajor:   1,
 			wantMinor:   0,
