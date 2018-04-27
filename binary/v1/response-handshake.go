@@ -24,7 +24,7 @@ func (r *ResponseHandshake) ReadFrom(rr io.Reader) (int64, error) {
 	// read response
 	n, err := r.response.ReadFrom(rr)
 	if err != nil {
-		return 0, errors.Wrapf(err, "failed to read response")
+		return 0, errors.Wrapf(err, "failed to read handshare response")
 	}
 
 	r.Success, err = r.ReadBool()
