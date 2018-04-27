@@ -626,7 +626,7 @@ func Test_request_WriteTo(t *testing.T) {
 			name:  "1",
 			r:     r,
 			want:  4,
-			wantW: []byte{4, 0, 0, 0, 0xD2, 0x02, 0x96, 0x49},
+			wantW: []byte{0xD2, 0x02, 0x96, 0x49},
 		},
 	}
 	for _, tt := range tests {

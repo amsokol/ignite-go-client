@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-
-	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
 // Request is interface of base message request functionality
@@ -186,11 +184,5 @@ func (r *request) WriteOString(v string) error {
 // WriteTo is function to write request data to io.Writer.
 // Returns written bytes.
 func (r *request) WriteTo(w io.Writer) (int64, error) {
-	// write payload length
-	l := int32(r.payload.Len())
-	if err := binary.Write(w, binary.LittleEndian, &l); err != nil {
-		return 0, errors.Wrapf(err, "failed to write request length")
-	}
-	// write payload
 	return r.payload.WriteTo(w)
 }

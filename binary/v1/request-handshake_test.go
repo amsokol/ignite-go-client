@@ -1,36 +1,39 @@
 package ignite
 
 import (
+	"bytes"
+	"reflect"
 	"testing"
 )
 
-func TestNewRequestHandshake(t *testing.T) {
-	type args struct {
-		major int
-		minor int
-		patch int
-	}
+func TestRequestHandshake_WriteTo(t *testing.T) {
 	tests := []struct {
 		name    string
-		args    args
-		want    Request
+		r       *RequestHandshake
+		want    int64
+		wantW   []byte
 		wantErr bool
 	}{
 		{
-			name: "1",
-			args: args{
-				major: 1,
-				minor: 0,
-				patch: 0,
-			},
+			name:  "1",
+			r:     NewRequestHandshake(1, 0, 0),
+			want:  4 + 8,
+			wantW: []byte{0x8, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x2},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewRequestHandshake(tt.args.major, tt.args.minor, tt.args.patch)
+			w := &bytes.Buffer{}
+			got, err := tt.r.WriteTo(w)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewRequestHandshake() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("RequestHandshake.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			}
+			if got != tt.want {
+				t.Errorf("RequestHandshake.WriteTo() = %v, want %v", got, tt.want)
+			}
+			if gotW := w.Bytes(); !reflect.DeepEqual(w.Bytes(), tt.wantW) {
+				t.Errorf("request.WriteTo() = %#v, want %#v", gotW, tt.wantW)
 			}
 		})
 	}

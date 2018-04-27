@@ -94,14 +94,8 @@ func Connect(ctx context.Context, network, host string, port, major, minor, patc
 		mutex: &sync.Mutex{}}
 	runtime.SetFinalizer(c, clientFinalizer)
 
-	// request
-	req, err := NewRequestHandshake(major, minor, patch)
-	if err != nil {
-		c.Close()
-		return nil, errors.Wrapf(err, "failed to create handshake request")
-	}
-
-	// response
+	// request and response
+	req := NewRequestHandshake(major, minor, patch)
 	res := &ResponseHandshake{}
 
 	// make handshake
