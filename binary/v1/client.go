@@ -35,6 +35,12 @@ type Client interface {
 	// Cache template can be applied if there is a '*' in the cache name.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_create_with_name
 	CacheCreateWithName(cache string) error
+
+	// CacheGetOrCreateWithName creates a cache with a given name.
+	// Cache template can be applied if there is a '*' in the cache name.
+	// Does nothing if the cache exists.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_or_create_with_name
+	CacheGetOrCreateWithName(cache string) error
 }
 
 type client struct {

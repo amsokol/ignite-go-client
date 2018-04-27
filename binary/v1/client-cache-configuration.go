@@ -24,3 +24,24 @@ func (c *client) CacheCreateWithName(cache string) error {
 
 	return res.CheckStatus()
 }
+
+// CacheGetOrCreateWithName creates a cache with a given name.
+// Cache template can be applied if there is a '*' in the cache name.
+// Does nothing if the cache exists.
+func (c *client) CacheGetOrCreateWithName(cache string) error {
+	// request and response
+	req := NewRequestOperation(OpCacheGetOrCreateWithName)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteOString(cache); err != nil {
+		return errors.Wrapf(err, "failed to write cache name")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_GET_OR_CREATE_WITH_NAME operation")
+	}
+
+	return res.CheckStatus()
+}
