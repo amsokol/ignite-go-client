@@ -10,7 +10,7 @@ import (
 
 // RequestOperation is struct to store operation request
 type RequestOperation struct {
-	Code int
+	Code int16
 	UID  int64
 
 	request
@@ -26,8 +26,7 @@ func (r *RequestOperation) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	// write operation code
-	code := int16(r.Code)
-	if err := binary.Write(w, binary.LittleEndian, &code); err != nil {
+	if err := binary.Write(w, binary.LittleEndian, &r.Code); err != nil {
 		return 0, errors.Wrapf(err, "failed to write operation code")
 	}
 
@@ -42,6 +41,6 @@ func (r *RequestOperation) WriteTo(w io.Writer) (int64, error) {
 }
 
 // NewRequestOperation creates new handshake request object
-func NewRequestOperation(code int) *RequestOperation {
+func NewRequestOperation(code int16) *RequestOperation {
 	return &RequestOperation{request: newRequest(), Code: code, UID: rand.Int63()}
 }
