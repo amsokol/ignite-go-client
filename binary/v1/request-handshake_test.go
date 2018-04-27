@@ -33,7 +33,7 @@ func TestRequestHandshake_WriteTo(t *testing.T) {
 				t.Errorf("RequestHandshake.WriteTo() = %v, want %v", got, tt.want)
 			}
 			if gotW := w.Bytes(); !reflect.DeepEqual(w.Bytes(), tt.wantW) {
-				t.Errorf("request.WriteTo() = %#v, want %#v", gotW, tt.wantW)
+				t.Errorf("RequestHandshake.WriteTo() = %#v, want %#v", gotW, tt.wantW)
 			}
 		})
 	}
