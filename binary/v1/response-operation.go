@@ -6,6 +6,11 @@ import (
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
+const (
+	// OperationStatusSuccess means success
+	OperationStatusSuccess = 0
+)
+
 // ResponseOperation is struct operation response
 type ResponseOperation struct {
 	// Request id
@@ -37,7 +42,7 @@ func (r *ResponseOperation) ReadFrom(rr io.Reader) (int64, error) {
 		return 0, errors.Wrapf(err, "failed to read status code")
 	}
 
-	if r.Status != 0 {
+	if r.Status != OperationStatusSuccess {
 		r.Message, _, err = r.ReadOString()
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read error message")
@@ -49,6 +54,17 @@ func (r *ResponseOperation) ReadFrom(rr io.Reader) (int64, error) {
 	}
 
 	return n, nil
+}
+
+// CheckStatus checks status of operation execution.
+// Returns:
+// nil in case of success.
+// error object in case of operation failed.
+func (r *ResponseOperation) CheckStatus() error {
+	if r.Status != OperationStatusSuccess {
+		return errors.NewError(r.Status, r.Message)
+	}
+	return nil
 }
 
 // NewResponseOperation is ResponseOperation constructor
