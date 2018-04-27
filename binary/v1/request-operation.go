@@ -20,7 +20,7 @@ type RequestOperation struct {
 // Returns written bytes.
 func (r *RequestOperation) WriteTo(w io.Writer) (int64, error) {
 	// write payload length
-	l := int32(r.payload.Len())
+	l := int32(2 + 8 + r.payload.Len())
 	if err := binary.Write(w, binary.LittleEndian, &l); err != nil {
 		return 0, errors.Wrapf(err, "failed to write operation request length")
 	}
