@@ -186,3 +186,8 @@ func (r *request) WriteOString(v string) error {
 func (r *request) WriteTo(w io.Writer) (int64, error) {
 	return r.payload.WriteTo(w)
 }
+
+// newRequest is private constructor for request
+func newRequest() request {
+	return request{payload: &bytes.Buffer{}}
+}

@@ -1,7 +1,6 @@
 package ignite
 
 import (
-	"bytes"
 	"encoding/binary"
 	"io"
 
@@ -41,11 +40,11 @@ func (r *RequestHandshake) WriteTo(w io.Writer) (int64, error) {
 	}
 	// write payload
 	n, err := r.payload.WriteTo(w)
-	return n + 4, err
+	return 4 + n, err
 }
 
 // NewRequestHandshake creates new handshake request object
 func NewRequestHandshake(major, minor, patch int) *RequestHandshake {
-	return &RequestHandshake{request: request{payload: &bytes.Buffer{}},
+	return &RequestHandshake{request: newRequest(),
 		major: major, minor: minor, patch: patch}
 }
