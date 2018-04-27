@@ -85,3 +85,37 @@ func Test_client_CacheGetOrCreateWithName(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheGetNames(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	tests := []struct {
+		name    string
+		c       Client
+		want    []string
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_ /*got*/, err := tt.c.CacheGetNames()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheGetNames() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			/*
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("client.CacheGetNames() = %v, want %v", got, tt.want)
+				}
+			*/
+		})
+	}
+}

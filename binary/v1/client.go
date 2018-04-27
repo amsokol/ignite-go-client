@@ -41,6 +41,10 @@ type Client interface {
 	// Does nothing if the cache exists.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_or_create_with_name
 	CacheGetOrCreateWithName(cache string) error
+
+	// CacheGetNames returns existing cache names.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_names
+	CacheGetNames() ([]string, error)
 }
 
 type client struct {
