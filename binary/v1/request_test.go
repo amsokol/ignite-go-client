@@ -611,6 +611,148 @@ func Test_request_WriteOString(t *testing.T) {
 	}
 }
 
+func Test_request_WriteNull(t *testing.T) {
+	r := &request{payload: &bytes.Buffer{}}
+
+	tests := []struct {
+		name    string
+		r       *request
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r,
+			want: []byte{101}[:],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteNull(); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteNull() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteNull() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteObject(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	r2 := &request{payload: &bytes.Buffer{}}
+	r3 := &request{payload: &bytes.Buffer{}}
+	r4 := &request{payload: &bytes.Buffer{}}
+	r5 := &request{payload: &bytes.Buffer{}}
+	r6 := &request{payload: &bytes.Buffer{}}
+	r7 := &request{payload: &bytes.Buffer{}}
+	r8 := &request{payload: &bytes.Buffer{}}
+	r9 := &request{payload: &bytes.Buffer{}}
+	r101 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		o interface{}
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "byte",
+			r:    r1,
+			args: args{
+				byte(123),
+			},
+			want: []byte{1, 123}[:],
+		},
+		{
+			name: "short",
+			r:    r2,
+			args: args{
+				int16(12345),
+			},
+			want: []byte{2, 0x39, 0x30}[:],
+		},
+		{
+			name: "int",
+			r:    r3,
+			args: args{
+				int32(1234567890),
+			},
+			want: []byte{3, 0xD2, 0x02, 0x96, 0x49}[:],
+		},
+		{
+			name: "long",
+			r:    r4,
+			args: args{
+				int64(1234567890123456789),
+			},
+			want: []byte{4, 0x15, 0x81, 0xE9, 0x7D, 0xF4, 0x10, 0x22, 0x11}[:],
+		},
+		{
+			name: "float",
+			r:    r5,
+			args: args{
+				float32(123456.789),
+			},
+			want: []byte{5, 0x65, 0x20, 0xf1, 0x47}[:],
+		},
+		{
+			name: "double",
+			r:    r6,
+			args: args{
+				float64(123456789.12345),
+			},
+			want: []byte{6, 0xad, 0x69, 0x7e, 0x54, 0x34, 0x6f, 0x9d, 0x41}[:],
+		},
+		{
+			name: "char",
+			r:    r7,
+			args: args{
+				Char('A'),
+			},
+			want: []byte{7, 0x41, 0x0}[:],
+		},
+		{
+			name: "bool",
+			r:    r8,
+			args: args{
+				true,
+			},
+			want: []byte{8, 0x1}[:],
+		},
+		{
+			name: "String",
+			r:    r9,
+			args: args{
+				"test string",
+			},
+			want: []byte{9, 0x0B, 0, 0, 0, 0x74, 0x65, 0x73, 0x74, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67}[:],
+		},
+		{
+			name: "NULL",
+			r:    r101,
+			args: args{
+				nil,
+			},
+			want: []byte{101}[:],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteObject(tt.args.o); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteObject() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteObject() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteTo(t *testing.T) {
 	r := &request{payload: &bytes.Buffer{}}
 	_ = r.WriteInt(1234567890)

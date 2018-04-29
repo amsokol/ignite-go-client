@@ -2,16 +2,16 @@ package ignite
 
 const (
 	// Supported standard types and their type codes are as follows:
-	typeByte   byte = 1
-	typeShort  byte = 2
-	typeInt    byte = 3
-	typeLong   byte = 4
-	typeFloat  byte = 5
-	typeDouble byte = 6
-	typeChar   byte = 7
-	typeBool   byte = 8
-	typeString byte = 9
-	typeUUID   byte = 10
+	typeByte   = 1
+	typeShort  = 2
+	typeInt    = 3
+	typeLong   = 4
+	typeFloat  = 5
+	typeDouble = 6
+	typeChar   = 7
+	typeBool   = 8
+	typeString = 9
+	// TODO: typeUUID   = 10
 	/*
 	   Apache.Ignite.Core.Impl.Binary.BinaryUtils
 
@@ -35,18 +35,18 @@ const (
 	   bytes[14] = jBytes[9]; // j
 	   bytes[15] = jBytes[8]; // k
 	*/
-	typeDate        byte = 11
-	typeByteArray   byte = 12
-	typeShortArray  byte = 13
-	typeIntArray    byte = 14
-	typeLongArray   byte = 15
-	typeFloatArray  byte = 16
-	typeDoubleArray byte = 17
-	typeCharArray   byte = 18
-	typeBoolArray   byte = 19
-	typeStringArray byte = 20
-	typeUUIDArray   byte = 21
-	typeDateArray   byte = 22
+	// TODO: typeDate        = 11
+	// TODO: typeByteArray   = 12
+	// TODO: typeShortArray  = 13
+	// TODO: typeIntArray    = 14
+	// TODO: typeLongArray   = 15
+	// TODO: typeFloatArray  = 16
+	// TODO: typeDoubleArray = 17
+	// TODO: typeCharArray   = 18
+	// TODO: typeBoolArray   = 19
+	// TODO: typeStringArray = 20
+	// TODO: typeUUIDArray   = 21
+	// TODO: typeDateArray   = 22
 	// TODO: Object array = 23
 	// TODO: Collection = 24
 	// TODO: Map = 25
@@ -54,9 +54,9 @@ const (
 	// TODO: Enum Array = 29
 	// TODO: Decimal = 30
 	// TODO: Decimal Array = 31
-	typeTimestamp byte = 33
+	// TODO: typeTimestamp byte = 33
 	// TODO: Timestamp Array = 34
-	typeTime byte = 36
+	// TODO: typeTime byte = 36
 	// TODO: Time Array = 37
 	typeNULL byte = 101
 )

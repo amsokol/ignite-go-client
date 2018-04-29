@@ -3,9 +3,10 @@ package ignite
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"reflect"
+
+	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
 // Request is interface of base message request functionality
@@ -213,7 +214,7 @@ func (r *request) WriteObject(o interface{}) error {
 	case string:
 		return r.WriteOString(v)
 	default:
-		return fmt.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
+		return errors.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
 	}
 }
 
