@@ -915,3 +915,22 @@ func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfiguration
 
 	return res.CheckStatus()
 }
+
+// CacheDestroy destroys cache with a given name.
+func (c *client) CacheDestroy(cache string) error {
+	// request and response
+	req := NewRequestOperation(OpCacheDestroy)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return errors.Wrapf(err, "failed to write cache name hash")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_DESTROY operation")
+	}
+
+	return res.CheckStatus()
+}

@@ -291,3 +291,44 @@ func Test_client_CacheGetOrCreateWithConfiguration(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheDestroy(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	type args struct {
+		cache string
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "CacheDestroy",
+			},
+		},
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "CacheDestroy",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.c.CacheDestroy(tt.args.cache); (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheDestroy() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

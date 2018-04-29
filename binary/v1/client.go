@@ -59,6 +59,10 @@ type Client interface {
 	// Does nothing if the name is already in use.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_or_create_with_configuration
 	CacheGetOrCreateWithConfiguration(cc *CacheConfigurationRefs) error
+
+	// CacheDestroy destroys cache with a given name.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_destroy
+	CacheDestroy(cache string) error
 }
 
 type client struct {
