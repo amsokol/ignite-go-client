@@ -181,6 +181,11 @@ func (r *request) WriteOString(v string) error {
 	return binary.Write(r.payload, binary.LittleEndian, s)
 }
 
+// WriteNull writes NULL
+func (r *request) WriteNull() error {
+	return r.WriteByte(typeNULL)
+}
+
 // WriteTo is function to write request data to io.Writer.
 // Returns written bytes.
 func (r *request) WriteTo(w io.Writer) (int64, error) {
