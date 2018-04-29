@@ -3,7 +3,9 @@ package ignite
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io"
+	"reflect"
 )
 
 // Request is interface of base message request functionality
@@ -184,6 +186,35 @@ func (r *request) WriteOString(v string) error {
 // WriteNull writes NULL
 func (r *request) WriteNull() error {
 	return r.WriteByte(typeNULL)
+}
+
+func (r *request) WriteObject(o interface{}) error {
+	if o == nil {
+		return r.WriteNull()
+	}
+
+	switch v := o.(type) {
+	case byte:
+		return r.WriteOByte(v)
+	case int16:
+		return r.WriteOShort(v)
+	case int32:
+		return r.WriteOInt(v)
+	case int64:
+		return r.WriteOLong(v)
+	case float32:
+		return r.WriteOFloat(v)
+	case float64:
+		return r.WriteODouble(v)
+	case Char:
+		return r.WriteOChar(v)
+	case bool:
+		return r.WriteOBool(v)
+	case string:
+		return r.WriteOString(v)
+	default:
+		return fmt.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
+	}
 }
 
 // WriteTo is function to write request data to io.Writer.
