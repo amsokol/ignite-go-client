@@ -2,6 +2,7 @@ package ignite
 
 import (
 	"context"
+	"reflect"
 	"testing"
 )
 
@@ -121,6 +122,78 @@ func Test_client_CacheGetNames(t *testing.T) {
 			}
 			if !found {
 				t.Errorf("client.CacheGetNames() , want \"%v\", but not found", tt.want)
+			}
+		})
+	}
+}
+
+func Test_client_CacheGetConfiguration(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	type args struct {
+		cache string
+		flag  byte
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    *CacheConfiguration
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "CacheGetConfiguration",
+			},
+			want: &CacheConfiguration{
+				AtomicityMode:                 0,
+				Backups:                       0,
+				CacheMode:                     2,
+				CopyOnRead:                    true,
+				DataRegionName:                "",
+				EagerTTL:                      true,
+				EnableStatistics:              false,
+				GroupName:                     "",
+				LockTimeout:                   0,
+				MaxConcurrentAsyncOperations:  500,
+				MaxQueryIterators:             1024,
+				Name:                          "CacheGetConfiguration",
+				OnheapCacheEnabled:            false,
+				PartitionLossPolicy:           4,
+				QueryDetailMetricsSize:        0,
+				QueryParellelism:              1,
+				ReadFromBackup:                true,
+				RebalanceBatchSize:            524288,
+				RebalanceBatchesPrefetchCount: 2,
+				RebalanceDelay:                0,
+				RebalanceMode:                 1,
+				RebalanceOrder:                0,
+				RebalanceThrottle:             0,
+				RebalanceTimeout:              10000,
+				SQLEscapeAll:                  false,
+				SQLIndexInlineMaxSize:         -1,
+				SQLSchema:                     "",
+				WriteSynchronizationMode:      0,
+				CacheKeyConfigurations:        []CacheKeyConfiguration{},
+				QueryEntities:                 []QueryEntity{},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheGetConfiguration(tt.args.cache, tt.args.flag)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheGetConfiguration() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("client.CacheGetConfiguration() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}

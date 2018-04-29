@@ -45,6 +45,10 @@ type Client interface {
 	// CacheGetNames returns existing cache names.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_names
 	CacheGetNames() ([]string, error)
+
+	// CacheGetConfiguration gets configuration for the given cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_configuration
+	CacheGetConfiguration(cache string, flag byte) (*CacheConfiguration, error)
 }
 
 type client struct {
