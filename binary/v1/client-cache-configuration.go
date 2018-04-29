@@ -5,36 +5,36 @@ import (
 )
 
 const (
-	cacheConfigurationAtomicityModeCode                 int16 = 2
-	cacheConfigurationBackupsCode                       int16 = 3
-	cacheConfigurationCacheModeCode                     int16 = 1
-	cacheConfigurationCopyOnReadCode                    int16 = 5
-	cacheConfigurationDataRegionNameCode                int16 = 100
-	cacheConfigurationEagerTTLCode                      int16 = 405
-	cacheConfigurationEnableStatisticsCode              int16 = 406
-	cacheConfigurationGroupNameCode                     int16 = 400
-	cacheConfigurationLockTimeoutCode                   int16 = 402
-	cacheConfigurationMaxConcurrentAsyncOperationsCode  int16 = 403
-	cacheConfigurationMaxQueryIteratorsCode             int16 = 206
-	cacheConfigurationNameCode                          int16 = 0
-	cacheConfigurationOnheapCacheEnabledCode            int16 = 101
-	cacheConfigurationPartitionLossPolicyCode           int16 = 404
-	cacheConfigurationQueryDetailMetricsSizeCode        int16 = 202
-	cacheConfigurationQueryParellelismCode              int16 = 201
-	cacheConfigurationReadFromBackupCode                int16 = 6
-	cacheConfigurationRebalanceBatchSizeCode            int16 = 303
-	cacheConfigurationRebalanceBatchesPrefetchCountCode int16 = 304
-	cacheConfigurationRebalanceDelayCode                int16 = 301
-	cacheConfigurationRebalanceModeCode                 int16 = 300
-	cacheConfigurationRebalanceOrderCode                int16 = 305
-	cacheConfigurationRebalanceThrottleCode             int16 = 306
-	cacheConfigurationRebalanceTimeoutCode              int16 = 302
-	cacheConfigurationSQLEscapeAllCode                  int16 = 205
-	cacheConfigurationSQLIndexInlineMaxSizeCode         int16 = 204
-	cacheConfigurationSQLSchemaCode                     int16 = 203
-	cacheConfigurationWriteSynchronizationModeCode      int16 = 4
-	cacheConfigurationCacheKeyConfigurationsCode        int16 = 401
-	cacheConfigurationQueryEntitiesCode                 int16 = 200
+	cacheConfigurationAtomicityModeCode                 = 2
+	cacheConfigurationBackupsCode                       = 3
+	cacheConfigurationCacheModeCode                     = 1
+	cacheConfigurationCopyOnReadCode                    = 5
+	cacheConfigurationDataRegionNameCode                = 100
+	cacheConfigurationEagerTTLCode                      = 405
+	cacheConfigurationEnableStatisticsCode              = 406
+	cacheConfigurationGroupNameCode                     = 400
+	cacheConfigurationLockTimeoutCode                   = 402
+	cacheConfigurationMaxConcurrentAsyncOperationsCode  = 403
+	cacheConfigurationMaxQueryIteratorsCode             = 206
+	cacheConfigurationNameCode                          = 0
+	cacheConfigurationOnheapCacheEnabledCode            = 101
+	cacheConfigurationPartitionLossPolicyCode           = 404
+	cacheConfigurationQueryDetailMetricsSizeCode        = 202
+	cacheConfigurationQueryParellelismCode              = 201
+	cacheConfigurationReadFromBackupCode                = 6
+	cacheConfigurationRebalanceBatchSizeCode            = 303
+	cacheConfigurationRebalanceBatchesPrefetchCountCode = 304
+	cacheConfigurationRebalanceDelayCode                = 301
+	cacheConfigurationRebalanceModeCode                 = 300
+	cacheConfigurationRebalanceOrderCode                = 305
+	cacheConfigurationRebalanceThrottleCode             = 306
+	cacheConfigurationRebalanceTimeoutCode              = 302
+	cacheConfigurationSQLEscapeAllCode                  = 205
+	cacheConfigurationSQLIndexInlineMaxSizeCode         = 204
+	cacheConfigurationSQLSchemaCode                     = 203
+	cacheConfigurationWriteSynchronizationModeCode      = 4
+	cacheConfigurationCacheKeyConfigurationsCode        = 401
+	cacheConfigurationQueryEntitiesCode                 = 200
 )
 
 const (
@@ -503,4 +503,415 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 	}
 
 	return &cc, nil
+}
+
+// CacheCreateWithConfiguration creates cache with provided configuration.
+// An error is returned if the name is already in use.
+func (c *client) CacheCreateWithConfiguration(cc *CacheConfigurationRefs) error {
+	return c.cacheCreateWithConfiguration(OpCacheCreateWithConfiguration, cc)
+}
+
+// CacheGetOrCreateWithConfiguration creates cache with provided configuration.
+// Does nothing if the name is already in use.
+func (c *client) CacheGetOrCreateWithConfiguration(cc *CacheConfigurationRefs) error {
+	return c.cacheCreateWithConfiguration(OpCacheGetOrCreateWithConfiguration, cc)
+}
+
+func (c *client) cacheCreateWithConfiguration(code int16, cc *CacheConfigurationRefs) error {
+	// request and response
+	req := NewRequestCacheCreateWithConfiguration(code)
+	res := NewResponseOperation(req.UID)
+
+	if cc.AtomicityMode != nil {
+		if err := req.WriteShort(cacheConfigurationAtomicityModeCode); err != nil {
+			return errors.Wrapf(err, "failed to write AtomicityMode property code")
+		}
+		if err := req.WriteInt(*cc.AtomicityMode); err != nil {
+			return errors.Wrapf(err, "failed to write AtomicityMode property value")
+		}
+		req.Count++
+	}
+	if cc.Backups != nil {
+		if err := req.WriteShort(cacheConfigurationBackupsCode); err != nil {
+			return errors.Wrapf(err, "failed to write Backups property code")
+		}
+		if err := req.WriteInt(*cc.Backups); err != nil {
+			return errors.Wrapf(err, "failed to write Backups property value")
+		}
+		req.Count++
+	}
+	if cc.CacheMode != nil {
+		if err := req.WriteShort(cacheConfigurationCacheModeCode); err != nil {
+			return errors.Wrapf(err, "failed to write CacheMode property code")
+		}
+		if err := req.WriteInt(*cc.CacheMode); err != nil {
+			return errors.Wrapf(err, "failed to write CacheMode property value")
+		}
+		req.Count++
+	}
+	if cc.CopyOnRead != nil {
+		if err := req.WriteShort(cacheConfigurationCopyOnReadCode); err != nil {
+			return errors.Wrapf(err, "failed to write CopyOnRead property code")
+		}
+		if err := req.WriteBool(*cc.CopyOnRead); err != nil {
+			return errors.Wrapf(err, "failed to write CopyOnRead property value")
+		}
+		req.Count++
+	}
+	if cc.DataRegionName != nil {
+		if err := req.WriteShort(cacheConfigurationDataRegionNameCode); err != nil {
+			return errors.Wrapf(err, "failed to write DataRegionName property code")
+		}
+		if err := req.WriteOString(*cc.DataRegionName); err != nil {
+			return errors.Wrapf(err, "failed to write DataRegionName property value")
+		}
+		req.Count++
+	}
+	if cc.EagerTTL != nil {
+		if err := req.WriteShort(cacheConfigurationEagerTTLCode); err != nil {
+			return errors.Wrapf(err, "failed to write EagerTTL property code")
+		}
+		if err := req.WriteBool(*cc.EagerTTL); err != nil {
+			return errors.Wrapf(err, "failed to write EagerTTL property value")
+		}
+		req.Count++
+	}
+	if cc.EnableStatistics != nil {
+		if err := req.WriteShort(cacheConfigurationEnableStatisticsCode); err != nil {
+			return errors.Wrapf(err, "failed to write EnableStatistics property code")
+		}
+		if err := req.WriteBool(*cc.EnableStatistics); err != nil {
+			return errors.Wrapf(err, "failed to write EnableStatistics property value")
+		}
+		req.Count++
+	}
+	if cc.GroupName != nil {
+		if err := req.WriteShort(cacheConfigurationGroupNameCode); err != nil {
+			return errors.Wrapf(err, "failed to write GroupName property code")
+		}
+		if err := req.WriteOString(*cc.GroupName); err != nil {
+			return errors.Wrapf(err, "failed to write GroupName property value")
+		}
+		req.Count++
+	}
+	if cc.LockTimeout != nil {
+		if err := req.WriteShort(cacheConfigurationLockTimeoutCode); err != nil {
+			return errors.Wrapf(err, "failed to write LockTimeout property code")
+		}
+		if err := req.WriteLong(*cc.LockTimeout); err != nil {
+			return errors.Wrapf(err, "failed to write LockTimeout property value")
+		}
+		req.Count++
+	}
+	if cc.MaxConcurrentAsyncOperations != nil {
+		if err := req.WriteShort(cacheConfigurationMaxConcurrentAsyncOperationsCode); err != nil {
+			return errors.Wrapf(err, "failed to write MaxConcurrentAsyncOperations property code")
+		}
+		if err := req.WriteInt(*cc.MaxConcurrentAsyncOperations); err != nil {
+			return errors.Wrapf(err, "failed to write MaxConcurrentAsyncOperations property value")
+		}
+		req.Count++
+	}
+	if cc.MaxQueryIterators != nil {
+		if err := req.WriteShort(cacheConfigurationMaxQueryIteratorsCode); err != nil {
+			return errors.Wrapf(err, "failed to write MaxQueryIterators property code")
+		}
+		if err := req.WriteInt(*cc.MaxQueryIterators); err != nil {
+			return errors.Wrapf(err, "failed to write MaxQueryIterators property value")
+		}
+		req.Count++
+	}
+	if cc.Name != nil {
+		if err := req.WriteShort(cacheConfigurationNameCode); err != nil {
+			return errors.Wrapf(err, "failed to write Name property code")
+		}
+		if err := req.WriteOString(*cc.Name); err != nil {
+			return errors.Wrapf(err, "failed to write Name property value")
+		}
+		req.Count++
+	}
+	if cc.OnheapCacheEnabled != nil {
+		if err := req.WriteShort(cacheConfigurationOnheapCacheEnabledCode); err != nil {
+			return errors.Wrapf(err, "failed to write OnheapCacheEnabled property code")
+		}
+		if err := req.WriteBool(*cc.OnheapCacheEnabled); err != nil {
+			return errors.Wrapf(err, "failed to write OnheapCacheEnabled property value")
+		}
+		req.Count++
+	}
+	if cc.PartitionLossPolicy != nil {
+		if err := req.WriteShort(cacheConfigurationPartitionLossPolicyCode); err != nil {
+			return errors.Wrapf(err, "failed to write PartitionLossPolicy property code")
+		}
+		if err := req.WriteInt(*cc.PartitionLossPolicy); err != nil {
+			return errors.Wrapf(err, "failed to write PartitionLossPolicy property value")
+		}
+		req.Count++
+	}
+	if cc.QueryDetailMetricsSize != nil {
+		if err := req.WriteShort(cacheConfigurationQueryDetailMetricsSizeCode); err != nil {
+			return errors.Wrapf(err, "failed to write QueryDetailMetricsSize property code")
+		}
+		if err := req.WriteInt(*cc.QueryDetailMetricsSize); err != nil {
+			return errors.Wrapf(err, "failed to write QueryDetailMetricsSize property value")
+		}
+		req.Count++
+	}
+	if cc.QueryParellelism != nil {
+		if err := req.WriteShort(cacheConfigurationQueryParellelismCode); err != nil {
+			return errors.Wrapf(err, "failed to write QueryParellelism property code")
+		}
+		if err := req.WriteInt(*cc.QueryParellelism); err != nil {
+			return errors.Wrapf(err, "failed to write QueryParellelism property value")
+		}
+		req.Count++
+	}
+	if cc.ReadFromBackup != nil {
+		if err := req.WriteShort(cacheConfigurationReadFromBackupCode); err != nil {
+			return errors.Wrapf(err, "failed to write ReadFromBackup property code")
+		}
+		if err := req.WriteBool(*cc.ReadFromBackup); err != nil {
+			return errors.Wrapf(err, "failed to write ReadFromBackup property value")
+		}
+		req.Count++
+	}
+	if cc.RebalanceBatchSize != nil {
+		if err := req.WriteShort(cacheConfigurationRebalanceBatchSizeCode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceBatchSize property code")
+		}
+		if err := req.WriteInt(*cc.RebalanceBatchSize); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceBatchSize property value")
+		}
+		req.Count++
+	}
+	if cc.RebalanceBatchesPrefetchCount != nil {
+		if err := req.WriteShort(cacheConfigurationRebalanceBatchesPrefetchCountCode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceBatchesPrefetchCount property code")
+		}
+		if err := req.WriteLong(*cc.RebalanceBatchesPrefetchCount); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceBatchesPrefetchCount property value")
+		}
+		req.Count++
+	}
+	if cc.RebalanceDelay != nil {
+		if err := req.WriteShort(cacheConfigurationRebalanceDelayCode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceDelay property code")
+		}
+		if err := req.WriteLong(*cc.RebalanceDelay); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceDelay property value")
+		}
+		req.Count++
+	}
+	if cc.RebalanceMode != nil {
+		if err := req.WriteShort(cacheConfigurationRebalanceModeCode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceMode property code")
+		}
+		if err := req.WriteInt(*cc.RebalanceMode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceMode property value")
+		}
+		req.Count++
+	}
+	if cc.RebalanceOrder != nil {
+		if err := req.WriteShort(cacheConfigurationRebalanceOrderCode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceOrder property code")
+		}
+		if err := req.WriteInt(*cc.RebalanceOrder); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceOrder property value")
+		}
+		req.Count++
+	}
+	if cc.RebalanceThrottle != nil {
+		if err := req.WriteShort(cacheConfigurationRebalanceThrottleCode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceThrottle property code")
+		}
+		if err := req.WriteLong(*cc.RebalanceThrottle); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceThrottle property value")
+		}
+		req.Count++
+	}
+	if cc.RebalanceTimeout != nil {
+		if err := req.WriteShort(cacheConfigurationRebalanceTimeoutCode); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceTimeout property code")
+		}
+		if err := req.WriteLong(*cc.RebalanceTimeout); err != nil {
+			return errors.Wrapf(err, "failed to write RebalanceTimeout property value")
+		}
+		req.Count++
+	}
+	if cc.SQLEscapeAll != nil {
+		if err := req.WriteShort(cacheConfigurationSQLEscapeAllCode); err != nil {
+			return errors.Wrapf(err, "failed to write SQLEscapeAll property code")
+		}
+		if err := req.WriteBool(*cc.SQLEscapeAll); err != nil {
+			return errors.Wrapf(err, "failed to write SQLEscapeAll property value")
+		}
+		req.Count++
+	}
+	if cc.SQLIndexInlineMaxSize != nil {
+		if err := req.WriteShort(cacheConfigurationSQLIndexInlineMaxSizeCode); err != nil {
+			return errors.Wrapf(err, "failed to write SQLIndexInlineMaxSize property code")
+		}
+		if err := req.WriteInt(*cc.SQLIndexInlineMaxSize); err != nil {
+			return errors.Wrapf(err, "failed to write SQLIndexInlineMaxSize property value")
+		}
+		req.Count++
+	}
+	if cc.SQLSchema != nil {
+		if err := req.WriteShort(cacheConfigurationSQLSchemaCode); err != nil {
+			return errors.Wrapf(err, "failed to write SQLSchema property code")
+		}
+		if err := req.WriteOString(*cc.SQLSchema); err != nil {
+			return errors.Wrapf(err, "failed to write SQLSchema property value")
+		}
+		req.Count++
+	}
+	if cc.WriteSynchronizationMode != nil {
+		if err := req.WriteShort(cacheConfigurationWriteSynchronizationModeCode); err != nil {
+			return errors.Wrapf(err, "failed to write WriteSynchronizationMode property code")
+		}
+		if err := req.WriteInt(*cc.WriteSynchronizationMode); err != nil {
+			return errors.Wrapf(err, "failed to write WriteSynchronizationMode property value")
+		}
+		req.Count++
+	}
+	if cc.WriteSynchronizationMode != nil {
+		if err := req.WriteShort(cacheConfigurationWriteSynchronizationModeCode); err != nil {
+			return errors.Wrapf(err, "failed to write WriteSynchronizationMode property code")
+		}
+		if err := req.WriteInt(*cc.WriteSynchronizationMode); err != nil {
+			return errors.Wrapf(err, "failed to write WriteSynchronizationMode property value")
+		}
+		req.Count++
+	}
+	if cc.CacheKeyConfigurations != nil && len(cc.CacheKeyConfigurations) > 0 {
+		if err := req.WriteShort(cacheConfigurationCacheKeyConfigurationsCode); err != nil {
+			return errors.Wrapf(err, "failed to write CacheKeyConfigurations code")
+		}
+		if err := req.WriteInt(int32(len(cc.CacheKeyConfigurations))); err != nil {
+			return errors.Wrapf(err, "failed to write CacheKeyConfigurations count")
+		}
+		for i, v := range cc.CacheKeyConfigurations {
+			if err := req.WriteOString(v.TypeName); err != nil {
+				return errors.Wrapf(err, "failed to write CacheKeyConfiguration.TypeName with index %d", i)
+			}
+			if err := req.WriteOString(v.AffinityKeyFieldName); err != nil {
+				return errors.Wrapf(err, "failed to write CacheKeyConfiguration.AffinityKeyFieldName with index %d", i)
+			}
+		}
+		req.Count++
+	}
+	if cc.QueryEntities != nil && len(cc.QueryEntities) > 0 {
+		if err := req.WriteShort(cacheConfigurationQueryEntitiesCode); err != nil {
+			return errors.Wrapf(err, "failed to write QueryEntities code")
+		}
+		if err := req.WriteInt(int32(len(cc.QueryEntities))); err != nil {
+			return errors.Wrapf(err, "failed to write QueryEntity count")
+		}
+		for i, v := range cc.QueryEntities {
+			if err := req.WriteOString(v.KeyTypeName); err != nil {
+				return errors.Wrapf(err, "failed to write QueryEntity.KeyTypeName with index %d", i)
+			}
+			if err := req.WriteOString(v.ValueTypeName); err != nil {
+				return errors.Wrapf(err, "failed to write QueryEntity.ValueTypeName with index %d", i)
+			}
+			if err := req.WriteOString(v.TableName); err != nil {
+				return errors.Wrapf(err, "failed to write QueryEntity.TableName with index %d", i)
+			}
+			if err := req.WriteOString(v.KeyFieldName); err != nil {
+				return errors.Wrapf(err, "failed to write QueryEntity.KeyFieldName with index %d", i)
+			}
+			if err := req.WriteOString(v.ValueFieldName); err != nil {
+				return errors.Wrapf(err, "failed to write QueryEntity.ValueFieldName with index %d", i)
+			}
+			var l int32
+			if v.QueryFields != nil {
+				l = int32(len(v.QueryFields))
+			}
+			if err := req.WriteInt(l); err != nil {
+				return errors.Wrapf(err, "failed to write QueryField count")
+			}
+			if l > 0 {
+				// write QueryFields
+				for j, v2 := range v.QueryFields {
+					if err := req.WriteOString(v2.Name); err != nil {
+						return errors.Wrapf(err, "failed to write QueryField.Name with index %d", j)
+					}
+					if err := req.WriteOString(v2.TypeName); err != nil {
+						return errors.Wrapf(err, "failed to write QueryField.TypeName with index %d", j)
+					}
+					if err := req.WriteBool(v2.IsKeyField); err != nil {
+						return errors.Wrapf(err, "failed to write QueryField.IsKeyField with index %d", j)
+					}
+					if err := req.WriteBool(v2.IsNotNullConstraintField); err != nil {
+						return errors.Wrapf(err, "failed to write QueryField.IsNotNullConstraintField with index %d", j)
+					}
+				}
+			}
+			// write FieldNameAliases
+			l = 0
+			if v.FieldNameAliases != nil {
+				l = int32(len(v.FieldNameAliases))
+			}
+			if err := req.WriteInt(l); err != nil {
+				return errors.Wrapf(err, "failed to write FieldNameAlias count")
+			}
+			if l > 0 {
+				for j, v2 := range v.FieldNameAliases {
+					if err := req.WriteOString(v2.Name); err != nil {
+						return errors.Wrapf(err, "failed to write FieldNameAlias.Name with index %d", j)
+					}
+					if err := req.WriteOString(v2.Alias); err != nil {
+						return errors.Wrapf(err, "failed to write FieldNameAlias.Alias with index %d", j)
+					}
+				}
+			}
+			// write QueryIndexes
+			l = 0
+			if v.QueryIndexes != nil {
+				l = int32(len(v.QueryIndexes))
+			}
+			if err := req.WriteInt(l); err != nil {
+				return errors.Wrapf(err, "failed to write QueryIndex count")
+			}
+			if l > 0 {
+				for j, v2 := range v.QueryIndexes {
+					if err := req.WriteOString(v2.Name); err != nil {
+						return errors.Wrapf(err, "failed to write QueryIndex.Name with index %d", j)
+					}
+					if err := req.WriteByte(v2.Type); err != nil {
+						return errors.Wrapf(err, "failed to write QueryIndex.Type with index %d", j)
+					}
+					if err := req.WriteInt(v2.InlineSize); err != nil {
+						return errors.Wrapf(err, "failed to write QueryIndex.InlineSize with index %d", j)
+					}
+					// write Fields
+					l = 0
+					if v2.Fields != nil {
+						l = int32(len(v2.Fields))
+					}
+					if err := req.WriteInt(l); err != nil {
+						return errors.Wrapf(err, "failed to write Field count")
+					}
+					if l > 0 {
+						for k, v3 := range v2.Fields {
+							if err := req.WriteOString(v3.Name); err != nil {
+								return errors.Wrapf(err, "failed to write Field.Name with index %d", k)
+							}
+							if err := req.WriteBool(v3.IsDescensing); err != nil {
+								return errors.Wrapf(err, "failed to write Field.IsDescensing with index %d", k)
+							}
+						}
+					}
+				}
+			}
+		}
+		req.Count++
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute operation to create cache with configuration")
+	}
+
+	return res.CheckStatus()
 }

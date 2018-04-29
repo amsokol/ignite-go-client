@@ -198,3 +198,96 @@ func Test_client_CacheGetConfiguration(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheCreateWithConfiguration(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	cache := "CacheCreateWithConfiguration"
+
+	type args struct {
+		cc *CacheConfigurationRefs
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cc: &CacheConfigurationRefs{
+					Name: &cache,
+				},
+			},
+		},
+		{
+			name: "2",
+			c:    c,
+			args: args{
+				cc: &CacheConfigurationRefs{
+					Name: &cache,
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.c.CacheCreateWithConfiguration(tt.args.cc); (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheCreateWithConfiguration() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_client_CacheGetOrCreateWithConfiguration(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	cache := "CacheGetOrCreateWithConfiguration"
+
+	type args struct {
+		cc *CacheConfigurationRefs
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cc: &CacheConfigurationRefs{
+					Name: &cache,
+				},
+			},
+		},
+		{
+			name: "2",
+			c:    c,
+			args: args{
+				cc: &CacheConfigurationRefs{
+					Name: &cache,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.c.CacheGetOrCreateWithConfiguration(tt.args.cc); (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheGetOrCreateWithConfiguration() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

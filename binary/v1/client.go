@@ -49,6 +49,16 @@ type Client interface {
 	// CacheGetConfiguration gets configuration for the given cache.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_configuration
 	CacheGetConfiguration(cache string, flag byte) (*CacheConfiguration, error)
+
+	// CacheCreateWithConfiguration creates cache with provided configuration.
+	// An error is returned if the name is already in use.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_create_with_configuration
+	CacheCreateWithConfiguration(cc *CacheConfigurationRefs) error
+
+	// CacheGetOrCreateWithConfiguration creates cache with provided configuration.
+	// Does nothing if the name is already in use.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_get_or_create_with_configuration
+	CacheGetOrCreateWithConfiguration(cc *CacheConfigurationRefs) error
 }
 
 type client struct {
