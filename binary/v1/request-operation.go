@@ -16,7 +16,7 @@ type RequestOperation struct {
 	request
 }
 
-// WriteTo is function to write handshake request data to io.Writer.
+// WriteTo is function to write operation request data to io.Writer.
 // Returns written bytes.
 func (r *RequestOperation) WriteTo(w io.Writer) (int64, error) {
 	// write payload length
