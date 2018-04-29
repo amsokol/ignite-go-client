@@ -4,6 +4,10 @@ import (
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
+// Cache Configuration methods
+// See for details:
+// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations
+
 const (
 	cacheConfigurationAtomicityModeCode                 = 2
 	cacheConfigurationBackupsCode                       = 3
