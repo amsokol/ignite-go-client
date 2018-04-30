@@ -137,6 +137,11 @@ type Client interface {
 	// CacheRemoveKey removes an entry with a given key, notifying listeners and cache writers.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_key
 	CacheRemoveKey(cache string, binary bool, key interface{}) (bool, error)
+
+	// CacheRemoveIfEquals removes an entry with a given key if provided value is equal to actual value,
+	// notifying listeners and cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_if_equals
+	CacheRemoveIfEquals(cache string, binary bool, key interface{}, value interface{}) (bool, error)
 }
 
 type client struct {
