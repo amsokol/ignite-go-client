@@ -427,3 +427,24 @@ func (c *client) CacheReplaceIfEquals(cache string, binary bool, key interface{}
 
 	return res.ReadBool()
 }
+
+// CacheClear clears the cache without notifying listeners or cache writers.
+func (c *client) CacheClear(cache string, binary bool) error {
+	// request and response
+	req := NewRequestOperation(OpCacheClear)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return errors.Wrapf(err, "failed to write binary flag")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_CLEAR operation")
+	}
+	return res.CheckStatus()
+}

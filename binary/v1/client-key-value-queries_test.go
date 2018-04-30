@@ -703,3 +703,43 @@ func Test_client_CacheReplaceIfEquals(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheClear(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	// put test values
+	if err = c.CachePut("CacheClear", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:  "CacheClear",
+				binary: false,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.c.CacheClear(tt.args.cache, tt.args.binary); (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheClear() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
