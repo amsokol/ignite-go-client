@@ -642,3 +642,25 @@ func (c *client) CacheRemoveKeys(cache string, binary bool, keys []interface{}) 
 
 	return res.CheckStatus()
 }
+
+// CacheRemoveAll destroys cache with a given name.
+func (c *client) CacheRemoveAll(cache string, binary bool) error {
+	// request and response
+	req := NewRequestOperation(OpCacheRemoveAll)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return errors.Wrapf(err, "failed to write binary flag")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_REMOVE_ALL operation")
+	}
+
+	return res.CheckStatus()
+}

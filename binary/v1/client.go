@@ -150,6 +150,10 @@ type Client interface {
 	// CacheRemoveKeys removes entries with given keys, notifying listeners and cache writers.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_keys
 	CacheRemoveKeys(cache string, binary bool, keys []interface{}) error
+
+	// CacheRemoveAll destroys cache with a given name.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_all
+	CacheRemoveAll(cache string, binary bool) error
 }
 
 type client struct {
