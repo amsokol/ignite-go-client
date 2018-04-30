@@ -472,3 +472,33 @@ func (c *client) CacheClearKey(cache string, binary bool, key interface{}) error
 	}
 	return res.CheckStatus()
 }
+
+// CacheClearKeys clears the cache keys without notifying listeners or cache writers.
+func (c *client) CacheClearKeys(cache string, binary bool, keys []interface{}) error {
+	// request and response
+	req := NewRequestOperation(OpCacheClearKeys)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteInt(int32(len(keys))); err != nil {
+		return errors.Wrapf(err, "failed to write key count")
+	}
+	for i, k := range keys {
+		if err := req.WriteObject(k); err != nil {
+			return errors.Wrapf(err, "failed to write cache key with index %d", i)
+		}
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_CLEAR_KEYS operation")
+	}
+
+	return res.CheckStatus()
+}
