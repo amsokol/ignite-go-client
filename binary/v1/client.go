@@ -146,6 +146,10 @@ type Client interface {
 	// CacheGetSize gets the number of entries in cache.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_size
 	CacheGetSize(cache string, binary bool, modes []byte) (int64, error)
+
+	// CacheRemoveKeys removes entries with given keys, notifying listeners and cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_keys
+	CacheRemoveKeys(cache string, binary bool, keys []interface{}) error
 }
 
 type client struct {

@@ -1010,3 +1010,47 @@ func Test_client_CacheGetSize(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheRemoveKeys(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	// put test values
+	if err = c.CachePut("CacheRemoveKeys", false, "key1", "value 1"); err != nil {
+		t.Fatal(err)
+	}
+	if err = c.CachePut("CacheRemoveKeys", false, "key2", "value 2"); err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+		keys   []interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "CacheRemoveKeys",
+				keys:  []interface{}{"key1", "key2"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.c.CacheRemoveKeys(tt.args.cache, tt.args.binary, tt.args.keys); (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheRemoveKeys() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
