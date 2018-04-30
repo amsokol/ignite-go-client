@@ -95,6 +95,11 @@ type Client interface {
 	// CacheGetAndPut puts a value with a given key to cache, and returns the previous value for that key.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_put
 	CacheGetAndPut(cache string, binary bool, key interface{}, value interface{}) (interface{}, error)
+
+	// CacheGetAndReplace puts a value with a given key to cache, returning previous value for that key,
+	// if and only if there is a value currently mapped for that key.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_replace
+	CacheGetAndReplace(cache string, binary bool, key interface{}, value interface{}) (interface{}, error)
 }
 
 type client struct {
