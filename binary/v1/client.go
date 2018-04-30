@@ -72,9 +72,17 @@ type Client interface {
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get
 	CacheGet(cache string, binary bool, key interface{}) (interface{}, error)
 
+	// CacheGetAll retrieves multiple key-value pairs from cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_all
+	CacheGetAll(cache string, binary bool, keys []interface{}) (map[interface{}]interface{}, error)
+
 	// CachePut puts a value with a given key to cache (overwriting existing value if any).
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put
 	CachePut(cache string, binary bool, key interface{}, value interface{}) error
+
+	// CachePutAll puts a value with a given key to cache (overwriting existing value if any).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put_all
+	CachePutAll(cache string, binary bool, data map[interface{}]interface{}) error
 }
 
 type client struct {
