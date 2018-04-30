@@ -142,6 +142,10 @@ type Client interface {
 	// notifying listeners and cache writers.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_if_equals
 	CacheRemoveIfEquals(cache string, binary bool, key interface{}, value interface{}) (bool, error)
+
+	// CacheGetSize gets the number of entries in cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_size
+	CacheGetSize(cache string, binary bool, modes []byte) (int64, error)
 }
 
 type client struct {

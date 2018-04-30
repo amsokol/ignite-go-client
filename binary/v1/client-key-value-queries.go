@@ -4,6 +4,17 @@ import (
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
+const (
+	// PeekModeAll is ALL
+	PeekModeAll = 0
+	// PeekModeNear is NEAR
+	PeekModeNear = 1
+	// PeekModePrimary is PRIMARY
+	PeekModePrimary = 2
+	// PeekModeBackup is BACKUP
+	PeekModeBackup = 3
+)
+
 // Key-Value Queries
 // See for details:
 // https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations
@@ -561,4 +572,43 @@ func (c *client) CacheRemoveIfEquals(cache string, binary bool, key interface{},
 	}
 
 	return res.ReadBool()
+}
+
+// CacheGetSize gets the number of entries in cache.
+func (c *client) CacheGetSize(cache string, binary bool, modes []byte) (int64, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheGetSize)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return 0, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return 0, errors.Wrapf(err, "failed to write binary flag")
+	}
+	var count int32
+	if modes != nil || len(modes) > 0 {
+		count = int32(len(modes))
+	}
+	if err := req.WriteInt(count); err != nil {
+		return 0, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if count > 0 {
+		for i, m := range modes {
+			if err := req.WriteByte(m); err != nil {
+				return 0, errors.Wrapf(err, "failed to write mode with index %d", i)
+			}
+		}
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return 0, errors.Wrapf(err, "failed to execute OP_CACHE_GET_SIZE operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return 0, err
+	}
+
+	return res.ReadLong()
 }
