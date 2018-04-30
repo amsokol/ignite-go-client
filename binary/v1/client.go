@@ -116,6 +116,11 @@ type Client interface {
 	// CacheReplace puts a value with a given key to cache only if the key already exists.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_replace
 	CacheReplace(cache string, binary bool, key interface{}, value interface{}) (bool, error)
+
+	// CacheReplaceIfEquals puts a value with a given key to cache only if
+	// the key already exists and value equals provided value.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_replace_if_equals
+	CacheReplaceIfEquals(cache string, binary bool, key interface{}, valueCompare interface{}, valueNew interface{}) (bool, error)
 }
 
 type client struct {

@@ -392,3 +392,38 @@ func (c *client) CacheReplace(cache string, binary bool, key interface{}, value 
 
 	return res.ReadBool()
 }
+
+// CacheReplaceIfEquals puts a value with a given key to cache only if
+// the key already exists and value equals provided value.
+func (c *client) CacheReplaceIfEquals(cache string, binary bool, key interface{}, valueCompare interface{}, valueNew interface{}) (bool, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheReplaceIfEquals)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return false, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteObject(key); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache key")
+	}
+	if err := req.WriteObject(valueCompare); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache value to compare")
+	}
+	if err := req.WriteObject(valueNew); err != nil {
+		return false, errors.Wrapf(err, "failed to write new cache value")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return false, errors.Wrapf(err, "failed to execute OP_CACHE_REPLACE_IF_EQUALS operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return false, err
+	}
+
+	return res.ReadBool()
+}

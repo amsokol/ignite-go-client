@@ -638,3 +638,68 @@ func Test_client_CacheReplace(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheReplaceIfEquals(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	// put test values
+	if err = c.CachePut("CacheReplaceIfEquals", false, "key", "value 1"); err != nil {
+		t.Fatalf("failed to put test pair: %s", err.Error())
+	}
+
+	type args struct {
+		cache        string
+		binary       bool
+		key          interface{}
+		valueCompare interface{}
+		valueNew     interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:        "CacheReplaceIfEquals",
+				binary:       false,
+				key:          "key",
+				valueCompare: "value 1",
+				valueNew:     "value 2",
+			},
+			want: true,
+		},
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:        "CacheReplaceIfEquals",
+				binary:       false,
+				key:          "key",
+				valueCompare: "value 1",
+				valueNew:     "value 3",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheReplaceIfEquals(tt.args.cache, tt.args.binary, tt.args.key, tt.args.valueCompare, tt.args.valueNew)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheReplaceIfEquals() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("client.CacheReplaceIfEquals() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
