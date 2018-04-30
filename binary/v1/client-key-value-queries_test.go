@@ -514,3 +514,65 @@ func Test_client_CachePutIfAbsent(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheGetAndPutIfAbsent(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	// put test values
+	if err = c.CachePut("CacheGetAndPutIfAbsent", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+		key    interface{}
+		value  interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:  "CacheGetAndPutIfAbsent",
+				binary: false,
+				key:    "key",
+				value:  "value 2",
+			},
+			want: "value 1",
+		},
+		{
+			name: "2",
+			c:    c,
+			args: args{
+				cache:  "CacheGetAndPutIfAbsent",
+				binary: false,
+				key:    "key-not-exist",
+				value:  "value",
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheGetAndPutIfAbsent(tt.args.cache, tt.args.binary, tt.args.key, tt.args.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheGetAndPutIfAbsent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("client.CacheGetAndPutIfAbsent() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

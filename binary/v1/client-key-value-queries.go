@@ -330,3 +330,34 @@ func (c *client) CachePutIfAbsent(cache string, binary bool, key interface{}, va
 
 	return res.ReadBool()
 }
+
+// CacheGetAndPutIfAbsent puts a value with a given key to cache only if the key does not already exist.
+func (c *client) CacheGetAndPutIfAbsent(cache string, binary bool, key interface{}, value interface{}) (interface{}, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheGetAndPutIfAbsent)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return nil, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteObject(key); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache key")
+	}
+	if err := req.WriteObject(value); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache value")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_PUT_IF_ABSENT operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return nil, err
+	}
+
+	return res.ReadObject()
+}
