@@ -234,7 +234,7 @@ func (c *client) CacheGetAndPut(cache string, binary bool, key interface{}, valu
 		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_PUT operation")
 	}
 	if err := res.CheckStatus(); err != nil {
-		return false, err
+		return nil, err
 	}
 
 	return res.ReadObject()
@@ -266,7 +266,7 @@ func (c *client) CacheGetAndReplace(cache string, binary bool, key interface{}, 
 		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_REPLACE operation")
 	}
 	if err := res.CheckStatus(); err != nil {
-		return false, err
+		return nil, err
 	}
 
 	return res.ReadObject()
@@ -294,8 +294,39 @@ func (c *client) CacheGetAndRemove(cache string, binary bool, key interface{}) (
 		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_REMOVE operation")
 	}
 	if err := res.CheckStatus(); err != nil {
-		return false, err
+		return nil, err
 	}
 
 	return res.ReadObject()
+}
+
+// CachePutIfAbsent puts a value with a given key to cache only if the key does not already exist.
+func (c *client) CachePutIfAbsent(cache string, binary bool, key interface{}, value interface{}) (bool, error) {
+	// request and response
+	req := NewRequestOperation(OpCachePutIfAbsent)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return false, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteObject(key); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache key")
+	}
+	if err := req.WriteObject(value); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache value")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return false, errors.Wrapf(err, "failed to execute OP_CACHE_PUT_IF_ABSENT operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return false, err
+	}
+
+	return res.ReadBool()
 }

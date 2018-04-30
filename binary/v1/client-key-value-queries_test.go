@@ -457,3 +457,60 @@ func Test_client_CacheGetAndRemove(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CachePutIfAbsent(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	type args struct {
+		cache  string
+		binary bool
+		key    interface{}
+		value  interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:  "CachePutIfAbsent",
+				binary: false,
+				key:    "key",
+				value:  byte(123),
+			},
+			want: true,
+		},
+		{
+			name: "2",
+			c:    c,
+			args: args{
+				cache:  "CachePutIfAbsent",
+				binary: false,
+				key:    "key",
+				value:  byte(45),
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CachePutIfAbsent(tt.args.cache, tt.args.binary, tt.args.key, tt.args.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CachePutIfAbsent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("client.CachePutIfAbsent() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
