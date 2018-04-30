@@ -33,13 +33,7 @@ func (c *client) CacheGet(cache string, binary bool, key interface{}) (interface
 		return nil, err
 	}
 
-	// read response data
-	o, err := res.ReadObject()
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read value object")
-	}
-
-	return o, nil
+	return res.ReadObject()
 }
 
 // CacheGetAll retrieves multiple key-value pairs from cache.
@@ -239,14 +233,11 @@ func (c *client) CacheGetAndPut(cache string, binary bool, key interface{}, valu
 	if err := c.Do(req, res); err != nil {
 		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_PUT operation")
 	}
-
-	// read response data
-	o, err := res.ReadObject()
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read value object")
+	if err := res.CheckStatus(); err != nil {
+		return false, err
 	}
 
-	return o, nil
+	return res.ReadObject()
 }
 
 // CacheGetAndReplace puts a value with a given key to cache, returning previous value for that key,
@@ -274,12 +265,37 @@ func (c *client) CacheGetAndReplace(cache string, binary bool, key interface{}, 
 	if err := c.Do(req, res); err != nil {
 		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_REPLACE operation")
 	}
-
-	// read response data
-	o, err := res.ReadObject()
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read value object")
+	if err := res.CheckStatus(); err != nil {
+		return false, err
 	}
 
-	return o, nil
+	return res.ReadObject()
+}
+
+// CacheGetAndRemove removes the cache entry with specified key, returning the value.
+func (c *client) CacheGetAndRemove(cache string, binary bool, key interface{}) (interface{}, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheGetAndRemove)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return nil, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteObject(key); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache key")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_REMOVE operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return false, err
+	}
+
+	return res.ReadObject()
 }

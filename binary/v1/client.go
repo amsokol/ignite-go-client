@@ -100,6 +100,10 @@ type Client interface {
 	// if and only if there is a value currently mapped for that key.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_replace
 	CacheGetAndReplace(cache string, binary bool, key interface{}, value interface{}) (interface{}, error)
+
+	// CacheGetAndRemove removes the cache entry with specified key, returning the value.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_remove
+	CacheGetAndRemove(cache string, binary bool, key interface{}) (interface{}, error)
 }
 
 type client struct {

@@ -413,3 +413,47 @@ func Test_client_CacheGetAndReplace(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheGetAndRemove(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	c.CachePut("CacheGetAndRemove", false, "key", "value 1")
+
+	type args struct {
+		cache  string
+		binary bool
+		key    interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "CacheGetAndRemove",
+				key:   "key",
+			},
+			want: "value 1",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheGetAndRemove(tt.args.cache, tt.args.binary, tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheGetAndRemove() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("client.CacheGetAndRemove() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
