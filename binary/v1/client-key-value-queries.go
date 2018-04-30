@@ -181,3 +181,36 @@ func (c *client) CacheContainsKey(cache string, binary bool, key interface{}) (b
 
 	return res.ReadBool()
 }
+
+// CacheContainsKeys returns a value indicating whether all given keys are present in cache.
+func (c *client) CacheContainsKeys(cache string, binary bool, keys []interface{}) (bool, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheContainsKeys)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return false, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteInt(int32(len(keys))); err != nil {
+		return false, errors.Wrapf(err, "failed to write key count")
+	}
+	for i, k := range keys {
+		if err := req.WriteObject(k); err != nil {
+			return false, errors.Wrapf(err, "failed to write cache key with index %d", i)
+		}
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return false, errors.Wrapf(err, "failed to execute OP_CACHE_CONTAINS_KEYS operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return false, err
+	}
+
+	return res.ReadBool()
+}

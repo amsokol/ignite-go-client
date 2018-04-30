@@ -242,3 +242,60 @@ func Test_client_CacheContainsKey(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheContainsKeys(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	err = c.CachePutAll("CacheContainsKeys", false,
+		map[interface{}]interface{}{"key1": "value1", Char('Q'): int32(12345), true: float64(123456.789)})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+		keys   []interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "CacheContainsKeys",
+				keys:  []interface{}{"key1", Char('Q'), true},
+			},
+			want: true,
+		},
+		{
+			name: "2",
+			c:    c,
+			args: args{
+				cache: "CacheContainsKeys",
+				keys:  []interface{}{"key2", Char('Q'), true},
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheContainsKeys(tt.args.cache, tt.args.binary, tt.args.keys)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheContainsKeys() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("client.CacheContainsKeys() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
