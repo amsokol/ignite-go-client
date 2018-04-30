@@ -112,6 +112,10 @@ type Client interface {
 	// CacheGetAndPutIfAbsent puts a value with a given key to cache only if the key does not already exist.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_put_if_absent
 	CacheGetAndPutIfAbsent(cache string, binary bool, key interface{}, value interface{}) (interface{}, error)
+
+	// CacheReplace puts a value with a given key to cache only if the key already exists.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_replace
+	CacheReplace(cache string, binary bool, key interface{}, value interface{}) (bool, error)
 }
 
 type client struct {
