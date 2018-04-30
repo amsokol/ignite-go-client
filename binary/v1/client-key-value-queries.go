@@ -502,3 +502,31 @@ func (c *client) CacheClearKeys(cache string, binary bool, keys []interface{}) e
 
 	return res.CheckStatus()
 }
+
+// CacheRemoveKey removes an entry with a given key, notifying listeners and cache writers.
+func (c *client) CacheRemoveKey(cache string, binary bool, key interface{}) (bool, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheRemoveKey)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return false, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteObject(key); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache key")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return false, errors.Wrapf(err, "failed to execute OP_CACHE_REMOVE_KEY operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return false, err
+	}
+
+	return res.ReadBool()
+}

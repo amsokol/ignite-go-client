@@ -830,3 +830,62 @@ func Test_client_CacheClearKeys(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheRemoveKey(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	// put test values
+	if err = c.CachePut("CacheRemoveKey", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+		key    interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:  "CacheRemoveKey",
+				binary: false,
+				key:    "key",
+			},
+			want: true,
+		},
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:  "CacheRemoveKey",
+				binary: false,
+				key:    "key",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheRemoveKey(tt.args.cache, tt.args.binary, tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheRemoveKey() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("client.CacheRemoveKey() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
