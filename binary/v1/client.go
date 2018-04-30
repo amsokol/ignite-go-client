@@ -63,6 +63,18 @@ type Client interface {
 	// CacheDestroy destroys cache with a given name.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations#section-op_cache_destroy
 	CacheDestroy(cache string) error
+
+	// Key-Value Queries
+	// See for details:
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations
+
+	// CacheGet retrieves a value from cache by key.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get
+	CacheGet(cache string, binary bool, key interface{}) (interface{}, error)
+
+	// CachePut puts a value with a given key to cache (overwriting existing value if any).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put
+	CachePut(cache string, binary bool, key interface{}, value interface{}) error
 }
 
 type client struct {
