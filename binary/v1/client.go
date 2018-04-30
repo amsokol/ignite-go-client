@@ -83,6 +83,10 @@ type Client interface {
 	// CachePutAll puts a value with a given key to cache (overwriting existing value if any).
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put_all
 	CachePutAll(cache string, binary bool, data map[interface{}]interface{}) error
+
+	// CacheContainsKey returns a value indicating whether given key is present in cache.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_contains_key
+	CacheContainsKey(cache string, binary bool, key interface{}) (bool, error)
 }
 
 type client struct {

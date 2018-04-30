@@ -186,3 +186,59 @@ func Test_client_CacheGetAll(t *testing.T) {
 		})
 	}
 }
+
+func Test_client_CacheContainsKey(t *testing.T) {
+	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	err = c.CachePut("CacheContainsKey", false, "key1", "value1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+		key    interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "CacheContainsKey",
+				key:   "key1",
+			},
+			want: true,
+		},
+		{
+			name: "2",
+			c:    c,
+			args: args{
+				cache: "CacheContainsKey",
+				key:   "key2",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheContainsKey(tt.args.cache, tt.args.binary, tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheContainsKey() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("client.CacheContainsKey() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

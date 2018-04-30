@@ -153,3 +153,31 @@ func (c *client) CachePutAll(cache string, binary bool, data map[interface{}]int
 
 	return res.CheckStatus()
 }
+
+// CacheContainsKey returns a value indicating whether given key is present in cache.
+func (c *client) CacheContainsKey(cache string, binary bool, key interface{}) (bool, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheContainsKey)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return false, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteObject(key); err != nil {
+		return false, errors.Wrapf(err, "failed to write cache key")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return false, errors.Wrapf(err, "failed to execute OP_CACHE_CONTAINS_KEY operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return false, err
+	}
+
+	return res.ReadBool()
+}
