@@ -125,6 +125,10 @@ type Client interface {
 	// CacheClear clears the cache without notifying listeners or cache writers.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_clear
 	CacheClear(cache string, binary bool) error
+
+	// CacheClearKey clears the cache key without notifying listeners or cache writers.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_clear_key
+	CacheClearKey(cache string, binary bool, key interface{}) error
 }
 
 type client struct {

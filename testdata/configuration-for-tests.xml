@@ -120,6 +120,12 @@
                     <property name="writeSynchronizationMode" value="FULL_SYNC"/>
                 </bean>
                 <bean class="org.apache.ignite.configuration.CacheConfiguration">
+                    <property name="name" value="CacheClearKey"/>
+                    <property name="cacheMode" value="PARTITIONED"/>
+                    <property name="atomicityMode" value="TRANSACTIONAL"/>
+                    <property name="writeSynchronizationMode" value="FULL_SYNC"/>
+                </bean>
+                <bean class="org.apache.ignite.configuration.CacheConfiguration">
                     <property name="name" value="TestDB1"/>
                     <property name="cacheMode" value="PARTITIONED"/>
                     <property name="atomicityMode" value="TRANSACTIONAL"/>
