@@ -214,3 +214,37 @@ func (c *client) CacheContainsKeys(cache string, binary bool, keys []interface{}
 
 	return res.ReadBool()
 }
+
+// CacheGetAndPut puts a value with a given key to cache, and returns the previous value for that key.
+func (c *client) CacheGetAndPut(cache string, binary bool, key interface{}, value interface{}) (interface{}, error) {
+	// request and response
+	req := NewRequestOperation(OpCacheGetAndPut)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := req.WriteInt(HashCode(cache)); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := req.WriteBool(binary); err != nil {
+		return nil, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := req.WriteObject(key); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache key")
+	}
+	if err := req.WriteObject(value); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache value")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET_AND_PUT operation")
+	}
+
+	// read response data
+	o, err := res.ReadObject()
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to read value object")
+	}
+
+	return o, nil
+}

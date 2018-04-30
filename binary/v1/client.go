@@ -91,6 +91,10 @@ type Client interface {
 	// CacheContainsKeys returns a value indicating whether all given keys are present in cache.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_contains_keys
 	CacheContainsKeys(cache string, binary bool, keys []interface{}) (bool, error)
+
+	// CacheGetAndPut puts a value with a given key to cache, and returns the previous value for that key.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_and_put
+	CacheGetAndPut(cache string, binary bool, key interface{}, value interface{}) (interface{}, error)
 }
 
 type client struct {
