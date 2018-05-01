@@ -7,7 +7,7 @@ import (
 )
 
 func Test_client_CacheGet(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +140,7 @@ func Test_client_CacheGet(t *testing.T) {
 }
 
 func Test_client_CacheGetAll(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -188,7 +188,7 @@ func Test_client_CacheGetAll(t *testing.T) {
 }
 
 func Test_client_CacheContainsKey(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -244,7 +244,7 @@ func Test_client_CacheContainsKey(t *testing.T) {
 }
 
 func Test_client_CacheContainsKeys(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -301,7 +301,7 @@ func Test_client_CacheContainsKeys(t *testing.T) {
 }
 
 func Test_client_CacheGetAndPut(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -357,7 +357,7 @@ func Test_client_CacheGetAndPut(t *testing.T) {
 }
 
 func Test_client_CacheGetAndReplace(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -415,7 +415,7 @@ func Test_client_CacheGetAndReplace(t *testing.T) {
 }
 
 func Test_client_CacheGetAndRemove(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -459,7 +459,7 @@ func Test_client_CacheGetAndRemove(t *testing.T) {
 }
 
 func Test_client_CachePutIfAbsent(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -516,7 +516,7 @@ func Test_client_CachePutIfAbsent(t *testing.T) {
 }
 
 func Test_client_CacheGetAndPutIfAbsent(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -578,7 +578,7 @@ func Test_client_CacheGetAndPutIfAbsent(t *testing.T) {
 }
 
 func Test_client_CacheReplace(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -640,7 +640,7 @@ func Test_client_CacheReplace(t *testing.T) {
 }
 
 func Test_client_CacheReplaceIfEquals(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -705,7 +705,7 @@ func Test_client_CacheReplaceIfEquals(t *testing.T) {
 }
 
 func Test_client_CacheClear(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -745,7 +745,7 @@ func Test_client_CacheClear(t *testing.T) {
 }
 
 func Test_client_CacheClearKey(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -787,7 +787,7 @@ func Test_client_CacheClearKey(t *testing.T) {
 }
 
 func Test_client_CacheClearKeys(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -832,7 +832,7 @@ func Test_client_CacheClearKeys(t *testing.T) {
 }
 
 func Test_client_CacheRemoveKey(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -891,7 +891,7 @@ func Test_client_CacheRemoveKey(t *testing.T) {
 }
 
 func Test_client_CacheRemoveIfEquals(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -953,7 +953,7 @@ func Test_client_CacheRemoveIfEquals(t *testing.T) {
 }
 
 func Test_client_CacheGetSize(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1012,7 +1012,7 @@ func Test_client_CacheGetSize(t *testing.T) {
 }
 
 func Test_client_CacheRemoveKeys(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1056,7 +1056,7 @@ func Test_client_CacheRemoveKeys(t *testing.T) {
 }
 
 func Test_client_CacheRemoveAll(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}

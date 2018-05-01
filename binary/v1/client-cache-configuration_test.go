@@ -6,8 +6,17 @@ import (
 	"testing"
 )
 
+var testConnInfo = ConnInfo{
+	Network: "tcp",
+	Host:    "localhost",
+	Port:    10800,
+	Major:   1,
+	Minor:   0,
+	Patch:   0,
+}
+
 func Test_client_CacheCreateWithName(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +57,7 @@ func Test_client_CacheCreateWithName(t *testing.T) {
 }
 
 func Test_client_CacheGetOrCreateWithName(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,7 +97,7 @@ func Test_client_CacheGetOrCreateWithName(t *testing.T) {
 }
 
 func Test_client_CacheGetNames(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +137,7 @@ func Test_client_CacheGetNames(t *testing.T) {
 }
 
 func Test_client_CacheGetConfiguration(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -200,7 +209,7 @@ func Test_client_CacheGetConfiguration(t *testing.T) {
 }
 
 func Test_client_CacheCreateWithConfiguration(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -247,7 +256,7 @@ func Test_client_CacheCreateWithConfiguration(t *testing.T) {
 }
 
 func Test_client_CacheGetOrCreateWithConfiguration(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -293,7 +302,7 @@ func Test_client_CacheGetOrCreateWithConfiguration(t *testing.T) {
 }
 
 func Test_client_CacheDestroy(t *testing.T) {
-	c, err := Connect(context.Background(), "tcp", "localhost", 10800, 1, 0, 0)
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}

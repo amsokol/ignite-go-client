@@ -12,6 +12,13 @@ import (
 	"github.com/amsokol/ignite-go-client/debug"
 )
 
+// ConnInfo contains connections parameters
+type ConnInfo struct {
+	Network, Host       string
+	Port                int
+	Major, Minor, Patch int
+}
+
 // Client is interface to communicate with Apache Ignite cluster.
 // Client is thread safe.
 type Client interface {
@@ -231,22 +238,22 @@ func (c *client) Close() error {
 
 // Connect connects to the Apache Ignite cluster
 // Returns: client
-func Connect(ctx context.Context, network, host string, port, major, minor, patch int) (Client, error) {
-	address := fmt.Sprintf("%s:%d", host, port)
+func Connect(ctx context.Context, ci ConnInfo) (Client, error) {
+	address := fmt.Sprintf("%s:%d", ci.Host, ci.Port)
 
 	// connect
 	d := net.Dialer{}
-	conn, err := d.DialContext(ctx, network, address)
+	conn, err := d.DialContext(ctx, ci.Network, address)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open connection")
 	}
 
-	c := &client{conn: conn, debugID: strings.Join([]string{"network=", network, "', address='", address, "'"}, ""),
+	c := &client{conn: conn, debugID: strings.Join([]string{"network=", ci.Network, "', address='", address, "'"}, ""),
 		mutex: &sync.Mutex{}}
 	runtime.SetFinalizer(c, clientFinalizer)
 
 	// request and response
-	req := NewRequestHandshake(major, minor, patch)
+	req := NewRequestHandshake(ci.Major, ci.Minor, ci.Patch)
 	res := &ResponseHandshake{}
 
 	// make handshake
