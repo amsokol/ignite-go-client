@@ -1,5 +1,9 @@
 package ignite
 
+import (
+	"time"
+)
+
 const (
 	// Supported standard types and their type codes are as follows:
 	typeByte   = 1
@@ -35,7 +39,7 @@ const (
 	   bytes[14] = jBytes[9]; // j
 	   bytes[15] = jBytes[8]; // k
 	*/
-	// TODO: typeDate        = 11
+	typeDate      = 11
 	typeByteArray = 12
 	// TODO: typeShortArray  = 13
 	// TODO: typeIntArray    = 14
@@ -63,3 +67,15 @@ const (
 
 // Char is Apache Ignite "char" type
 type Char rune
+
+// DateType is Unix time, the number of MILLISECONDS elapsed
+// since January 1, 1970 UTC.
+type DateType int64
+
+// Date converts Golang time.Time to Apache Ignite Date
+func Date(t time.Time) DateType {
+	t1 := t.UTC()
+	t2 := t1.Unix() * 1000
+	t2 += int64(t1.Nanosecond()) / int64(time.Millisecond)
+	return DateType(t2)
+}

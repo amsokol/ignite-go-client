@@ -341,6 +341,36 @@ func Test_response_ReadUUID(t *testing.T) {
 	}
 }
 
+func Test_response_ReadDate(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0})}
+	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    time.Time
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: dm,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadDate()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadDate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadDate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadByteArray(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0, 1, 2, 3})}
 
@@ -414,6 +444,8 @@ func Test_response_ReadObject(t *testing.T) {
 		[]byte{9, 0x0B, 0, 0, 0, 0x74, 0x65, 0x73, 0x74, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67})}
 	r10 := &response{message: bytes.NewBuffer([]byte{10, 0xd6, 0x58, 0x9d, 0xa7, 0xf8, 0xb1, 0x46, 0x87, 0xb5,
 		0xbd, 0x2d, 0xdc, 0x73, 0x62, 0xa4, 0xa4})}
+	r11 := &response{message: bytes.NewBuffer([]byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0})}
+	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
 	r12 := &response{message: bytes.NewBuffer([]byte{12, 3, 0, 0, 0, 1, 2, 3})}
 	r33 := &response{message: bytes.NewBuffer([]byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0,
 		0x55, 0xf8, 0x6, 0x0})}
@@ -476,6 +508,11 @@ func Test_response_ReadObject(t *testing.T) {
 			name: "UUID",
 			r:    r10,
 			want: uid,
+		},
+		{
+			name: "Date",
+			r:    r11,
+			want: dm,
 		},
 		{
 			name: "byte array",

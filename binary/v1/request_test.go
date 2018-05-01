@@ -650,6 +650,41 @@ func Test_request_WriteOUUID(t *testing.T) {
 	}
 }
 
+func Test_request_WriteODate(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+
+	type args struct {
+		v DateType
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: Date(tm),
+			},
+			want: []byte{11, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteODate(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteODate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteODate() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteByteArray(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
@@ -791,10 +826,12 @@ func Test_request_WriteObject(t *testing.T) {
 	r8 := &request{payload: &bytes.Buffer{}}
 	r9 := &request{payload: &bytes.Buffer{}}
 	r10 := &request{payload: &bytes.Buffer{}}
+	r11 := &request{payload: &bytes.Buffer{}}
 	r12 := &request{payload: &bytes.Buffer{}}
 	r33 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
 	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
 
 	type args struct {
@@ -887,6 +924,14 @@ func Test_request_WriteObject(t *testing.T) {
 			},
 			want: []byte{10, 0xd6, 0x58, 0x9d, 0xa7, 0xf8, 0xb1, 0x46, 0x87, 0xb5,
 				0xbd, 0x2d, 0xdc, 0x73, 0x62, 0xa4, 0xa4}[:],
+		},
+		{
+			name: "Date",
+			r:    r11,
+			args: args{
+				Date(dm),
+			},
+			want: []byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0},
 		},
 		{
 			name: "byte array",

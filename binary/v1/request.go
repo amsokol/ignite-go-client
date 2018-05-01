@@ -62,6 +62,9 @@ type Request interface {
 	// UUID is marshaled as object in all cases.
 	WriteOUUID(v uuid.UUID) error
 
+	// WriteODate writes "Date" object value
+	WriteODate(v DateType) error
+
 	// WriteByteArray writes "byte" array value
 	WriteByteArray(v []byte) error
 	// WriteOByteArray writes "byte array" object value
@@ -209,6 +212,14 @@ func (r *request) WriteOUUID(v uuid.UUID) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
+// WriteODate writes "Date" object value
+func (r *request) WriteODate(v DateType) error {
+	if err := r.WriteByte(typeDate); err != nil {
+		return err
+	}
+	return r.WriteLong(int64(v))
+}
+
 // WriteByteArray writes "byte" array value
 func (r *request) WriteByteArray(v []byte) error {
 	if err := r.WriteInt(int32(len(v))); err != nil {
@@ -272,6 +283,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOString(v)
 	case uuid.UUID:
 		return r.WriteOUUID(v)
+	case DateType:
+		return r.WriteODate(v)
 	case []byte:
 		return r.WriteOByteArray(v)
 	case time.Time:

@@ -49,6 +49,9 @@ type Response interface {
 	// ReadUUID reads "UUID" object value
 	ReadUUID() (uuid.UUID, error)
 
+	// ReadDate reads "Date" object value
+	ReadDate() (time.Time, error)
+
 	// ReadByteArray reads "byte" array value
 	ReadByteArray() ([]byte, error)
 
@@ -172,6 +175,15 @@ func (r *response) ReadUUID() (uuid.UUID, error) {
 	return o, err
 }
 
+// ReadDate reads "Date" object value
+func (r *response) ReadDate() (time.Time, error) {
+	v, err := r.ReadLong()
+	if err != nil {
+		return time.Time{}, err
+	}
+	return time.Unix(int64(v)/1000, (int64(v)%1000)*int64(time.Millisecond)).UTC(), nil
+}
+
 // ReadByteArray reads "byte" array value
 func (r *response) ReadByteArray() ([]byte, error) {
 	l, err := r.ReadInt()
@@ -227,6 +239,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadString()
 	case typeUUID:
 		return r.ReadUUID()
+	case typeDate:
+		return r.ReadDate()
 	case typeByteArray:
 		return r.ReadByteArray()
 	case typeTimestamp:

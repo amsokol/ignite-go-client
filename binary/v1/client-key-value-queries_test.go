@@ -26,6 +26,8 @@ func Test_client_CacheGet(t *testing.T) {
 	c.CachePut("CacheGet", false, "string", "test string")
 	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
 	c.CachePut("CacheGet", false, "UUID", uid)
+	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+	c.CachePut("CacheGet", false, "Date", dm)
 	c.CachePut("CacheGet", false, "byte array", []byte{1, 2, 3})
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	c.CachePut("CacheGet", false, "Timestamp", tm)
@@ -131,6 +133,15 @@ func Test_client_CacheGet(t *testing.T) {
 				key:   "UUID",
 			},
 			want: uid,
+		},
+		{
+			name: "Date",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "Date",
+			},
+			want: dm,
 		},
 		{
 			name: "byte array",
