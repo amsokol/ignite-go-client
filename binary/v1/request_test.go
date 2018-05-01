@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func Test_request_WriteByte(t *testing.T) {
@@ -612,6 +614,110 @@ func Test_request_WriteOString(t *testing.T) {
 	}
 }
 
+func Test_request_WriteOUUID(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	v, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
+
+	type args struct {
+		v uuid.UUID
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: v,
+			},
+			want: []byte{10, 0xd6, 0x58, 0x9d, 0xa7, 0xf8, 0xb1, 0x46, 0x87, 0xb5,
+				0xbd, 0x2d, 0xdc, 0x73, 0x62, 0xa4, 0xa4}[:],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOUUID(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOUUID() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOUUID() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteByteArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []byte
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []byte{1, 2, 3},
+			},
+			want: []byte{3, 0, 0, 0, 1, 2, 3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteByteArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteByteArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteByteArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteOByteArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []byte
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []byte{1, 2, 3},
+			},
+			want: []byte{12, 3, 0, 0, 0, 1, 2, 3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOByteArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOByteArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOByteArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOTimestamp(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -684,9 +790,12 @@ func Test_request_WriteObject(t *testing.T) {
 	r7 := &request{payload: &bytes.Buffer{}}
 	r8 := &request{payload: &bytes.Buffer{}}
 	r9 := &request{payload: &bytes.Buffer{}}
+	r10 := &request{payload: &bytes.Buffer{}}
+	r12 := &request{payload: &bytes.Buffer{}}
 	r33 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
 
 	type args struct {
 		o interface{}
@@ -769,6 +878,23 @@ func Test_request_WriteObject(t *testing.T) {
 				"test string",
 			},
 			want: []byte{9, 0x0B, 0, 0, 0, 0x74, 0x65, 0x73, 0x74, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67}[:],
+		},
+		{
+			name: "UUID",
+			r:    r10,
+			args: args{
+				uid,
+			},
+			want: []byte{10, 0xd6, 0x58, 0x9d, 0xa7, 0xf8, 0xb1, 0x46, 0x87, 0xb5,
+				0xbd, 0x2d, 0xdc, 0x73, 0x62, 0xa4, 0xa4}[:],
+		},
+		{
+			name: "byte array",
+			r:    r12,
+			args: args{
+				[]byte{1, 2, 3},
+			},
+			want: []byte{12, 3, 0, 0, 0, 1, 2, 3},
 		},
 		{
 			name: "Timestamp",

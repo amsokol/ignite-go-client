@@ -11,7 +11,7 @@ const (
 	typeChar   = 7
 	typeBool   = 8
 	typeString = 9
-	// TODO: typeUUID   = 10
+	typeUUID   = 10
 	/*
 	   Apache.Ignite.Core.Impl.Binary.BinaryUtils
 
@@ -36,7 +36,7 @@ const (
 	   bytes[15] = jBytes[8]; // k
 	*/
 	// TODO: typeDate        = 11
-	// TODO: typeByteArray   = 12
+	typeByteArray = 12
 	// TODO: typeShortArray  = 13
 	// TODO: typeIntArray    = 14
 	// TODO: typeLongArray   = 15

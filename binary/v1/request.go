@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
@@ -55,6 +57,15 @@ type Request interface {
 	// WriteOString writes "string" object value
 	// String is marshaled as object in all cases.
 	WriteOString(v string) error
+
+	// WriteOUUID writes "UUID" object value
+	// UUID is marshaled as object in all cases.
+	WriteOUUID(v uuid.UUID) error
+
+	// WriteByteArray writes "byte" array value
+	WriteByteArray(v []byte) error
+	// WriteOByteArray writes "byte array" object value
+	WriteOByteArray(v []byte) error
 
 	// WriteOTimestamp writes "Timestamp" object value
 	// Timestamp is marshaled as object in all cases.
@@ -189,6 +200,31 @@ func (r *request) WriteOString(v string) error {
 	return binary.Write(r.payload, binary.LittleEndian, s)
 }
 
+// WriteOUUID writes "UUID" object value
+// UUID is marshaled as object in all cases.
+func (r *request) WriteOUUID(v uuid.UUID) error {
+	if err := r.WriteByte(typeUUID); err != nil {
+		return err
+	}
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteByteArray writes "byte" array value
+func (r *request) WriteByteArray(v []byte) error {
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteOByteArray writes "byte" array object value
+func (r *request) WriteOByteArray(v []byte) error {
+	if err := r.WriteByte(typeByteArray); err != nil {
+		return err
+	}
+	return r.WriteByteArray(v)
+}
+
 // WriteOTimestamp writes "Timestamp" object value
 // Timestamp is marshaled as object in all cases.
 func (r *request) WriteOTimestamp(v time.Time) error {
@@ -234,6 +270,10 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOBool(v)
 	case string:
 		return r.WriteOString(v)
+	case uuid.UUID:
+		return r.WriteOUUID(v)
+	case []byte:
+		return r.WriteOByteArray(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	default:

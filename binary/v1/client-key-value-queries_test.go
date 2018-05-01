@@ -4,6 +4,9 @@ import (
 	"context"
 	"reflect"
 	"testing"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 func Test_client_CacheGet(t *testing.T) {
@@ -21,6 +24,11 @@ func Test_client_CacheGet(t *testing.T) {
 	c.CachePut("CacheGet", false, "char", Char('A'))
 	c.CachePut("CacheGet", false, "bool", true)
 	c.CachePut("CacheGet", false, "string", "test string")
+	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
+	c.CachePut("CacheGet", false, "UUID", uid)
+	c.CachePut("CacheGet", false, "byte array", []byte{1, 2, 3})
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	c.CachePut("CacheGet", false, "Timestamp", tm)
 
 	type args struct {
 		cache  string
@@ -116,6 +124,33 @@ func Test_client_CacheGet(t *testing.T) {
 			want: "test string",
 		},
 		{
+			name: "UUID",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "UUID",
+			},
+			want: uid,
+		},
+		{
+			name: "byte array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "byte array",
+			},
+			want: []byte{1, 2, 3},
+		},
+		{
+			name: "Timestamp",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "Timestamp",
+			},
+			want: tm,
+		},
+		{
 			name: "NULL",
 			c:    c,
 			args: args{
@@ -133,7 +168,7 @@ func Test_client_CacheGet(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("client.CacheGet() = %v, want %v", got, tt.want)
+				t.Errorf("client.CacheGet() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}

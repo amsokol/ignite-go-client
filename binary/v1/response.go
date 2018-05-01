@@ -6,6 +6,8 @@ import (
 	"io"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
@@ -43,6 +45,12 @@ type Response interface {
 	ReadString() (string, error)
 	// ReadOString reads "string" object value
 	ReadOString() (string, bool, error)
+
+	// ReadUUID reads "UUID" object value
+	ReadUUID() (uuid.UUID, error)
+
+	// ReadByteArray reads "byte" array value
+	ReadByteArray() ([]byte, error)
 
 	// ReadTimestamp reads "Timestamp" object value
 	ReadTimestamp() (time.Time, error)
@@ -157,6 +165,26 @@ func (r *response) ReadOString() (string, bool, error) {
 	}
 }
 
+// ReadUUID reads "UUID" object value
+func (r *response) ReadUUID() (uuid.UUID, error) {
+	var o uuid.UUID
+	err := binary.Read(r.message, binary.LittleEndian, &o)
+	return o, err
+}
+
+// ReadByteArray reads "byte" array value
+func (r *response) ReadByteArray() ([]byte, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]byte, l)
+	if l > 0 {
+		err = binary.Read(r.message, binary.LittleEndian, &b)
+	}
+	return b, err
+}
+
 // ReadTimestamp reads "Timestamp" object value
 func (r *response) ReadTimestamp() (time.Time, error) {
 	high, err := r.ReadLong()
@@ -197,6 +225,10 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadBool()
 	case typeString:
 		return r.ReadString()
+	case typeUUID:
+		return r.ReadUUID()
+	case typeByteArray:
+		return r.ReadByteArray()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeNULL:
