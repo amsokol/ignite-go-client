@@ -753,6 +753,74 @@ func Test_request_WriteOByteArray(t *testing.T) {
 	}
 }
 
+func Test_request_WriteShortArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []int16
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []int16{1, 2, 3},
+			},
+			want: []byte{3, 0, 0, 0, 1, 0, 2, 0, 3, 0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteShortArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteShortArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteShortArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteOShortArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []int16
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []int16{1, 2, 3},
+			},
+			want: []byte{13, 3, 0, 0, 0, 1, 0, 2, 0, 3, 0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOShortArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOShortArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOShortArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOTimestamp(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -863,6 +931,7 @@ func Test_request_WriteObject(t *testing.T) {
 	r10 := &request{payload: &bytes.Buffer{}}
 	r11 := &request{payload: &bytes.Buffer{}}
 	r12 := &request{payload: &bytes.Buffer{}}
+	r13 := &request{payload: &bytes.Buffer{}}
 	r33 := &request{payload: &bytes.Buffer{}}
 	r36 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
@@ -976,6 +1045,14 @@ func Test_request_WriteObject(t *testing.T) {
 				[]byte{1, 2, 3},
 			},
 			want: []byte{12, 3, 0, 0, 0, 1, 2, 3},
+		},
+		{
+			name: "short array",
+			r:    r13,
+			args: args{
+				[]int16{1, 2, 3},
+			},
+			want: []byte{13, 3, 0, 0, 0, 1, 0, 2, 0, 3, 0},
 		},
 		{
 			name: "Timestamp",

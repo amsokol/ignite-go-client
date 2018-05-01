@@ -39,9 +39,9 @@ const (
 	   bytes[14] = jBytes[9]; // j
 	   bytes[15] = jBytes[8]; // k
 	*/
-	typeDate      = 11
-	typeByteArray = 12
-	// TODO: typeShortArray  = 13
+	typeDate       = 11
+	typeByteArray  = 12
+	typeShortArray = 13
 	// TODO: typeIntArray    = 14
 	// TODO: typeLongArray   = 15
 	// TODO: typeFloatArray  = 16

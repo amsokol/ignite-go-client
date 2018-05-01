@@ -70,6 +70,11 @@ type Request interface {
 	// WriteOByteArray writes "byte array" object value
 	WriteOByteArray(v []byte) error
 
+	// WriteShortArray writes "short" array value
+	WriteShortArray(v []int16) error
+	// WriteOShortArray writes "short array" object value
+	WriteOShortArray(v []int16) error
+
 	// WriteOTimestamp writes "Timestamp" object value
 	// Timestamp is marshaled as object in all cases.
 	WriteOTimestamp(v time.Time) error
@@ -240,6 +245,22 @@ func (r *request) WriteOByteArray(v []byte) error {
 	return r.WriteByteArray(v)
 }
 
+// WriteShortArray writes "short" array value
+func (r *request) WriteShortArray(v []int16) error {
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteOShortArray writes "short" array object value
+func (r *request) WriteOShortArray(v []int16) error {
+	if err := r.WriteByte(typeShortArray); err != nil {
+		return err
+	}
+	return r.WriteShortArray(v)
+}
+
 // WriteOTimestamp writes "Timestamp" object value
 // Timestamp is marshaled as object in all cases.
 func (r *request) WriteOTimestamp(v time.Time) error {
@@ -300,6 +321,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteODate(v)
 	case []byte:
 		return r.WriteOByteArray(v)
+	case []int16:
+		return r.WriteOShortArray(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	case TimeType:
