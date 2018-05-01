@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_request_WriteByte(t *testing.T) {
@@ -611,6 +612,41 @@ func Test_request_WriteOString(t *testing.T) {
 	}
 }
 
+func Test_request_WriteOTimestamp(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+
+	type args struct {
+		v time.Time
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: tm,
+			},
+			want: []byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0}[:],
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOTimestamp(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOTimestamp() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOString() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteNull(t *testing.T) {
 	r := &request{payload: &bytes.Buffer{}}
 
@@ -648,7 +684,9 @@ func Test_request_WriteObject(t *testing.T) {
 	r7 := &request{payload: &bytes.Buffer{}}
 	r8 := &request{payload: &bytes.Buffer{}}
 	r9 := &request{payload: &bytes.Buffer{}}
+	r33 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 
 	type args struct {
 		o interface{}
@@ -731,6 +769,14 @@ func Test_request_WriteObject(t *testing.T) {
 				"test string",
 			},
 			want: []byte{9, 0x0B, 0, 0, 0, 0x74, 0x65, 0x73, 0x74, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67}[:],
+		},
+		{
+			name: "Timestamp",
+			r:    r33,
+			args: args{
+				tm,
+			},
+			want: []byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0}[:],
 		},
 		{
 			name: "NULL",

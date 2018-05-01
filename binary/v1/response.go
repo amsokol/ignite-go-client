@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
+	"time"
 
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
@@ -42,6 +43,9 @@ type Response interface {
 	ReadString() (string, error)
 	// ReadOString reads "string" object value
 	ReadOString() (string, bool, error)
+
+	// ReadTimestamp reads "Timestamp" object value
+	ReadTimestamp() (time.Time, error)
 
 	// ReadFrom is function to read request data from io.Reader.
 	// Returns read bytes.
@@ -153,6 +157,21 @@ func (r *response) ReadOString() (string, bool, error) {
 	}
 }
 
+// ReadTimestamp reads "Timestamp" object value
+func (r *response) ReadTimestamp() (time.Time, error) {
+	high, err := r.ReadLong()
+	if err != nil {
+		return time.Time{}, err
+	}
+	low, err := r.ReadInt()
+	if err != nil {
+		return time.Time{}, err
+	}
+	low = int32((high%1000)*int64(time.Millisecond)) + low
+	high = high / 1000
+	return time.Unix(high, int64(low)).UTC(), nil
+}
+
 func (r *response) ReadObject() (interface{}, error) {
 	t, err := r.ReadByte()
 	if err != nil {
@@ -178,6 +197,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadBool()
 	case typeString:
 		return r.ReadString()
+	case typeTimestamp:
+		return r.ReadTimestamp()
 	case typeNULL:
 		return nil, nil
 	default:

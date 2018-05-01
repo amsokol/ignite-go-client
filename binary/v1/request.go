@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"io"
 	"reflect"
+	"time"
 
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
@@ -54,6 +55,10 @@ type Request interface {
 	// WriteOString writes "string" object value
 	// String is marshaled as object in all cases.
 	WriteOString(v string) error
+
+	// WriteOTimestamp writes "Timestamp" object value
+	// Timestamp is marshaled as object in all cases.
+	WriteOTimestamp(v time.Time) error
 
 	// WriteTo is function to write request data to io.Writer.
 	// Returns written bytes.
@@ -184,6 +189,22 @@ func (r *request) WriteOString(v string) error {
 	return binary.Write(r.payload, binary.LittleEndian, s)
 }
 
+// WriteOTimestamp writes "Timestamp" object value
+// Timestamp is marshaled as object in all cases.
+func (r *request) WriteOTimestamp(v time.Time) error {
+	if err := r.WriteByte(typeTimestamp); err != nil {
+		return err
+	}
+	high := int64(v.Unix() * 1000) // Unix time in milliseconds
+	low := v.Nanosecond()
+	high += int64(low / int(time.Millisecond))
+	low = low % int(time.Millisecond)
+	if err := r.WriteLong(high); err != nil {
+		return err
+	}
+	return r.WriteInt(int32(low))
+}
+
 // WriteNull writes NULL
 func (r *request) WriteNull() error {
 	return r.WriteByte(typeNULL)
@@ -213,6 +234,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOBool(v)
 	case string:
 		return r.WriteOString(v)
+	case time.Time:
+		return r.WriteOTimestamp(v)
 	default:
 		return errors.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
 	}

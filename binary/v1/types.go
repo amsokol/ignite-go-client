@@ -54,7 +54,7 @@ const (
 	// TODO: Enum Array = 29
 	// TODO: Decimal = 30
 	// TODO: Decimal Array = 31
-	// TODO: typeTimestamp byte = 33
+	typeTimestamp byte = 33
 	// TODO: Timestamp Array = 34
 	// TODO: typeTime byte = 36
 	// TODO: Time Array = 37

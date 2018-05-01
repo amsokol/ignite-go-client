@@ -5,6 +5,7 @@ import (
 	"io"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_response_ReadByte(t *testing.T) {
@@ -301,6 +302,37 @@ func Test_response_ReadOString(t *testing.T) {
 			}
 			if got1 != tt.want1 {
 				t.Errorf("response.ReadOString() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
+
+func Test_response_ReadTimestamp(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer(
+		[]byte{0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0})}
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    time.Time
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: tm,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadTimestamp()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadTimestamp() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadTimestamp() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
