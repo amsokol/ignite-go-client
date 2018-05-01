@@ -655,7 +655,7 @@ func Test_request_WriteODate(t *testing.T) {
 	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
 
 	type args struct {
-		v DateType
+		v Date
 	}
 	tests := []struct {
 		name    string
@@ -668,7 +668,7 @@ func Test_request_WriteODate(t *testing.T) {
 			name: "1",
 			r:    r1,
 			args: args{
-				v: Date(dm),
+				v: DateT(dm),
 			},
 			want: []byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0},
 		},
@@ -926,7 +926,7 @@ func Test_request_WriteOTime(t *testing.T) {
 	tm := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 
 	type args struct {
-		v TimeType
+		v Time
 	}
 	tests := []struct {
 		name    string
@@ -939,7 +939,7 @@ func Test_request_WriteOTime(t *testing.T) {
 			name: "1",
 			r:    r1,
 			args: args{
-				v: Time(tm),
+				v: TimeT(tm),
 			},
 			want: []byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0},
 		},
@@ -1100,7 +1100,7 @@ func Test_request_WriteObject(t *testing.T) {
 			name: "Date",
 			r:    r11,
 			args: args{
-				Date(dm),
+				DateT(dm),
 			},
 			want: []byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0},
 		},
@@ -1140,7 +1140,7 @@ func Test_request_WriteObject(t *testing.T) {
 			name: "Time",
 			r:    r36,
 			args: args{
-				Time(tm),
+				TimeT(tm),
 			},
 			want: []byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0}[:],
 		},

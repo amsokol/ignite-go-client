@@ -63,7 +63,7 @@ type Request interface {
 	WriteOUUID(v uuid.UUID) error
 
 	// WriteODate writes "Date" object value
-	WriteODate(v DateType) error
+	WriteODate(v Date) error
 
 	// WriteByteArray writes "byte" array value
 	WriteByteArray(v []byte) error
@@ -86,7 +86,7 @@ type Request interface {
 
 	// WriteOTime writes "Time" object value
 	// Time is marshaled as object in all cases.
-	WriteOTime(v TimeType) error
+	WriteOTime(v Time) error
 
 	// WriteTo is function to write request data to io.Writer.
 	// Returns written bytes.
@@ -227,7 +227,7 @@ func (r *request) WriteOUUID(v uuid.UUID) error {
 }
 
 // WriteODate writes "Date" object value
-func (r *request) WriteODate(v DateType) error {
+func (r *request) WriteODate(v Date) error {
 	if err := r.WriteByte(typeDate); err != nil {
 		return err
 	}
@@ -300,7 +300,7 @@ func (r *request) WriteOTimestamp(v time.Time) error {
 
 // WriteOTime writes "Time" object value
 // Time is marshaled as object in all cases.
-func (r *request) WriteOTime(v TimeType) error {
+func (r *request) WriteOTime(v Time) error {
 	if err := r.WriteByte(typeTime); err != nil {
 		return err
 	}
@@ -338,7 +338,7 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOString(v)
 	case uuid.UUID:
 		return r.WriteOUUID(v)
-	case DateType:
+	case Date:
 		return r.WriteODate(v)
 	case []byte:
 		return r.WriteOByteArray(v)
@@ -348,7 +348,7 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOIntArray(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
-	case TimeType:
+	case Time:
 		return r.WriteOTime(v)
 	default:
 		return errors.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
