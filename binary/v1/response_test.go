@@ -459,6 +459,36 @@ func Test_response_ReadIntArray(t *testing.T) {
 	}
 }
 
+func Test_response_ReadLongArray(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer(
+		[]byte{3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    []int64
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: []int64{1, 2, 3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadLongArray()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadLongArray() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadLongArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadTimestamp(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0})}
@@ -541,6 +571,8 @@ func Test_response_ReadObject(t *testing.T) {
 	r13 := &response{message: bytes.NewBuffer([]byte{13, 3, 0, 0, 0, 1, 0, 2, 0, 3, 0})}
 	r14 := &response{message: bytes.NewBuffer(
 		[]byte{14, 3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0})}
+	r15 := &response{message: bytes.NewBuffer(
+		[]byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0})}
 	r33 := &response{message: bytes.NewBuffer([]byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0,
 		0x55, 0xf8, 0x6, 0x0})}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -623,6 +655,11 @@ func Test_response_ReadObject(t *testing.T) {
 			name: "int array",
 			r:    r14,
 			want: []int32{1, 2, 3},
+		},
+		{
+			name: "long array",
+			r:    r15,
+			want: []int64{1, 2, 3},
 		},
 		{
 			name: "Timestamp",

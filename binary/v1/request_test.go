@@ -882,6 +882,77 @@ func Test_request_WriteOIntArray(t *testing.T) {
 			if err := tt.r.WriteOIntArray(tt.args.v); (err != nil) != tt.wantErr {
 				t.Errorf("request.WriteOIntArray() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOIntArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteLongArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []int64
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []int64{1, 2, 3},
+			},
+			want: []byte{3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteLongArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteLongArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteLongArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteOLongArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []int64
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []int64{1, 2, 3},
+			},
+			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOLongArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOLongArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOLongArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
 		})
 	}
 }
@@ -998,6 +1069,7 @@ func Test_request_WriteObject(t *testing.T) {
 	r12 := &request{payload: &bytes.Buffer{}}
 	r13 := &request{payload: &bytes.Buffer{}}
 	r14 := &request{payload: &bytes.Buffer{}}
+	r15 := &request{payload: &bytes.Buffer{}}
 	r33 := &request{payload: &bytes.Buffer{}}
 	r36 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
@@ -1127,6 +1199,14 @@ func Test_request_WriteObject(t *testing.T) {
 				[]int32{1, 2, 3},
 			},
 			want: []byte{14, 3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0},
+		},
+		{
+			name: "long array",
+			r:    r15,
+			args: args{
+				[]int64{1, 2, 3},
+			},
+			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
 		},
 		{
 			name: "Timestamp",

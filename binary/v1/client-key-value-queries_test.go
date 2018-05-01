@@ -31,6 +31,7 @@ func Test_client_CacheGet(t *testing.T) {
 	c.CachePut("CacheGet", false, "byte array", []byte{1, 2, 3})
 	c.CachePut("CacheGet", false, "short array", []int16{1, 2, 3})
 	c.CachePut("CacheGet", false, "int array", []int32{1, 2, 3})
+	c.CachePut("CacheGet", false, "long array", []int64{1, 2, 3})
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	c.CachePut("CacheGet", false, "Timestamp", tm)
 	tm2 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
@@ -173,6 +174,15 @@ func Test_client_CacheGet(t *testing.T) {
 				key:   "int array",
 			},
 			want: []int32{1, 2, 3},
+		},
+		{
+			name: "long array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "long array",
+			},
+			want: []int64{1, 2, 3},
 		},
 		{
 			name: "Timestamp",
