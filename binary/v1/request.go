@@ -74,6 +74,10 @@ type Request interface {
 	// Timestamp is marshaled as object in all cases.
 	WriteOTimestamp(v time.Time) error
 
+	// WriteOTime writes "Time" object value
+	// Time is marshaled as object in all cases.
+	WriteOTime(v TimeType) error
+
 	// WriteTo is function to write request data to io.Writer.
 	// Returns written bytes.
 	WriteTo(w io.Writer) (int64, error)
@@ -252,6 +256,15 @@ func (r *request) WriteOTimestamp(v time.Time) error {
 	return r.WriteInt(int32(low))
 }
 
+// WriteOTime writes "Time" object value
+// Time is marshaled as object in all cases.
+func (r *request) WriteOTime(v TimeType) error {
+	if err := r.WriteByte(typeTime); err != nil {
+		return err
+	}
+	return r.WriteLong(int64(v))
+}
+
 // WriteNull writes NULL
 func (r *request) WriteNull() error {
 	return r.WriteByte(typeNULL)
@@ -289,6 +302,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOByteArray(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
+	case TimeType:
+		return r.WriteOTime(v)
 	default:
 		return errors.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
 	}

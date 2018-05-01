@@ -60,7 +60,7 @@ const (
 	// TODO: Decimal Array = 31
 	typeTimestamp byte = 33
 	// TODO: Timestamp Array = 34
-	// TODO: typeTime byte = 36
+	typeTime byte = 36
 	// TODO: Time Array = 37
 	typeNULL byte = 101
 )
@@ -78,4 +78,16 @@ func Date(t time.Time) DateType {
 	t2 := t1.Unix() * 1000
 	t2 += int64(t1.Nanosecond()) / int64(time.Millisecond)
 	return DateType(t2)
+}
+
+// TimeType is Apache Ignite Time type
+type TimeType int64
+
+// Time converts Golang time.Time to Apache Ignite Time
+func Time(t time.Time) TimeType {
+	t1 := t.UTC()
+	t2 := time.Date(1970, 1, 1, t1.Hour(), t1.Minute(), t1.Second(), t1.Nanosecond(), time.UTC)
+	t3 := t2.Unix() * 1000
+	t3 += int64(t2.Nanosecond()) / int64(time.Millisecond)
+	return TimeType(t3)
 }

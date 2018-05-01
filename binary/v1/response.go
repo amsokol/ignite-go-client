@@ -58,6 +58,9 @@ type Response interface {
 	// ReadTimestamp reads "Timestamp" object value
 	ReadTimestamp() (time.Time, error)
 
+	// ReadTime reads "Time" object value
+	ReadTime() (time.Time, error)
+
 	// ReadFrom is function to read request data from io.Reader.
 	// Returns read bytes.
 	ReadFrom(r io.Reader) (int64, error)
@@ -212,6 +215,16 @@ func (r *response) ReadTimestamp() (time.Time, error) {
 	return time.Unix(high, int64(low)).UTC(), nil
 }
 
+// ReadTime reads "Time" object value
+func (r *response) ReadTime() (time.Time, error) {
+	v, err := r.ReadLong()
+	if err != nil {
+		return time.Time{}, err
+	}
+	t := time.Unix(int64(v)/1000, (int64(v)%1000)*int64(time.Millisecond)).UTC()
+	return time.Date(1, 1, 1, t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.UTC), nil
+}
+
 func (r *response) ReadObject() (interface{}, error) {
 	t, err := r.ReadByte()
 	if err != nil {
@@ -245,6 +258,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadByteArray()
 	case typeTimestamp:
 		return r.ReadTimestamp()
+	case typeTime:
+		return r.ReadTime()
 	case typeNULL:
 		return nil, nil
 	default:
