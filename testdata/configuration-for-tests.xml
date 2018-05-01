@@ -162,7 +162,7 @@
                     <property name="writeSynchronizationMode" value="FULL_SYNC"/>
                 </bean>
                 <bean class="org.apache.ignite.configuration.CacheConfiguration">
-                    <property name="name" value="TestDB1"/>
+                    <property name="name" value="QuerySQLFields"/>
                     <property name="cacheMode" value="PARTITIONED"/>
                     <property name="atomicityMode" value="TRANSACTIONAL"/>
                     <property name="writeSynchronizationMode" value="FULL_SYNC"/>
@@ -214,7 +214,7 @@
                     </property>
                 </bean>
                 <bean class="org.apache.ignite.configuration.CacheConfiguration">
-                    <property name="name" value="TestDB2"/>
+                    <property name="name" value="QuerySQLFieldsCursorGetPage"/>
                     <property name="cacheMode" value="PARTITIONED"/>
                     <property name="atomicityMode" value="TRANSACTIONAL"/>
                     <property name="writeSynchronizationMode" value="FULL_SYNC"/>
@@ -266,7 +266,7 @@
                     </property>
                 </bean>
                 <bean class="org.apache.ignite.configuration.CacheConfiguration">
-                    <property name="name" value="TestDB3"/>
+                    <property name="name" value="ResourceClose"/>
                     <property name="cacheMode" value="PARTITIONED"/>
                     <property name="atomicityMode" value="TRANSACTIONAL"/>
                     <property name="writeSynchronizationMode" value="FULL_SYNC"/>

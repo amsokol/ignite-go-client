@@ -154,6 +154,38 @@ type Client interface {
 	// CacheRemoveAll destroys cache with a given name.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_all
 	CacheRemoveAll(cache string, binary bool) error
+
+	// SQL and Scan Queries
+	// See for details:
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations
+
+	// QuerySQL executes an SQL query over data stored in the cluster. The query returns the whole record (key and value).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql
+	QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQLResult, error)
+
+	// QuerySQLCursorGetPage retrieves the next SQL query cursor page by cursor id from QuerySQL.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_cursor_get_page
+	QuerySQLCursorGetPage(id int64) (QuerySQLPage, error)
+
+	// QuerySQLFieldsRaw is equal to QuerySQLFields but return raw Response object.
+	// Used for SQL driver to reduce memory allocations.
+	QuerySQLFieldsRaw(cache string, binary bool, data QuerySQLFieldsData) (*ResponseOperation, error)
+
+	// QuerySQLFields performs SQL fields query.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields
+	QuerySQLFields(cache string, binary bool, data QuerySQLFieldsData) (QuerySQLFieldsResult, error)
+
+	// QuerySQLFieldsCursorGetPageRaw is equal to QuerySQLFieldsCursorGetPage but return raw Response object.
+	// Used for SQL driver to reduce memory allocations.
+	QuerySQLFieldsCursorGetPageRaw(id int64) (*ResponseOperation, error)
+
+	// QuerySQLFieldsCursorGetPage retrieves the next query result page by cursor id from QuerySQLFields.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields_cursor_get_page
+	QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQLFieldsPage, error)
+
+	// ResourceClose closes a resource, such as query cursor.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_resource_close
+	ResourceClose(id int64) error
 }
 
 type client struct {
