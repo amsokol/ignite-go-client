@@ -42,7 +42,7 @@ const (
 	typeDate       = 11
 	typeByteArray  = 12
 	typeShortArray = 13
-	// TODO: typeIntArray    = 14
+	typeIntArray   = 14
 	// TODO: typeLongArray   = 15
 	// TODO: typeFloatArray  = 16
 	// TODO: typeDoubleArray = 17
