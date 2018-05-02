@@ -226,6 +226,15 @@ func Test_client_CacheGet(t *testing.T) {
 			want: []bool{true, false, true},
 		},
 		{
+			name: "string array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "string array",
+			},
+			want: []string{"one", "two", "три"},
+		},
+		{
 			name: "Timestamp",
 			c:    c,
 			args: args{
