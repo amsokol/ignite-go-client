@@ -139,8 +139,8 @@ func (r *response) ReadDate() (time.Time, error) {
 	return time.Unix(int64(v)/1000, (int64(v)%1000)*int64(time.Millisecond)).UTC(), nil
 }
 
-// ReadArrayByte reads "byte" array value
-func (r *response) ReadArrayByte() ([]byte, error) {
+// ReadArrayBytes reads "byte" array value
+func (r *response) ReadArrayBytes() ([]byte, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -152,8 +152,8 @@ func (r *response) ReadArrayByte() ([]byte, error) {
 	return b, err
 }
 
-// ReadArrayShort reads "short" array value
-func (r *response) ReadArrayShort() ([]int16, error) {
+// ReadArrayShorts reads "short" array value
+func (r *response) ReadArrayShorts() ([]int16, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -165,8 +165,8 @@ func (r *response) ReadArrayShort() ([]int16, error) {
 	return b, err
 }
 
-// ReadArrayInt reads "int" array value
-func (r *response) ReadArrayInt() ([]int32, error) {
+// ReadArrayInts reads "int" array value
+func (r *response) ReadArrayInts() ([]int32, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -178,8 +178,8 @@ func (r *response) ReadArrayInt() ([]int32, error) {
 	return b, err
 }
 
-// ReadArrayLong reads "long" array value
-func (r *response) ReadArrayLong() ([]int64, error) {
+// ReadArrayLongs reads "long" array value
+func (r *response) ReadArrayLongs() ([]int64, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -191,8 +191,8 @@ func (r *response) ReadArrayLong() ([]int64, error) {
 	return b, err
 }
 
-// ReadArrayFloat reads "float" array value
-func (r *response) ReadArrayFloat() ([]float32, error) {
+// ReadArrayFloats reads "float" array value
+func (r *response) ReadArrayFloats() ([]float32, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -204,8 +204,8 @@ func (r *response) ReadArrayFloat() ([]float32, error) {
 	return b, err
 }
 
-// ReadArrayDouble reads "double" array value
-func (r *response) ReadArrayDouble() ([]float64, error) {
+// ReadArrayDoubles reads "double" array value
+func (r *response) ReadArrayDoubles() ([]float64, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -217,8 +217,8 @@ func (r *response) ReadArrayDouble() ([]float64, error) {
 	return b, err
 }
 
-// ReadArrayChar reads "char" array value
-func (r *response) ReadArrayChar() ([]Char, error) {
+// ReadArrayChars reads "char" array value
+func (r *response) ReadArrayChars() ([]Char, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -232,8 +232,8 @@ func (r *response) ReadArrayChar() ([]Char, error) {
 	return b, nil
 }
 
-// ReadArrayBool reads "bool" array value
-func (r *response) ReadArrayBool() ([]bool, error) {
+// ReadArrayBools reads "bool" array value
+func (r *response) ReadArrayBools() ([]bool, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -245,8 +245,8 @@ func (r *response) ReadArrayBool() ([]bool, error) {
 	return b, err
 }
 
-// ReadArrayOString reads "String" array value
-func (r *response) ReadArrayOString() ([]string, error) {
+// ReadArrayOStrings reads "String" array value
+func (r *response) ReadArrayOStrings() ([]string, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -315,23 +315,23 @@ func (r *response) ReadObject() (interface{}, error) {
 	case typeDate:
 		return r.ReadDate()
 	case typeByteArray:
-		return r.ReadArrayByte()
+		return r.ReadArrayBytes()
 	case typeShortArray:
-		return r.ReadArrayShort()
+		return r.ReadArrayShorts()
 	case typeIntArray:
-		return r.ReadArrayInt()
+		return r.ReadArrayInts()
 	case typeLongArray:
-		return r.ReadArrayLong()
+		return r.ReadArrayLongs()
 	case typeFloatArray:
-		return r.ReadArrayFloat()
+		return r.ReadArrayFloats()
 	case typeDoubleArray:
-		return r.ReadArrayDouble()
+		return r.ReadArrayDoubles()
 	case typeCharArray:
-		return r.ReadArrayChar()
+		return r.ReadArrayChars()
 	case typeBoolArray:
-		return r.ReadArrayBool()
+		return r.ReadArrayBools()
 	case typeStringArray:
-		return r.ReadArrayOString()
+		return r.ReadArrayOStrings()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeTime:

@@ -685,7 +685,7 @@ func Test_request_WriteODate(t *testing.T) {
 	}
 }
 
-func Test_request_WriteOArrayByte(t *testing.T) {
+func Test_request_WriteOArrayBytes(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -709,17 +709,17 @@ func Test_request_WriteOArrayByte(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayByte(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayByte() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayBytes(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayBytes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayByte() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayBytes() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayShort(t *testing.T) {
+func Test_request_WriteOArrayShorts(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -743,17 +743,17 @@ func Test_request_WriteOArrayShort(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayShort(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayShort() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayShorts(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayShorts() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayShort() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayShorts() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayInt(t *testing.T) {
+func Test_request_WriteOArrayInts(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -777,17 +777,17 @@ func Test_request_WriteOArrayInt(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayInt(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayInt() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayInts(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayInts() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayInt() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayInts() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayLong(t *testing.T) {
+func Test_request_WriteOArrayLongs(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -811,17 +811,17 @@ func Test_request_WriteOArrayLong(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayLong(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayLong() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayLongs(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayLongs() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayLong() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayLongs() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayFloat(t *testing.T) {
+func Test_request_WriteOArrayFloats(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -845,17 +845,17 @@ func Test_request_WriteOArrayFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayFloat(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayFloat() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayFloats(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayFloats() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayFloat() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayFloats() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayDouble(t *testing.T) {
+func Test_request_WriteOArrayDoubles(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -880,17 +880,17 @@ func Test_request_WriteOArrayDouble(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayDouble(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayDouble() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayDoubles(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayDoubles() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayDouble() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayDoubles() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayChar(t *testing.T) {
+func Test_request_WriteOArrayChars(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -914,17 +914,17 @@ func Test_request_WriteOArrayChar(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayChar(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayChar() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayChars(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayChars() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayChar() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayChars() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayBool(t *testing.T) {
+func Test_request_WriteOArrayBools(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -948,17 +948,17 @@ func Test_request_WriteOArrayBool(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayBool(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayBool() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayBools(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayBools() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayBool() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayBools() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteOArrayOString(t *testing.T) {
+func Test_request_WriteOArrayOStrings(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -985,11 +985,11 @@ func Test_request_WriteOArrayOString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOArrayOString(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOArrayOString() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayOStrings(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayOStrings() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOArrayOString() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayOStrings() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}

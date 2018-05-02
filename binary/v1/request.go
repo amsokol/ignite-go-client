@@ -160,8 +160,8 @@ func (r *request) WriteODate(v Date) error {
 	return r.WriteLong(int64(v))
 }
 
-// WriteOArrayByte writes "byte" array object value
-func (r *request) WriteOArrayByte(v []byte) error {
+// WriteOArrayBytes writes "byte" array object value
+func (r *request) WriteOArrayBytes(v []byte) error {
 	if err := r.WriteByte(typeByteArray); err != nil {
 		return err
 	}
@@ -171,8 +171,8 @@ func (r *request) WriteOArrayByte(v []byte) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
-// WriteOArrayShort writes "short" array object value
-func (r *request) WriteOArrayShort(v []int16) error {
+// WriteOArrayShorts writes "short" array object value
+func (r *request) WriteOArrayShorts(v []int16) error {
 	if err := r.WriteByte(typeShortArray); err != nil {
 		return err
 	}
@@ -182,8 +182,8 @@ func (r *request) WriteOArrayShort(v []int16) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
-// WriteOArrayInt writes "int" array object value
-func (r *request) WriteOArrayInt(v []int32) error {
+// WriteOArrayInts writes "int" array object value
+func (r *request) WriteOArrayInts(v []int32) error {
 	if err := r.WriteByte(typeIntArray); err != nil {
 		return err
 	}
@@ -193,8 +193,8 @@ func (r *request) WriteOArrayInt(v []int32) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
-// WriteOArrayLong writes "long" array object value
-func (r *request) WriteOArrayLong(v []int64) error {
+// WriteOArrayLongs writes "long" array object value
+func (r *request) WriteOArrayLongs(v []int64) error {
 	if err := r.WriteByte(typeLongArray); err != nil {
 		return err
 	}
@@ -204,8 +204,8 @@ func (r *request) WriteOArrayLong(v []int64) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
-// WriteOArrayFloat writes "float" array object value
-func (r *request) WriteOArrayFloat(v []float32) error {
+// WriteOArrayFloats writes "float" array object value
+func (r *request) WriteOArrayFloats(v []float32) error {
 	if err := r.WriteByte(typeFloatArray); err != nil {
 		return err
 	}
@@ -215,8 +215,8 @@ func (r *request) WriteOArrayFloat(v []float32) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
-// WriteOArrayDouble writes "double" array object value
-func (r *request) WriteOArrayDouble(v []float64) error {
+// WriteOArrayDoubles writes "double" array object value
+func (r *request) WriteOArrayDoubles(v []float64) error {
 	if err := r.WriteByte(typeDoubleArray); err != nil {
 		return err
 	}
@@ -226,8 +226,8 @@ func (r *request) WriteOArrayDouble(v []float64) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
-// WriteOArrayChar writes "char" array object value
-func (r *request) WriteOArrayChar(v []Char) error {
+// WriteOArrayChars writes "char" array object value
+func (r *request) WriteOArrayChars(v []Char) error {
 	if err := r.WriteByte(typeCharArray); err != nil {
 		return err
 	}
@@ -242,8 +242,8 @@ func (r *request) WriteOArrayChar(v []Char) error {
 	return nil
 }
 
-// WriteOArrayBool writes "Bool" array object value
-func (r *request) WriteOArrayBool(v []bool) error {
+// WriteOArrayBools writes "Bool" array object value
+func (r *request) WriteOArrayBools(v []bool) error {
 	if err := r.WriteByte(typeBoolArray); err != nil {
 		return err
 	}
@@ -253,8 +253,8 @@ func (r *request) WriteOArrayBool(v []bool) error {
 	return binary.Write(r.payload, binary.LittleEndian, v)
 }
 
-// WriteOArrayOString writes "String" array object value
-func (r *request) WriteOArrayOString(v []string) error {
+// WriteOArrayOStrings writes "String" array object value
+func (r *request) WriteOArrayOStrings(v []string) error {
 	if err := r.WriteByte(typeStringArray); err != nil {
 		return err
 	}
@@ -328,23 +328,23 @@ func (r *request) WriteObject(o interface{}) error {
 	case Date:
 		return r.WriteODate(v)
 	case []byte:
-		return r.WriteOArrayByte(v)
+		return r.WriteOArrayBytes(v)
 	case []int16:
-		return r.WriteOArrayShort(v)
+		return r.WriteOArrayShorts(v)
 	case []int32:
-		return r.WriteOArrayInt(v)
+		return r.WriteOArrayInts(v)
 	case []int64:
-		return r.WriteOArrayLong(v)
+		return r.WriteOArrayLongs(v)
 	case []float32:
-		return r.WriteOArrayFloat(v)
+		return r.WriteOArrayFloats(v)
 	case []float64:
-		return r.WriteOArrayDouble(v)
+		return r.WriteOArrayDoubles(v)
 	case []Char:
-		return r.WriteOArrayChar(v)
+		return r.WriteOArrayChars(v)
 	case []bool:
-		return r.WriteOArrayBool(v)
+		return r.WriteOArrayBools(v)
 	case []string:
-		return r.WriteOArrayOString(v)
+		return r.WriteOArrayOStrings(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	case Time:
