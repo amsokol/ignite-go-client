@@ -11,10 +11,6 @@ import (
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
-const (
-	errInvalidType = "invalid type (expected %d, but got %d)"
-)
-
 // Response is interface of base message response functionality
 type Response interface {
 	// ReadByte reads "byte" value
@@ -43,8 +39,8 @@ type Response interface {
 
 	// ReadString reads "string" value
 	ReadString() (string, error)
-	// ReadOString reads "string" object value
-	ReadOString() (string, bool, error)
+	// ReadOString reads "string" object value or NULL (returns "")
+	ReadOString() (string, error)
 
 	// ReadUUID reads "UUID" object value
 	ReadUUID() (uuid.UUID, error)
@@ -52,29 +48,32 @@ type Response interface {
 	// ReadDate reads "Date" object value
 	ReadDate() (time.Time, error)
 
-	// ReadByteArray reads "byte" array value
-	ReadByteArray() ([]byte, error)
+	// ReadArrayByte reads "byte" array value
+	ReadArrayByte() ([]byte, error)
 
-	// ReadShortArray reads "short" array value
-	ReadShortArray() ([]int16, error)
+	// ReadArrayShort reads "short" array value
+	ReadArrayShort() ([]int16, error)
 
-	// ReadIntArray reads "int" array value
-	ReadIntArray() ([]int32, error)
+	// ReadArrayInt reads "int" array value
+	ReadArrayInt() ([]int32, error)
 
-	// ReadLongArray reads "long" array value
-	ReadLongArray() ([]int64, error)
+	// ReadArrayLong reads "long" array value
+	ReadArrayLong() ([]int64, error)
 
-	// ReadFloatArray reads "float" array value
-	ReadFloatArray() ([]float32, error)
+	// ReadArrayFloat reads "float" array value
+	ReadArrayFloat() ([]float32, error)
 
-	// ReadDoubleArray reads "double" array value
-	ReadDoubleArray() ([]float64, error)
+	// ReadArrayDouble reads "double" array value
+	ReadArrayDouble() ([]float64, error)
 
-	// ReadCharArray reads "char" array value
-	ReadCharArray() ([]Char, error)
+	// ReadArrayChar reads "char" array value
+	ReadArrayChar() ([]Char, error)
 
-	// ReadBoolArray reads "bool" array value
-	ReadBoolArray() ([]bool, error)
+	// ReadArrayBool reads "bool" array value
+	ReadArrayBool() ([]bool, error)
+
+	// ReadArrayOString reads "String" array value
+	ReadArrayOString() ([]string, error)
 
 	// ReadTimestamp reads "Timestamp" object value
 	ReadTimestamp() (time.Time, error)
@@ -175,20 +174,20 @@ func (r *response) ReadString() (string, error) {
 	return "", nil
 }
 
-// ReadOString reads "string" object value
-func (r *response) ReadOString() (string, bool, error) {
+// ReadOString reads "string" object value or NULL (returns "")
+func (r *response) ReadOString() (string, error) {
 	t, err := r.ReadByte()
 	if err != nil {
-		return "", false, err
+		return "", err
 	}
 	switch t {
 	case typeNULL:
-		return "", true, nil
+		return "", nil
 	case typeString:
 		v, err := r.ReadString()
-		return v, false, err
+		return v, err
 	default:
-		return "", false, errors.Errorf(errInvalidType, typeString, t)
+		return "", errors.Errorf("invalid type (expected %d, but got %d)", typeString, t)
 	}
 }
 
@@ -208,8 +207,8 @@ func (r *response) ReadDate() (time.Time, error) {
 	return time.Unix(int64(v)/1000, (int64(v)%1000)*int64(time.Millisecond)).UTC(), nil
 }
 
-// ReadByteArray reads "byte" array value
-func (r *response) ReadByteArray() ([]byte, error) {
+// ReadArrayByte reads "byte" array value
+func (r *response) ReadArrayByte() ([]byte, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -221,8 +220,8 @@ func (r *response) ReadByteArray() ([]byte, error) {
 	return b, err
 }
 
-// ReadShortArray reads "short" array value
-func (r *response) ReadShortArray() ([]int16, error) {
+// ReadArrayShort reads "short" array value
+func (r *response) ReadArrayShort() ([]int16, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -234,8 +233,8 @@ func (r *response) ReadShortArray() ([]int16, error) {
 	return b, err
 }
 
-// ReadIntArray reads "int" array value
-func (r *response) ReadIntArray() ([]int32, error) {
+// ReadArrayInt reads "int" array value
+func (r *response) ReadArrayInt() ([]int32, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -247,8 +246,8 @@ func (r *response) ReadIntArray() ([]int32, error) {
 	return b, err
 }
 
-// ReadLongArray reads "long" array value
-func (r *response) ReadLongArray() ([]int64, error) {
+// ReadArrayLong reads "long" array value
+func (r *response) ReadArrayLong() ([]int64, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -260,8 +259,8 @@ func (r *response) ReadLongArray() ([]int64, error) {
 	return b, err
 }
 
-// ReadFloatArray reads "float" array value
-func (r *response) ReadFloatArray() ([]float32, error) {
+// ReadArrayFloat reads "float" array value
+func (r *response) ReadArrayFloat() ([]float32, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -273,8 +272,8 @@ func (r *response) ReadFloatArray() ([]float32, error) {
 	return b, err
 }
 
-// ReadDoubleArray reads "double" array value
-func (r *response) ReadDoubleArray() ([]float64, error) {
+// ReadArrayDouble reads "double" array value
+func (r *response) ReadArrayDouble() ([]float64, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -286,8 +285,8 @@ func (r *response) ReadDoubleArray() ([]float64, error) {
 	return b, err
 }
 
-// ReadCharArray reads "char" array value
-func (r *response) ReadCharArray() ([]Char, error) {
+// ReadArrayChar reads "char" array value
+func (r *response) ReadArrayChar() ([]Char, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -301,8 +300,8 @@ func (r *response) ReadCharArray() ([]Char, error) {
 	return b, nil
 }
 
-// ReadBoolArray reads "bool" array value
-func (r *response) ReadBoolArray() ([]bool, error) {
+// ReadArrayBool reads "bool" array value
+func (r *response) ReadArrayBool() ([]bool, error) {
 	l, err := r.ReadInt()
 	if err != nil {
 		return nil, err
@@ -312,6 +311,21 @@ func (r *response) ReadBoolArray() ([]bool, error) {
 		err = binary.Read(r.message, binary.LittleEndian, &b)
 	}
 	return b, err
+}
+
+// ReadArrayOString reads "String" array value
+func (r *response) ReadArrayOString() ([]string, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]string, l)
+	for i := 0; i < int(l); i++ {
+		if b[i], err = r.ReadOString(); err != nil {
+			return nil, err
+		}
+	}
+	return b, nil
 }
 
 // ReadTimestamp reads "Timestamp" object value
@@ -369,21 +383,23 @@ func (r *response) ReadObject() (interface{}, error) {
 	case typeDate:
 		return r.ReadDate()
 	case typeByteArray:
-		return r.ReadByteArray()
+		return r.ReadArrayByte()
 	case typeShortArray:
-		return r.ReadShortArray()
+		return r.ReadArrayShort()
 	case typeIntArray:
-		return r.ReadIntArray()
+		return r.ReadArrayInt()
 	case typeLongArray:
-		return r.ReadLongArray()
+		return r.ReadArrayLong()
 	case typeFloatArray:
-		return r.ReadFloatArray()
+		return r.ReadArrayFloat()
 	case typeDoubleArray:
-		return r.ReadDoubleArray()
+		return r.ReadArrayDouble()
 	case typeCharArray:
-		return r.ReadCharArray()
+		return r.ReadArrayChar()
 	case typeBoolArray:
-		return r.ReadBoolArray()
+		return r.ReadArrayBool()
+	case typeStringArray:
+		return r.ReadArrayOString()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeTime:

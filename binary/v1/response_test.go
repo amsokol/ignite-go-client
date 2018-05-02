@@ -268,7 +268,6 @@ func Test_response_ReadOString(t *testing.T) {
 		name    string
 		r       *response
 		want    string
-		want1   bool
 		wantErr bool
 	}{
 		{
@@ -282,9 +281,8 @@ func Test_response_ReadOString(t *testing.T) {
 			want: "",
 		},
 		{
-			name:  "3",
-			r:     r3,
-			want1: true,
+			name: "3",
+			r:    r3,
 		},
 		{
 			name:    "4",
@@ -294,16 +292,13 @@ func Test_response_ReadOString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, err := tt.r.ReadOString()
+			got, err := tt.r.ReadOString()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("response.ReadOString() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
 				t.Errorf("response.ReadOString() got = %v, want %v", got, tt.want)
-			}
-			if got1 != tt.want1 {
-				t.Errorf("response.ReadOString() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
@@ -371,7 +366,7 @@ func Test_response_ReadDate(t *testing.T) {
 	}
 }
 
-func Test_response_ReadByteArray(t *testing.T) {
+func Test_response_ReadArrayByte(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0, 1, 2, 3})}
 
 	tests := []struct {
@@ -388,19 +383,19 @@ func Test_response_ReadByteArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadByteArray()
+			got, err := tt.r.ReadArrayByte()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadByteArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayByte() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadByteArray() = %#v, want %#v", got, tt.want)
+				t.Errorf("response.ReadArrayByte() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_response_ReadShortArray(t *testing.T) {
+func Test_response_ReadArrayShort(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0, 1, 0, 2, 0, 3, 0})}
 
 	tests := []struct {
@@ -417,19 +412,19 @@ func Test_response_ReadShortArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadShortArray()
+			got, err := tt.r.ReadArrayShort()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadShortArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayShort() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadShortArray() = %#v, want %#v", got, tt.want)
+				t.Errorf("response.ReadArrayShort() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_response_ReadIntArray(t *testing.T) {
+func Test_response_ReadArrayInt(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0})}
 
@@ -447,19 +442,19 @@ func Test_response_ReadIntArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadIntArray()
+			got, err := tt.r.ReadArrayInt()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadIntArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayInt() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadIntArray() = %v, want %v", got, tt.want)
+				t.Errorf("response.ReadArrayInt() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_response_ReadLongArray(t *testing.T) {
+func Test_response_ReadArrayLong(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0})}
 
@@ -477,19 +472,19 @@ func Test_response_ReadLongArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadLongArray()
+			got, err := tt.r.ReadArrayLong()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadLongArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayLong() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadLongArray() = %v, want %v", got, tt.want)
+				t.Errorf("response.ReadArrayLong() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_response_ReadFloatArray(t *testing.T) {
+func Test_response_ReadArrayFloat(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40})}
 
@@ -507,19 +502,19 @@ func Test_response_ReadFloatArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadFloatArray()
+			got, err := tt.r.ReadArrayFloat()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadFloatArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayFloat() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadFloatArray() = %v, want %v", got, tt.want)
+				t.Errorf("response.ReadArrayFloat() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_response_ReadDoubleArray(t *testing.T) {
+func Test_response_ReadArrayDouble(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{3, 0, 0, 0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
 			0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40})}
@@ -538,19 +533,19 @@ func Test_response_ReadDoubleArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadDoubleArray()
+			got, err := tt.r.ReadArrayDouble()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadDoubleArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayDouble() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadDoubleArray() = %v, want %v", got, tt.want)
+				t.Errorf("response.ReadArrayDouble() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_response_ReadCharArray(t *testing.T) {
+func Test_response_ReadArrayChar(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0, 0x41, 0x0, 0x42, 0x0, 0x2f, 0x4})}
 
 	tests := []struct {
@@ -567,19 +562,19 @@ func Test_response_ReadCharArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadCharArray()
+			got, err := tt.r.ReadArrayChar()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadCharArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayChar() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadCharArray() = %v, want %v", got, tt.want)
+				t.Errorf("response.ReadArrayChar() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_response_ReadBoolArray(t *testing.T) {
+func Test_response_ReadArrayBool(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0, 1, 0, 1})}
 
 	tests := []struct {
@@ -596,13 +591,45 @@ func Test_response_ReadBoolArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.r.ReadBoolArray()
+			got, err := tt.r.ReadArrayBool()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("response.ReadBoolArray() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("response.ReadArrayBool() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("response.ReadBoolArray() = %v, want %v", got, tt.want)
+				t.Errorf("response.ReadArrayBool() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_response_ReadArrayOString(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0,
+		0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
+		0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
+		0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    []string
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: []string{"one", "two", "три"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadArrayOString()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadArrayOString() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadArrayOString() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -699,6 +726,10 @@ func Test_response_ReadObject(t *testing.T) {
 			0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40})}
 	r18 := &response{message: bytes.NewBuffer([]byte{18, 3, 0, 0, 0, 0x41, 0x0, 0x42, 0x0, 0x2f, 0x4})}
 	r19 := &response{message: bytes.NewBuffer([]byte{19, 3, 0, 0, 0, 1, 0, 1})}
+	r20 := &response{message: bytes.NewBuffer([]byte{20, 3, 0, 0, 0,
+		0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
+		0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
+		0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8})}
 	r33 := &response{message: bytes.NewBuffer([]byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0,
 		0x55, 0xf8, 0x6, 0x0})}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -806,6 +837,11 @@ func Test_response_ReadObject(t *testing.T) {
 			name: "bool array",
 			r:    r19,
 			want: []bool{true, false, true},
+		},
+		{
+			name: "string array",
+			r:    r20,
+			want: []string{"one", "two", "три"},
 		},
 		{
 			name: "Timestamp",

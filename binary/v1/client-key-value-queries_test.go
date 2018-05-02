@@ -36,6 +36,7 @@ func Test_client_CacheGet(t *testing.T) {
 	c.CachePut("CacheGet", false, "double array", []float64{1.1, 2.2, 3.3})
 	c.CachePut("CacheGet", false, "char array", []Char{'A', 'B', 'Я'})
 	c.CachePut("CacheGet", false, "bool array", []bool{true, false, true})
+	c.CachePut("CacheGet", false, "string array", []string{"one", "two", "три"})
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	c.CachePut("CacheGet", false, "Timestamp", tm)
 	tm2 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)

@@ -51,7 +51,7 @@ func (r *ResponseHandshake) ReadFrom(rr io.Reader) (int64, error) {
 		}
 		r.Patch = int(v)
 
-		r.Message, _, err = r.ReadOString()
+		r.Message, err = r.ReadOString()
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read error message")
 		}

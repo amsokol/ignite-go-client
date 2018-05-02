@@ -685,41 +685,7 @@ func Test_request_WriteODate(t *testing.T) {
 	}
 }
 
-func Test_request_WriteByteArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []byte
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []byte{1, 2, 3},
-			},
-			want: []byte{3, 0, 0, 0, 1, 2, 3},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteByteArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteByteArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteByteArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteOByteArray(t *testing.T) {
+func Test_request_WriteOArrayByte(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -743,51 +709,17 @@ func Test_request_WriteOByteArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOByteArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOByteArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayByte(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayByte() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOByteArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayByte() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteShortArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []int16
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []int16{1, 2, 3},
-			},
-			want: []byte{3, 0, 0, 0, 1, 0, 2, 0, 3, 0},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteShortArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteShortArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteShortArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteOShortArray(t *testing.T) {
+func Test_request_WriteOArrayShort(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -811,51 +743,17 @@ func Test_request_WriteOShortArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOShortArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOShortArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayShort(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayShort() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOShortArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayShort() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteIntArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []int32
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []int32{1, 2, 3},
-			},
-			want: []byte{3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteIntArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteIntArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteIntArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteOIntArray(t *testing.T) {
+func Test_request_WriteOArrayInt(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -879,51 +777,17 @@ func Test_request_WriteOIntArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOIntArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOIntArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayInt(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayInt() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOIntArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayInt() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteLongArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []int64
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []int64{1, 2, 3},
-			},
-			want: []byte{3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteLongArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteLongArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteLongArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteOLongArray(t *testing.T) {
+func Test_request_WriteOArrayLong(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -947,51 +811,17 @@ func Test_request_WriteOLongArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOLongArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOLongArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayLong(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayLong() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOLongArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayLong() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteFloatArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []float32
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []float32{1.1, 2.2, 3.3},
-			},
-			want: []byte{0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteFloatArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteFloatArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteFloatArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteOFloatArray(t *testing.T) {
+func Test_request_WriteOArrayFloat(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -1015,52 +845,17 @@ func Test_request_WriteOFloatArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOFloatArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOFloatArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayFloat(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayFloat() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOFloatArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayFloat() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteDoubleArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []float64
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []float64{1.1, 2.2, 3.3},
-			},
-			want: []byte{0x3, 0x0, 0x0, 0x0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
-				0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteDoubleArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteDoubleArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteDoubleArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteODoubleArray(t *testing.T) {
+func Test_request_WriteOArrayDouble(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -1085,51 +880,17 @@ func Test_request_WriteODoubleArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteODoubleArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteODoubleArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayDouble(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayDouble() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteODoubleArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayDouble() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteCharArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []Char
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []Char{'A', 'B', 'Я'},
-			},
-			want: []byte{3, 0, 0, 0, 0x41, 0x0, 0x42, 0x0, 0x2f, 0x4},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteCharArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteCharArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteCharArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteOCharArray(t *testing.T) {
+func Test_request_WriteOArrayChar(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -1153,51 +914,17 @@ func Test_request_WriteOCharArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOCharArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOCharArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayChar(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayChar() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOCharArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayChar() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
 }
 
-func Test_request_WriteBoolArray(t *testing.T) {
-	r1 := &request{payload: &bytes.Buffer{}}
-
-	type args struct {
-		v []bool
-	}
-	tests := []struct {
-		name    string
-		r       *request
-		args    args
-		want    []byte
-		wantErr bool
-	}{
-		{
-			name: "1",
-			r:    r1,
-			args: args{
-				v: []bool{true, false, true},
-			},
-			want: []byte{3, 0, 0, 0, 1, 0, 1},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteBoolArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteBoolArray() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteBoolArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
-			}
-		})
-	}
-}
-
-func Test_request_WriteOBoolArray(t *testing.T) {
+func Test_request_WriteOArrayBool(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
@@ -1221,11 +948,48 @@ func Test_request_WriteOBoolArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.r.WriteOBoolArray(tt.args.v); (err != nil) != tt.wantErr {
-				t.Errorf("request.WriteOBoolArray() error = %v, wantErr %v", err, tt.wantErr)
+			if err := tt.r.WriteOArrayBool(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayBool() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
-				t.Errorf("request.WriteOBoolArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+				t.Errorf("request.WriteOArrayBool() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteOArrayOString(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []string
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []string{"one", "two", "три"},
+			},
+			want: []byte{20, 3, 0, 0, 0,
+				0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
+				0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
+				0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOArrayOString(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayOString() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOArrayOString() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
 			}
 		})
 	}
@@ -1348,6 +1112,7 @@ func Test_request_WriteObject(t *testing.T) {
 	r17 := &request{payload: &bytes.Buffer{}}
 	r18 := &request{payload: &bytes.Buffer{}}
 	r19 := &request{payload: &bytes.Buffer{}}
+	r20 := &request{payload: &bytes.Buffer{}}
 	r33 := &request{payload: &bytes.Buffer{}}
 	r36 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
@@ -1518,6 +1283,17 @@ func Test_request_WriteObject(t *testing.T) {
 				[]bool{true, false, true},
 			},
 			want: []byte{19, 3, 0, 0, 0, 1, 0, 1},
+		},
+		{
+			name: "string array",
+			r:    r20,
+			args: args{
+				[]string{"one", "two", "три"},
+			},
+			want: []byte{20, 3, 0, 0, 0,
+				0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
+				0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
+				0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8},
 		},
 		{
 			name: "Timestamp",
