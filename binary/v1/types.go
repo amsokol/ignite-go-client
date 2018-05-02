@@ -23,7 +23,7 @@ const (
 	typeLongArray   = 15
 	typeFloatArray  = 16
 	typeDoubleArray = 17
-	// TODO: typeCharArray   = 18
+	typeCharArray   = 18
 	// TODO: typeBoolArray   = 19
 	// TODO: typeStringArray = 20
 	// TODO: typeUUIDArray   = 21

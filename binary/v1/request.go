@@ -45,7 +45,7 @@ type Request interface {
 	WriteODouble(v float64) error
 
 	// WriteChar writes "char" value
-	WriteChar(v rune) error
+	WriteChar(v Char) error
 	// WriteOChar writes "char" object value
 	WriteOChar(v Char) error
 
@@ -67,33 +67,38 @@ type Request interface {
 
 	// WriteByteArray writes "byte" array value
 	WriteByteArray(v []byte) error
-	// WriteOByteArray writes "byte array" object value
+	// WriteOByteArray writes "byte" array object value
 	WriteOByteArray(v []byte) error
 
 	// WriteShortArray writes "short" array value
 	WriteShortArray(v []int16) error
-	// WriteOShortArray writes "short array" object value
+	// WriteOShortArray writes "short" array object value
 	WriteOShortArray(v []int16) error
 
 	// WriteIntArray writes "int" array value
 	WriteIntArray(v []int32) error
-	// WriteOIntArray writes "int array" object value
+	// WriteOIntArray writes "int" array object value
 	WriteOIntArray(v []int32) error
 
 	// WriteLongArray writes "long" array value
 	WriteLongArray(v []int64) error
-	// WriteOLongArray writes "long array" object value
+	// WriteOLongArray writes "long" array object value
 	WriteOLongArray(v []int64) error
 
 	// WriteFloatArray writes "float" array value
 	WriteFloatArray(v []float32) error
-	// WriteOFloatArray writes "float array" object value
+	// WriteOFloatArray writes "float" array object value
 	WriteOFloatArray(v []float32) error
 
 	// WriteDoubleArray writes "double" array value
 	WriteDoubleArray(v []float64) error
-	// WriteODoubleArray writes "double array" object value
+	// WriteODoubleArray writes "double" array object value
 	WriteODoubleArray(v []float64) error
+
+	// WriteCharArray writes "char" array value
+	WriteCharArray(v []Char) error
+	// WriteOCharArray writes "char" array object value
+	WriteOCharArray(v []Char) error
 
 	// WriteOTimestamp writes "Timestamp" object value
 	// Timestamp is marshaled as object in all cases.
@@ -194,7 +199,7 @@ func (r *request) WriteODouble(v float64) error {
 }
 
 // WriteChar writes "char" value
-func (r *request) WriteChar(v rune) error {
+func (r *request) WriteChar(v Char) error {
 	return binary.Write(r.payload, binary.LittleEndian, int16(v))
 }
 
@@ -203,7 +208,7 @@ func (r *request) WriteOChar(v Char) error {
 	if err := r.WriteByte(typeChar); err != nil {
 		return err
 	}
-	return r.WriteChar(rune(v))
+	return r.WriteChar(v)
 }
 
 // WriteBool writes "bool" value
@@ -345,6 +350,27 @@ func (r *request) WriteODoubleArray(v []float64) error {
 	return r.WriteDoubleArray(v)
 }
 
+// WriteCharArray writes "char" array value
+func (r *request) WriteCharArray(v []Char) error {
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	for _, c := range v {
+		if err := r.WriteChar(c); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// WriteOCharArray writes "char" array object value
+func (r *request) WriteOCharArray(v []Char) error {
+	if err := r.WriteByte(typeCharArray); err != nil {
+		return err
+	}
+	return r.WriteCharArray(v)
+}
+
 // WriteOTimestamp writes "Timestamp" object value
 // Timestamp is marshaled as object in all cases.
 func (r *request) WriteOTimestamp(v time.Time) error {
@@ -415,6 +441,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOFloatArray(v)
 	case []float64:
 		return r.WriteODoubleArray(v)
+	case []Char:
+		return r.WriteOCharArray(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	case Time:

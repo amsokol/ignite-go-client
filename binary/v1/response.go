@@ -70,6 +70,9 @@ type Response interface {
 	// ReadDoubleArray reads "double" array value
 	ReadDoubleArray() ([]float64, error)
 
+	// ReadCharArray reads "char" array value
+	ReadCharArray() ([]Char, error)
+
 	// ReadTimestamp reads "Timestamp" object value
 	ReadTimestamp() (time.Time, error)
 
@@ -280,6 +283,21 @@ func (r *response) ReadDoubleArray() ([]float64, error) {
 	return b, err
 }
 
+// ReadCharArray reads "char" array value
+func (r *response) ReadCharArray() ([]Char, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]Char, l)
+	for i := 0; i < int(l); i++ {
+		if b[i], err = r.ReadChar(); err != nil {
+			return nil, err
+		}
+	}
+	return b, nil
+}
+
 // ReadTimestamp reads "Timestamp" object value
 func (r *response) ReadTimestamp() (time.Time, error) {
 	high, err := r.ReadLong()
@@ -346,6 +364,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadFloatArray()
 	case typeDoubleArray:
 		return r.ReadDoubleArray()
+	case typeCharArray:
+		return r.ReadCharArray()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeTime:
