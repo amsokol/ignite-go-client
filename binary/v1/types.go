@@ -49,8 +49,8 @@ type Char rune
 // since January 1, 1970 UTC.
 type Date int64
 
-// DateT converts Golang time.Time to Apache Ignite Date
-func DateT(t time.Time) Date {
+// ToDate converts Golang time.Time to Apache Ignite Date
+func ToDate(t time.Time) Date {
 	t1 := t.UTC()
 	t2 := t1.Unix() * 1000
 	t2 += int64(t1.Nanosecond()) / int64(time.Millisecond)
@@ -60,8 +60,8 @@ func DateT(t time.Time) Date {
 // Time is Apache Ignite Time type
 type Time int64
 
-// TimeT converts Golang time.Time to Apache Ignite Time
-func TimeT(t time.Time) Time {
+// ToTime converts Golang time.Time to Apache Ignite Time
+func ToTime(t time.Time) Time {
 	t1 := t.UTC()
 	t2 := time.Date(1970, 1, 1, t1.Hour(), t1.Minute(), t1.Second(), t1.Nanosecond(), time.UTC)
 	t3 := t2.Unix() * 1000

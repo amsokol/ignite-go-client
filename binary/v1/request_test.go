@@ -668,7 +668,7 @@ func Test_request_WriteODate(t *testing.T) {
 			name: "1",
 			r:    r1,
 			args: args{
-				v: DateT(dm),
+				v: ToDate(dm),
 			},
 			want: []byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0},
 		},
@@ -1148,7 +1148,7 @@ func Test_request_WriteOTime(t *testing.T) {
 			name: "1",
 			r:    r1,
 			args: args{
-				v: TimeT(tm),
+				v: ToTime(tm),
 			},
 			want: []byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0},
 		},
@@ -1312,7 +1312,7 @@ func Test_request_WriteObject(t *testing.T) {
 			name: "Date",
 			r:    r11,
 			args: args{
-				DateT(dm),
+				ToDate(dm),
 			},
 			want: []byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0},
 		},
@@ -1377,7 +1377,7 @@ func Test_request_WriteObject(t *testing.T) {
 			name: "Time",
 			r:    r36,
 			args: args{
-				TimeT(tm),
+				ToTime(tm),
 			},
 			want: []byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0}[:],
 		},
