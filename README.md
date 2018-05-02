@@ -159,7 +159,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | bool               | bool                                                                   |
 | String             | string                                                                 |
 | UUID (Guid)        | uuid.UUID ([UUID library from Google](https://github.com/google/uuid)) |
-| date*              | ignite.Date / time.Time                                                |
+| Date*              | ignite.Date / time.Time                                                |
 | byte array         | []byte                                                                 |
 | short array        | []int16                                                                |
 | int array          | []int32                                                                |
@@ -170,7 +170,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | bool array         | []bool                                                                 |
 | String array       | []string                                                               |
 | UUID (Guid) array  | []uuid.UUID                                                            |
-| Date array         | []ignite.Date / []time.Time                                            |
+| Date array*        | []ignite.Date / []time.Time                                            |
 | Object array       | Not supported. Need help.                                              |
 | Collection         | Not supported. Need help.                                              |
 | Map                | Not supported. Need help.                                              |
@@ -181,14 +181,28 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | Timestamp          | time.Time                                                              |
 | Timestamp array    | []time.Time                                                            |
 | Time**             | ignite.Time / time.Time                                                |
-| Time array         | []ignite.Time / []time.Time                                            |
+| Time array**       | []ignite.Time / []time.Time                                            |
 | NULL               | nil                                                                    |
 
-*`date` is outdated type. It's recommended to use `Timestamp` type.
-If you still need `date` type use `ignite.NativeTime2Date` and `ignite.Date2NativeTime` functions to convert between Golang `time.Time` and `ignite.Date` types.
+*`Date` is outdated type. It's recommended to use `Timestamp` type.
+If you still need `Date` type use `ignite.ToDate()` function when you **put** date:
 
-**`Time` is outdated type. It's recommended to use `Timestamp` type.
-If you still need `Time` type use `ignite.NativeTime2Time` and `ignite.Time2NativeTime` functions to convert between Golang `time.Time` and `ignite.Time` types.
+```go
+t := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+err := c.CachePut("CacheGet", false, "Date", ToDate(t)) // ToDate() converts time.Time to ignite.Date
+...
+t, err = c.CacheGet("CacheGet", false, "Date") // 't' is time.Time, you don't need any converting
+```
+
+*`Time` is outdated type. It's recommended to use `Timestamp` type.
+If you still need `Time` type use `ignite.ToTime()` function when you **put** time:
+
+```go
+t := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+err := c.CachePut("CacheGet", false, "Time", ToTime(t)) // ToTime() converts time.Time to ignite.Time (year, month and day are ignored)
+...
+t, err = c.CacheGet("CacheGet", false, "Time") // 't' is time.Time (where year=1, month=1 and day=1), you don't need any converting
+```
 
 ### SQL and Scan Queries supported operations
 
