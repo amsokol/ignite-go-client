@@ -169,7 +169,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | char array         | []ignite.Char                                                          |
 | bool array         | []bool                                                                 |
 | String array       | []string                                                               |
-| UUID (Guid) array  | Not supported. Need help from Apache Ignite team.                      |
+| UUID (Guid) array  | []uuid.UUID                                                            |
 | Date array         | []ignite.Date / []time.Time                                            |
 | Object array       | Not supported. Need help.                                              |
 | Collection         | Not supported. Need help.                                              |

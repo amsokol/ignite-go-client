@@ -995,6 +995,46 @@ func Test_request_WriteOArrayOStrings(t *testing.T) {
 	}
 }
 
+func Test_request_WriteOArrayOUUIDs(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	uid1, _ := uuid.Parse("a0c07c4c-7e2e-43d3-8eda-176881477c81")
+	uid2, _ := uuid.Parse("4015b55f-72f0-48a4-8d01-64168d50f627")
+	uid3, _ := uuid.Parse("827d1bf0-c5d4-4443-8708-d8b5de31fe74")
+
+	type args struct {
+		v []uuid.UUID
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []uuid.UUID{uid1, uid2, uid3},
+			},
+			want: []byte{21, 3, 0, 0, 0,
+				10, 0xa0, 0xc0, 0x7c, 0x4c, 0x7e, 0x2e, 0x43, 0xd3, 0x8e, 0xda, 0x17, 0x68, 0x81, 0x47, 0x7c, 0x81,
+				10, 0x40, 0x15, 0xb5, 0x5f, 0x72, 0xf0, 0x48, 0xa4, 0x8d, 0x1, 0x64, 0x16, 0x8d, 0x50, 0xf6, 0x27,
+				10, 0x82, 0x7d, 0x1b, 0xf0, 0xc5, 0xd4, 0x44, 0x43, 0x87, 0x8, 0xd8, 0xb5, 0xde, 0x31, 0xfe, 0x74},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOArrayOUUIDs(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayOUUIDs() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOArrayOUUIDs() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOArrayODates(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 	dm1 := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
@@ -1153,6 +1193,10 @@ func Test_request_WriteObject(t *testing.T) {
 	r18 := &request{payload: &bytes.Buffer{}}
 	r19 := &request{payload: &bytes.Buffer{}}
 	r20 := &request{payload: &bytes.Buffer{}}
+	r21 := &request{payload: &bytes.Buffer{}}
+	uid1, _ := uuid.Parse("a0c07c4c-7e2e-43d3-8eda-176881477c81")
+	uid2, _ := uuid.Parse("4015b55f-72f0-48a4-8d01-64168d50f627")
+	uid3, _ := uuid.Parse("827d1bf0-c5d4-4443-8708-d8b5de31fe74")
 	r22 := &request{payload: &bytes.Buffer{}}
 	dm1 := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
 	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
@@ -1338,6 +1382,17 @@ func Test_request_WriteObject(t *testing.T) {
 				0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
 				0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
 				0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8},
+		},
+		{
+			name: "UUID array",
+			r:    r21,
+			args: args{
+				[]uuid.UUID{uid1, uid2, uid3},
+			},
+			want: []byte{21, 3, 0, 0, 0,
+				10, 0xa0, 0xc0, 0x7c, 0x4c, 0x7e, 0x2e, 0x43, 0xd3, 0x8e, 0xda, 0x17, 0x68, 0x81, 0x47, 0x7c, 0x81,
+				10, 0x40, 0x15, 0xb5, 0x5f, 0x72, 0xf0, 0x48, 0xa4, 0x8d, 0x1, 0x64, 0x16, 0x8d, 0x50, 0xf6, 0x27,
+				10, 0x82, 0x7d, 0x1b, 0xf0, 0xc5, 0xd4, 0x44, 0x43, 0x87, 0x8, 0xd8, 0xb5, 0xde, 0x31, 0xfe, 0x74},
 		},
 		{
 			name: "date array",

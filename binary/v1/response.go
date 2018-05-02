@@ -260,6 +260,23 @@ func (r *response) ReadArrayOStrings() ([]string, error) {
 	return b, nil
 }
 
+// ReadArrayOUUIDs reads "UUID" array value
+func (r *response) ReadArrayOUUIDs() ([]uuid.UUID, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]uuid.UUID, l)
+	for i := 0; i < int(l); i++ {
+		o, err := r.ReadObject()
+		if err != nil {
+			return nil, err
+		}
+		b[i] = o.(uuid.UUID)
+	}
+	return b, nil
+}
+
 // ReadArrayODates reads "Date" array value
 func (r *response) ReadArrayODates() ([]time.Time, error) {
 	l, err := r.ReadInt()
@@ -351,6 +368,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadArrayOStrings()
 	case typeDateArray:
 		return r.ReadArrayODates()
+	case typeUUIDArray:
+		return r.ReadArrayOUUIDs()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeTime:

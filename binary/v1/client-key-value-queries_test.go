@@ -37,6 +37,10 @@ func Test_client_CacheGet(t *testing.T) {
 	c.CachePut("CacheGet", false, "char array", []Char{'A', 'B', 'Я'})
 	c.CachePut("CacheGet", false, "bool array", []bool{true, false, true})
 	c.CachePut("CacheGet", false, "string array", []string{"one", "two", "три"})
+	uid1, _ := uuid.Parse("a0c07c4c-7e2e-43d3-8eda-176881477c81")
+	uid2, _ := uuid.Parse("4015b55f-72f0-48a4-8d01-64168d50f627")
+	uid3, _ := uuid.Parse("827d1bf0-c5d4-4443-8708-d8b5de31fe74")
+	c.CachePut("CacheGet", false, "UUID array", []uuid.UUID{uid1, uid2, uid3})
 	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
 	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
 	c.CachePut("CacheGet", false, "date array", []Date{ToDate(dm), ToDate(dm2), ToDate(dm3)})
@@ -236,6 +240,15 @@ func Test_client_CacheGet(t *testing.T) {
 				key:   "string array",
 			},
 			want: []string{"one", "two", "три"},
+		},
+		{
+			name: "UUID array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "UUID array",
+			},
+			want: []uuid.UUID{uid1, uid2, uid3},
 		},
 		{
 			name: "date array",

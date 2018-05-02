@@ -269,6 +269,22 @@ func (r *request) WriteOArrayOStrings(v []string) error {
 	return nil
 }
 
+// WriteOArrayOUUIDs writes "UUID" array object value
+func (r *request) WriteOArrayOUUIDs(v []uuid.UUID) error {
+	if err := r.WriteByte(typeUUIDArray); err != nil {
+		return err
+	}
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	for _, d := range v {
+		if err := r.WriteOUUID(d); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WriteOArrayODates writes "Date" array object value
 func (r *request) WriteOArrayODates(v []Date) error {
 	if err := r.WriteByte(typeDateArray); err != nil {
@@ -363,6 +379,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOArrayOStrings(v)
 	case []Date:
 		return r.WriteOArrayODates(v)
+	case []uuid.UUID:
+		return r.WriteOArrayOUUIDs(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	case Time:
