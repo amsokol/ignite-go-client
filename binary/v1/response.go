@@ -67,6 +67,9 @@ type Response interface {
 	// ReadFloatArray reads "float" array value
 	ReadFloatArray() ([]float32, error)
 
+	// ReadDoubleArray reads "double" array value
+	ReadDoubleArray() ([]float64, error)
+
 	// ReadTimestamp reads "Timestamp" object value
 	ReadTimestamp() (time.Time, error)
 
@@ -264,6 +267,19 @@ func (r *response) ReadFloatArray() ([]float32, error) {
 	return b, err
 }
 
+// ReadDoubleArray reads "double" array value
+func (r *response) ReadDoubleArray() ([]float64, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]float64, l)
+	if l > 0 {
+		err = binary.Read(r.message, binary.LittleEndian, &b)
+	}
+	return b, err
+}
+
 // ReadTimestamp reads "Timestamp" object value
 func (r *response) ReadTimestamp() (time.Time, error) {
 	high, err := r.ReadLong()
@@ -328,6 +344,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadLongArray()
 	case typeFloatArray:
 		return r.ReadFloatArray()
+	case typeDoubleArray:
+		return r.ReadDoubleArray()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeTime:

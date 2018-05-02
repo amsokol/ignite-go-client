@@ -1025,6 +1025,76 @@ func Test_request_WriteOFloatArray(t *testing.T) {
 	}
 }
 
+func Test_request_WriteDoubleArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []float64
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []float64{1.1, 2.2, 3.3},
+			},
+			want: []byte{0x3, 0x0, 0x0, 0x0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
+				0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteDoubleArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteDoubleArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteDoubleArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteODoubleArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []float64
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []float64{1.1, 2.2, 3.3},
+			},
+			want: []byte{17, 0x3, 0x0, 0x0, 0x0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
+				0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteODoubleArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteODoubleArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteODoubleArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOTimestamp(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -1139,6 +1209,7 @@ func Test_request_WriteObject(t *testing.T) {
 	r14 := &request{payload: &bytes.Buffer{}}
 	r15 := &request{payload: &bytes.Buffer{}}
 	r16 := &request{payload: &bytes.Buffer{}}
+	r17 := &request{payload: &bytes.Buffer{}}
 	r33 := &request{payload: &bytes.Buffer{}}
 	r36 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
@@ -1278,12 +1349,21 @@ func Test_request_WriteObject(t *testing.T) {
 			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
 		},
 		{
-			name: "float32 array",
+			name: "float array",
 			r:    r16,
 			args: args{
 				[]float32{1.1, 2.2, 3.3},
 			},
 			want: []byte{16, 0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40},
+		},
+		{
+			name: "double array",
+			r:    r17,
+			args: args{
+				[]float64{1.1, 2.2, 3.3},
+			},
+			want: []byte{17, 3, 0, 0, 0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
+				0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40},
 		},
 		{
 			name: "Timestamp",

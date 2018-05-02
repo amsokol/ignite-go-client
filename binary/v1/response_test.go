@@ -519,6 +519,37 @@ func Test_response_ReadFloatArray(t *testing.T) {
 	}
 }
 
+func Test_response_ReadDoubleArray(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer(
+		[]byte{3, 0, 0, 0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
+			0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    []float64
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: []float64{1.1, 2.2, 3.3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadDoubleArray()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadDoubleArray() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadDoubleArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadTimestamp(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0})}
@@ -605,6 +636,9 @@ func Test_response_ReadObject(t *testing.T) {
 		[]byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0})}
 	r16 := &response{message: bytes.NewBuffer(
 		[]byte{16, 0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40})}
+	r17 := &response{message: bytes.NewBuffer(
+		[]byte{17, 3, 0, 0, 0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
+			0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40})}
 	r33 := &response{message: bytes.NewBuffer([]byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0,
 		0x55, 0xf8, 0x6, 0x0})}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -697,6 +731,11 @@ func Test_response_ReadObject(t *testing.T) {
 			name: "float array",
 			r:    r16,
 			want: []float32{1.1, 2.2, 3.3},
+		},
+		{
+			name: "double array",
+			r:    r17,
+			want: []float64{1.1, 2.2, 3.3},
 		},
 		{
 			name: "Timestamp",

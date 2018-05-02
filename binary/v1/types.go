@@ -6,23 +6,23 @@ import (
 
 const (
 	// Supported standard types and their type codes are as follows:
-	typeByte       = 1
-	typeShort      = 2
-	typeInt        = 3
-	typeLong       = 4
-	typeFloat      = 5
-	typeDouble     = 6
-	typeChar       = 7
-	typeBool       = 8
-	typeString     = 9
-	typeUUID       = 10
-	typeDate       = 11
-	typeByteArray  = 12
-	typeShortArray = 13
-	typeIntArray   = 14
-	typeLongArray  = 15
+	typeByte        = 1
+	typeShort       = 2
+	typeInt         = 3
+	typeLong        = 4
+	typeFloat       = 5
+	typeDouble      = 6
+	typeChar        = 7
+	typeBool        = 8
+	typeString      = 9
+	typeUUID        = 10
+	typeDate        = 11
+	typeByteArray   = 12
+	typeShortArray  = 13
+	typeIntArray    = 14
+	typeLongArray   = 15
 	typeFloatArray  = 16
-	// TODO: typeDoubleArray = 17
+	typeDoubleArray = 17
 	// TODO: typeCharArray   = 18
 	// TODO: typeBoolArray   = 19
 	// TODO: typeStringArray = 20

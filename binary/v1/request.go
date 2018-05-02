@@ -90,6 +90,11 @@ type Request interface {
 	// WriteOFloatArray writes "float array" object value
 	WriteOFloatArray(v []float32) error
 
+	// WriteDoubleArray writes "double" array value
+	WriteDoubleArray(v []float64) error
+	// WriteODoubleArray writes "double array" object value
+	WriteODoubleArray(v []float64) error
+
 	// WriteOTimestamp writes "Timestamp" object value
 	// Timestamp is marshaled as object in all cases.
 	WriteOTimestamp(v time.Time) error
@@ -324,6 +329,22 @@ func (r *request) WriteOFloatArray(v []float32) error {
 	return r.WriteFloatArray(v)
 }
 
+// WriteDoubleArray writes "double" array value
+func (r *request) WriteDoubleArray(v []float64) error {
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteODoubleArray writes "double" array object value
+func (r *request) WriteODoubleArray(v []float64) error {
+	if err := r.WriteByte(typeDoubleArray); err != nil {
+		return err
+	}
+	return r.WriteDoubleArray(v)
+}
+
 // WriteOTimestamp writes "Timestamp" object value
 // Timestamp is marshaled as object in all cases.
 func (r *request) WriteOTimestamp(v time.Time) error {
@@ -392,6 +413,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOLongArray(v)
 	case []float32:
 		return r.WriteOFloatArray(v)
+	case []float64:
+		return r.WriteODoubleArray(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	case Time:
