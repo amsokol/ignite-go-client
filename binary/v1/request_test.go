@@ -957,6 +957,74 @@ func Test_request_WriteOLongArray(t *testing.T) {
 	}
 }
 
+func Test_request_WriteFloatArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []float32
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []float32{1.1, 2.2, 3.3},
+			},
+			want: []byte{0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteFloatArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteFloatArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteFloatArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
+func Test_request_WriteOFloatArray(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+
+	type args struct {
+		v []float32
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []float32{1.1, 2.2, 3.3},
+			},
+			want: []byte{16, 0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOFloatArray(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOFloatArray() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOFloatArray() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOTimestamp(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -1070,6 +1138,7 @@ func Test_request_WriteObject(t *testing.T) {
 	r13 := &request{payload: &bytes.Buffer{}}
 	r14 := &request{payload: &bytes.Buffer{}}
 	r15 := &request{payload: &bytes.Buffer{}}
+	r16 := &request{payload: &bytes.Buffer{}}
 	r33 := &request{payload: &bytes.Buffer{}}
 	r36 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
@@ -1207,6 +1276,14 @@ func Test_request_WriteObject(t *testing.T) {
 				[]int64{1, 2, 3},
 			},
 			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+		},
+		{
+			name: "float32 array",
+			r:    r16,
+			args: args{
+				[]float32{1.1, 2.2, 3.3},
+			},
+			want: []byte{16, 0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40},
 		},
 		{
 			name: "Timestamp",

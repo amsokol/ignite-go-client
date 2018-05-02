@@ -21,7 +21,7 @@ const (
 	typeShortArray = 13
 	typeIntArray   = 14
 	typeLongArray  = 15
-	// TODO: typeFloatArray  = 16
+	typeFloatArray  = 16
 	// TODO: typeDoubleArray = 17
 	// TODO: typeCharArray   = 18
 	// TODO: typeBoolArray   = 19
