@@ -73,6 +73,9 @@ type Response interface {
 	// ReadCharArray reads "char" array value
 	ReadCharArray() ([]Char, error)
 
+	// ReadBoolArray reads "bool" array value
+	ReadBoolArray() ([]bool, error)
+
 	// ReadTimestamp reads "Timestamp" object value
 	ReadTimestamp() (time.Time, error)
 
@@ -298,6 +301,19 @@ func (r *response) ReadCharArray() ([]Char, error) {
 	return b, nil
 }
 
+// ReadBoolArray reads "bool" array value
+func (r *response) ReadBoolArray() ([]bool, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]bool, l)
+	if l > 0 {
+		err = binary.Read(r.message, binary.LittleEndian, &b)
+	}
+	return b, err
+}
+
 // ReadTimestamp reads "Timestamp" object value
 func (r *response) ReadTimestamp() (time.Time, error) {
 	high, err := r.ReadLong()
@@ -366,6 +382,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadDoubleArray()
 	case typeCharArray:
 		return r.ReadCharArray()
+	case typeBoolArray:
+		return r.ReadBoolArray()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeTime:

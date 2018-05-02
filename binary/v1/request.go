@@ -100,6 +100,11 @@ type Request interface {
 	// WriteOCharArray writes "char" array object value
 	WriteOCharArray(v []Char) error
 
+	// WriteBoolArray writes "bool" array value
+	WriteBoolArray(v []bool) error
+	// WriteOBoolArray writes "bool" array object value
+	WriteOBoolArray(v []bool) error
+
 	// WriteOTimestamp writes "Timestamp" object value
 	// Timestamp is marshaled as object in all cases.
 	WriteOTimestamp(v time.Time) error
@@ -371,6 +376,22 @@ func (r *request) WriteOCharArray(v []Char) error {
 	return r.WriteCharArray(v)
 }
 
+// WriteBoolArray writes "bool" array value
+func (r *request) WriteBoolArray(v []bool) error {
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	return binary.Write(r.payload, binary.LittleEndian, v)
+}
+
+// WriteOBoolArray writes "Bool" array object value
+func (r *request) WriteOBoolArray(v []bool) error {
+	if err := r.WriteByte(typeBoolArray); err != nil {
+		return err
+	}
+	return r.WriteBoolArray(v)
+}
+
 // WriteOTimestamp writes "Timestamp" object value
 // Timestamp is marshaled as object in all cases.
 func (r *request) WriteOTimestamp(v time.Time) error {
@@ -443,6 +464,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteODoubleArray(v)
 	case []Char:
 		return r.WriteOCharArray(v)
+	case []bool:
+		return r.WriteOBoolArray(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	case Time:

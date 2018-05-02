@@ -579,6 +579,35 @@ func Test_response_ReadCharArray(t *testing.T) {
 	}
 }
 
+func Test_response_ReadBoolArray(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0, 1, 0, 1})}
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    []bool
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: []bool{true, false, true},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadBoolArray()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadBoolArray() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadBoolArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadTimestamp(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0})}
@@ -669,6 +698,7 @@ func Test_response_ReadObject(t *testing.T) {
 		[]byte{17, 3, 0, 0, 0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
 			0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40})}
 	r18 := &response{message: bytes.NewBuffer([]byte{18, 3, 0, 0, 0, 0x41, 0x0, 0x42, 0x0, 0x2f, 0x4})}
+	r19 := &response{message: bytes.NewBuffer([]byte{19, 3, 0, 0, 0, 1, 0, 1})}
 	r33 := &response{message: bytes.NewBuffer([]byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0,
 		0x55, 0xf8, 0x6, 0x0})}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -771,6 +801,11 @@ func Test_response_ReadObject(t *testing.T) {
 			name: "char array",
 			r:    r18,
 			want: []Char{'A', 'B', 'Я'},
+		},
+		{
+			name: "bool array",
+			r:    r19,
+			want: []bool{true, false, true},
 		},
 		{
 			name: "Timestamp",
