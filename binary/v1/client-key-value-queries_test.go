@@ -52,6 +52,10 @@ func Test_client_CacheGet(t *testing.T) {
 	c.CachePut("CacheGet", false, "Timestamp array", []time.Time{tm1, tm2, tm3})
 	tm4 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
 	c.CachePut("CacheGet", false, "Time", tm4)
+	tm5 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+	tm6 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123), time.UTC)
+	tm7 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123), time.UTC)
+	c.CachePut("CacheGet", false, "Time array", []Time{ToTime(tm5), ToTime(tm6), ToTime(tm7)})
 
 	type args struct {
 		cache  string
@@ -289,6 +293,15 @@ func Test_client_CacheGet(t *testing.T) {
 				key:   "Time",
 			},
 			want: tm4,
+		},
+		{
+			name: "Time array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "Time array",
+			},
+			want: []time.Time{tm5, tm6, tm7},
 		},
 		{
 			name: "NULL",

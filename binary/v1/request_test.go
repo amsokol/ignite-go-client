@@ -1185,6 +1185,46 @@ func Test_request_WriteOTime(t *testing.T) {
 	}
 }
 
+func Test_request_WriteOArrayOTimes(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	tm1 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm2 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm3 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+
+	type args struct {
+		v []Time
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []Time{ToTime(tm1), ToTime(tm2), ToTime(tm3)},
+			},
+			want: []byte{37, 3, 0, 0, 0,
+				36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0,
+				36, 0xa3, 0x48, 0x50, 0x3, 0x0, 0x0, 0x0, 0x0,
+				36, 0x6b, 0x25, 0x88, 0x3, 0x0, 0x0, 0x0, 0x0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOArrayOTimes(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayOTimes() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOArrayOTimes() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteNull(t *testing.T) {
 	r := &request{payload: &bytes.Buffer{}}
 
@@ -1223,7 +1263,9 @@ func Test_request_WriteObject(t *testing.T) {
 	r8 := &request{payload: &bytes.Buffer{}}
 	r9 := &request{payload: &bytes.Buffer{}}
 	r10 := &request{payload: &bytes.Buffer{}}
+	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
 	r11 := &request{payload: &bytes.Buffer{}}
+	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
 	r12 := &request{payload: &bytes.Buffer{}}
 	r13 := &request{payload: &bytes.Buffer{}}
 	r14 := &request{payload: &bytes.Buffer{}}
@@ -1247,10 +1289,12 @@ func Test_request_WriteObject(t *testing.T) {
 	tm2 := time.Date(2019, 5, 4, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	r36 := &request{payload: &bytes.Buffer{}}
-	r101 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
-	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
-	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
+	r37 := &request{payload: &bytes.Buffer{}}
+	tm4 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm5 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm6 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	r101 := &request{payload: &bytes.Buffer{}}
 
 	type args struct {
 		o interface{}
@@ -1475,6 +1519,17 @@ func Test_request_WriteObject(t *testing.T) {
 				ToTime(tm),
 			},
 			want: []byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0}[:],
+		},
+		{
+			name: "Time array",
+			r:    r37,
+			args: args{
+				[]Time{ToTime(tm4), ToTime(tm5), ToTime(tm6)},
+			},
+			want: []byte{37, 3, 0, 0, 0,
+				36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0,
+				36, 0xa3, 0x48, 0x50, 0x3, 0x0, 0x0, 0x0, 0x0,
+				36, 0x6b, 0x25, 0x88, 0x3, 0x0, 0x0, 0x0, 0x0},
 		},
 		{
 			name: "NULL",

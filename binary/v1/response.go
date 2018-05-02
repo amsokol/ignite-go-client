@@ -336,6 +336,23 @@ func (r *response) ReadTime() (time.Time, error) {
 	return time.Date(1, 1, 1, t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.UTC), nil
 }
 
+// ReadArrayOTimes reads "Time" array value
+func (r *response) ReadArrayOTimes() ([]time.Time, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]time.Time, l)
+	for i := 0; i < int(l); i++ {
+		o, err := r.ReadObject()
+		if err != nil {
+			return nil, err
+		}
+		b[i] = o.(time.Time)
+	}
+	return b, nil
+}
+
 func (r *response) ReadObject() (interface{}, error) {
 	t, err := r.ReadByte()
 	if err != nil {
@@ -393,6 +410,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadArrayOTimestamps()
 	case typeTime:
 		return r.ReadTime()
+	case typeTimeArray:
+		return r.ReadArrayOTimes()
 	case typeNULL:
 		return nil, nil
 	default:

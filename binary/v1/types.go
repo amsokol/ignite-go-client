@@ -38,8 +38,8 @@ const (
 	typeTimestamp      = 33
 	typeTimestampArray = 34
 	typeTime           = 36
-	// TODO: Time Array = 37
-	typeNULL byte = 101
+	typeTimeArray      = 37
+	typeNULL           = 101
 )
 
 // Char is Apache Ignite "char" type

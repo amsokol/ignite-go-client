@@ -342,6 +342,22 @@ func (r *request) WriteOTime(v Time) error {
 	return r.WriteLong(int64(v))
 }
 
+// WriteOArrayOTimes writes "Time" array object value
+func (r *request) WriteOArrayOTimes(v []Time) error {
+	if err := r.WriteByte(typeTimeArray); err != nil {
+		return err
+	}
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	for _, d := range v {
+		if err := r.WriteOTime(d); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WriteNull writes NULL
 func (r *request) WriteNull() error {
 	return r.WriteByte(typeNULL)
@@ -403,6 +419,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOArrayOTimestamps(v)
 	case Time:
 		return r.WriteOTime(v)
+	case []Time:
+		return r.WriteOArrayOTimes(v)
 	default:
 		return errors.Errorf("unsupported object type: %s", reflect.TypeOf(v).Name())
 	}

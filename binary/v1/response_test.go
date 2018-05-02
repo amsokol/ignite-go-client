@@ -802,6 +802,41 @@ func Test_response_ReadTime(t *testing.T) {
 	}
 }
 
+func Test_response_ReadArrayOTimes(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0,
+		36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0,
+		36, 0xa3, 0x48, 0x50, 0x3, 0x0, 0x0, 0x0, 0x0,
+		36, 0x6b, 0x25, 0x88, 0x3, 0x0, 0x0, 0x0, 0x0})}
+	tm4 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+	tm5 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123), time.UTC)
+	tm6 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123), time.UTC)
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    []time.Time
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: []time.Time{tm4, tm5, tm6},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadArrayOTimes()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadArrayOTimes() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadArrayOTimes() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadObject(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer([]byte{1, 123})}
 	r2 := &response{message: bytes.NewBuffer([]byte{2, 0x39, 0x30})}
@@ -861,6 +896,13 @@ func Test_response_ReadObject(t *testing.T) {
 	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	r36 := &response{message: bytes.NewBuffer([]byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0})}
 	tm4 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+	r37 := &response{message: bytes.NewBuffer([]byte{37, 3, 0, 0, 0,
+		36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0,
+		36, 0xa3, 0x48, 0x50, 0x3, 0x0, 0x0, 0x0, 0x0,
+		36, 0x6b, 0x25, 0x88, 0x3, 0x0, 0x0, 0x0, 0x0})}
+	tm5 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+	tm6 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123), time.UTC)
+	tm7 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123), time.UTC)
 	r101 := &response{message: bytes.NewBuffer([]byte{101})}
 
 	tests := []struct {
@@ -993,6 +1035,11 @@ func Test_response_ReadObject(t *testing.T) {
 			name: "Time",
 			r:    r36,
 			want: tm4,
+		},
+		{
+			name: "Time array",
+			r:    r37,
+			want: []time.Time{tm5, tm6, tm7},
 		},
 		{
 			name: "NULL",

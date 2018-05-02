@@ -181,7 +181,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | Timestamp          | time.Time                                                              |
 | Timestamp array    | []time.Time                                                            |
 | Time**             | ignite.Time / time.Time                                                |
-| Time array         | Not supported. Need help.                                              |
+| Time array         | []ignite.Time / []time.Time                                            |
 | NULL               | nil                                                                    |
 
 *`date` is outdated type. It's recommended to use `Timestamp` type.
