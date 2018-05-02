@@ -388,7 +388,7 @@ func (c *client) QuerySQLFields(cache string, binary bool, data QuerySQLFieldsDa
 		r.Fields = make([]string, 0, fieldCount)
 		for i := 0; i < r.FieldCount; i++ {
 			var s string
-			if s, _, err = res.ReadOString(); err != nil {
+			if s, err = res.ReadOString(); err != nil {
 				return r, errors.Wrapf(err, "failed to read field name with index %d", i)
 			}
 			r.Fields = append(r.Fields, s)

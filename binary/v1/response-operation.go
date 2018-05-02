@@ -43,7 +43,7 @@ func (r *ResponseOperation) ReadFrom(rr io.Reader) (int64, error) {
 	}
 
 	if r.Status != OperationStatusSuccess {
-		r.Message, _, err = r.ReadOString()
+		r.Message, err = r.ReadOString()
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read error message")
 		}

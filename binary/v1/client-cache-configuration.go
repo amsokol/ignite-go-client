@@ -267,7 +267,7 @@ func (c *client) CacheGetNames() ([]string, error) {
 	// read cache names
 	names := make([]string, 0, int(count))
 	for i := 0; i < int(count); i++ {
-		name, _, err := res.ReadOString()
+		name, err := res.ReadOString()
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read cache name with index %d", i)
 		}
@@ -318,7 +318,7 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 	if cc.CopyOnRead, err = res.ReadBool(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read CopyOnRead")
 	}
-	if cc.DataRegionName, _, err = res.ReadOString(); err != nil {
+	if cc.DataRegionName, err = res.ReadOString(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read DataRegionName")
 	}
 	if cc.EagerTTL, err = res.ReadBool(); err != nil {
@@ -327,7 +327,7 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 	if cc.EnableStatistics, err = res.ReadBool(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read EnableStatistics")
 	}
-	if cc.GroupName, _, err = res.ReadOString(); err != nil {
+	if cc.GroupName, err = res.ReadOString(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read GroupName")
 	}
 	if cc.LockTimeout, err = res.ReadLong(); err != nil {
@@ -339,7 +339,7 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 	if cc.MaxQueryIterators, err = res.ReadInt(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read MaxQueryIterators")
 	}
-	if cc.Name, _, err = res.ReadOString(); err != nil {
+	if cc.Name, err = res.ReadOString(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read Name")
 	}
 	if cc.OnheapCacheEnabled, err = res.ReadBool(); err != nil {
@@ -384,7 +384,7 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 	if cc.SQLIndexInlineMaxSize, err = res.ReadInt(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read SQLIndexInlineMaxSize")
 	}
-	if cc.SQLSchema, _, err = res.ReadOString(); err != nil {
+	if cc.SQLSchema, err = res.ReadOString(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read SQLSchema")
 	}
 	if cc.WriteSynchronizationMode, err = res.ReadInt(); err != nil {
@@ -398,10 +398,10 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 	cc.CacheKeyConfigurations = make([]CacheKeyConfiguration, 0, int(count))
 	for i := 0; i < int(count); i++ {
 		var ckc CacheKeyConfiguration
-		if ckc.TypeName, _, err = res.ReadOString(); err != nil {
+		if ckc.TypeName, err = res.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read CacheKeyConfiguration.TypeName")
 		}
-		if ckc.AffinityKeyFieldName, _, err = res.ReadOString(); err != nil {
+		if ckc.AffinityKeyFieldName, err = res.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read CacheKeyConfiguration.AffinityKeyFieldName")
 		}
 		cc.CacheKeyConfigurations = append(cc.CacheKeyConfigurations, ckc)
@@ -413,19 +413,19 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 	cc.QueryEntities = make([]QueryEntity, 0, int(count))
 	for i := 0; i < int(count); i++ {
 		var qe QueryEntity
-		if qe.KeyTypeName, _, err = res.ReadOString(); err != nil {
+		if qe.KeyTypeName, err = res.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read QueryEntity.KeyTypeName")
 		}
-		if qe.ValueTypeName, _, err = res.ReadOString(); err != nil {
+		if qe.ValueTypeName, err = res.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read QueryEntity.ValueTypeName")
 		}
-		if qe.TableName, _, err = res.ReadOString(); err != nil {
+		if qe.TableName, err = res.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read QueryEntity.TableName")
 		}
-		if qe.KeyFieldName, _, err = res.ReadOString(); err != nil {
+		if qe.KeyFieldName, err = res.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read QueryEntity.KeyFieldName")
 		}
-		if qe.ValueFieldName, _, err = res.ReadOString(); err != nil {
+		if qe.ValueFieldName, err = res.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read QueryEntity.ValueFieldName")
 		}
 
@@ -438,10 +438,10 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 		qe.QueryFields = make([]QueryField, 0, int(count2))
 		for j := 0; j < int(count2); j++ {
 			var qf QueryField
-			if qf.Name, _, err = res.ReadOString(); err != nil {
+			if qf.Name, err = res.ReadOString(); err != nil {
 				return nil, errors.Wrapf(err, "failed to read QueryField.Name")
 			}
-			if qf.TypeName, _, err = res.ReadOString(); err != nil {
+			if qf.TypeName, err = res.ReadOString(); err != nil {
 				return nil, errors.Wrapf(err, "failed to read QueryField.TypeName")
 			}
 			if qf.IsKeyField, err = res.ReadBool(); err != nil {
@@ -459,10 +459,10 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 		qe.FieldNameAliases = make([]FieldNameAlias, 0, int(count2))
 		for j := 0; j < int(count2); j++ {
 			var fna FieldNameAlias
-			if fna.Name, _, err = res.ReadOString(); err != nil {
+			if fna.Name, err = res.ReadOString(); err != nil {
 				return nil, errors.Wrapf(err, "failed to read FieldNameAlias.Name")
 			}
-			if fna.Alias, _, err = res.ReadOString(); err != nil {
+			if fna.Alias, err = res.ReadOString(); err != nil {
 				return nil, errors.Wrapf(err, "failed to read FieldNameAlias.Alias")
 			}
 			qe.FieldNameAliases = append(qe.FieldNameAliases, fna)
@@ -475,7 +475,7 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 		qe.QueryIndexes = make([]QueryIndex, 0, int(count2))
 		for j := 0; j < int(count2); j++ {
 			var qi QueryIndex
-			if qi.Name, _, err = res.ReadOString(); err != nil {
+			if qi.Name, err = res.ReadOString(); err != nil {
 				return nil, errors.Wrapf(err, "failed to read QueryIndex.Name")
 			}
 			if qi.Type, err = res.ReadByte(); err != nil {
@@ -493,7 +493,7 @@ func (c *client) CacheGetConfiguration(cache string, flag byte) (*CacheConfigura
 			qi.Fields = make([]Field, 0, int(count3))
 			for k := 0; k < int(count3); k++ {
 				var f Field
-				if f.Name, _, err = res.ReadOString(); err != nil {
+				if f.Name, err = res.ReadOString(); err != nil {
 					return nil, errors.Wrapf(err, "failed to read Field.Name")
 				}
 				if f.IsDescensing, err = res.ReadBool(); err != nil {
