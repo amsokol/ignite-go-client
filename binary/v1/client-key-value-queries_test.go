@@ -37,6 +37,9 @@ func Test_client_CacheGet(t *testing.T) {
 	c.CachePut("CacheGet", false, "char array", []Char{'A', 'B', 'Я'})
 	c.CachePut("CacheGet", false, "bool array", []bool{true, false, true})
 	c.CachePut("CacheGet", false, "string array", []string{"one", "two", "три"})
+	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
+	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
+	c.CachePut("CacheGet", false, "date array", []Date{ToDate(dm), ToDate(dm2), ToDate(dm3)})
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	c.CachePut("CacheGet", false, "Timestamp", tm)
 	tm2 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
@@ -233,6 +236,15 @@ func Test_client_CacheGet(t *testing.T) {
 				key:   "string array",
 			},
 			want: []string{"one", "two", "три"},
+		},
+		{
+			name: "date array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "date array",
+			},
+			want: []time.Time{dm, dm2, dm3},
 		},
 		{
 			name: "Timestamp",

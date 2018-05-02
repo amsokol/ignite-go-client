@@ -635,6 +635,41 @@ func Test_response_ReadArrayOStrings(t *testing.T) {
 	}
 }
 
+func Test_response_ReadArrayODates(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0,
+		11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0,
+		11, 0x0, 0xf0, 0x23, 0x80, 0x6a, 0x1, 0x0, 0x0,
+		11, 0x0, 0xf8, 0xc6, 0x81, 0x72, 0x1, 0x0, 0x0})}
+	dm1 := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
+	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    []time.Time
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: []time.Time{dm1, dm2, dm3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadArrayODates()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadArrayODates() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadArrayODates() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadTimestamp(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer(
 		[]byte{0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0})}
@@ -730,6 +765,13 @@ func Test_response_ReadObject(t *testing.T) {
 		0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
 		0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
 		0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8})}
+	r22 := &response{message: bytes.NewBuffer([]byte{22, 3, 0, 0, 0,
+		11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0,
+		11, 0x0, 0xf0, 0x23, 0x80, 0x6a, 0x1, 0x0, 0x0,
+		11, 0x0, 0xf8, 0xc6, 0x81, 0x72, 0x1, 0x0, 0x0})}
+	dm1 := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
+	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
 	r33 := &response{message: bytes.NewBuffer([]byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0,
 		0x55, 0xf8, 0x6, 0x0})}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -842,6 +884,11 @@ func Test_response_ReadObject(t *testing.T) {
 			name: "string array",
 			r:    r20,
 			want: []string{"one", "two", "три"},
+		},
+		{
+			name: "date array",
+			r:    r22,
+			want: []time.Time{dm1, dm2, dm3},
 		},
 		{
 			name: "Timestamp",

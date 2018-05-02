@@ -260,6 +260,23 @@ func (r *response) ReadArrayOStrings() ([]string, error) {
 	return b, nil
 }
 
+// ReadArrayODates reads "Date" array value
+func (r *response) ReadArrayODates() ([]time.Time, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]time.Time, l)
+	for i := 0; i < int(l); i++ {
+		o, err := r.ReadObject()
+		if err != nil {
+			return nil, err
+		}
+		b[i] = o.(time.Time)
+	}
+	return b, nil
+}
+
 // ReadTimestamp reads "Timestamp" object value
 func (r *response) ReadTimestamp() (time.Time, error) {
 	high, err := r.ReadLong()
@@ -332,6 +349,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadArrayBools()
 	case typeStringArray:
 		return r.ReadArrayOStrings()
+	case typeDateArray:
+		return r.ReadArrayODates()
 	case typeTimestamp:
 		return r.ReadTimestamp()
 	case typeTime:

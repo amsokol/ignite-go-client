@@ -27,7 +27,7 @@ const (
 	typeBoolArray   = 19
 	typeStringArray = 20
 	// TODO: typeUUIDArray   = 21
-	// TODO: typeDateArray   = 22
+	typeDateArray = 22
 	// TODO: Object array = 23
 	// TODO: Collection = 24
 	// TODO: Map = 25

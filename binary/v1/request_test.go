@@ -995,6 +995,46 @@ func Test_request_WriteOArrayOStrings(t *testing.T) {
 	}
 }
 
+func Test_request_WriteOArrayODates(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	dm1 := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
+	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
+
+	type args struct {
+		v []Date
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []Date{ToDate(dm1), ToDate(dm2), ToDate(dm3)},
+			},
+			want: []byte{22, 3, 0, 0, 0,
+				11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0,
+				11, 0x0, 0xf0, 0x23, 0x80, 0x6a, 0x1, 0x0, 0x0,
+				11, 0x0, 0xf8, 0xc6, 0x81, 0x72, 0x1, 0x0, 0x0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOArrayODates(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayODates() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOArrayOStrings() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOTimestamp(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -1113,6 +1153,10 @@ func Test_request_WriteObject(t *testing.T) {
 	r18 := &request{payload: &bytes.Buffer{}}
 	r19 := &request{payload: &bytes.Buffer{}}
 	r20 := &request{payload: &bytes.Buffer{}}
+	r22 := &request{payload: &bytes.Buffer{}}
+	dm1 := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
+	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
 	r33 := &request{payload: &bytes.Buffer{}}
 	r36 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
@@ -1294,6 +1338,17 @@ func Test_request_WriteObject(t *testing.T) {
 				0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
 				0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
 				0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8},
+		},
+		{
+			name: "date array",
+			r:    r22,
+			args: args{
+				[]Date{ToDate(dm1), ToDate(dm2), ToDate(dm3)},
+			},
+			want: []byte{22, 3, 0, 0, 0,
+				11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0,
+				11, 0x0, 0xf0, 0x23, 0x80, 0x6a, 0x1, 0x0, 0x0,
+				11, 0x0, 0xf8, 0xc6, 0x81, 0x72, 0x1, 0x0, 0x0},
 		},
 		{
 			name: "Timestamp",

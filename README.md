@@ -112,7 +112,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 | Name               | Mandatory | Description                                                   | Default value                     |
 |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
-| schema             | no        | Database schema                                               | "" (PUBLIC schema will be used) |
+| schema             | no        | Database schema                                               | "" (PUBLIC schema will be used)   |
 | version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
 | page-size          | no        | Query cursor page size                                        | 10000                             |
 | max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
@@ -159,7 +159,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | bool               | bool                                                                   |
 | String             | string                                                                 |
 | UUID (Guid)        | uuid.UUID ([UUID library from Google](https://github.com/google/uuid)) |
-| date*              | ignite.Date                                                            |
+| date*              | ignite.Date / time.Time                                                |
 | byte array         | []byte                                                                 |
 | short array        | []int16                                                                |
 | int array          | []int32                                                                |
@@ -170,7 +170,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | bool array         | []bool                                                                 |
 | String array       | []string                                                               |
 | UUID (Guid) array  | Not supported. Need help from Apache Ignite team.                      |
-| Date array         | Not supported. Need help from Apache Ignite team.                      |
+| Date array         | []ignite.Date / []time.Time                                            |
 | Object array       | Not supported. Need help.                                              |
 | Collection         | Not supported. Need help.                                              |
 | Map                | Not supported. Need help.                                              |
@@ -180,7 +180,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | Decimal array      | Not supported. Need help.                                              |
 | Timestamp          | time.Time                                                              |
 | Timestamp array    | Not supported. Need help.                                              |
-| Time**             | ignite.Time                                                            |
+| Time**             | ignite.Time / time.Time                                                |
 | Time array         | Not supported. Need help.                                              |
 | NULL               | nil                                                                    |
 

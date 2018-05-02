@@ -269,6 +269,22 @@ func (r *request) WriteOArrayOStrings(v []string) error {
 	return nil
 }
 
+// WriteOArrayODates writes "Date" array object value
+func (r *request) WriteOArrayODates(v []Date) error {
+	if err := r.WriteByte(typeDateArray); err != nil {
+		return err
+	}
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	for _, d := range v {
+		if err := r.WriteODate(d); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WriteOTimestamp writes "Timestamp" object value
 // Timestamp is marshaled as object in all cases.
 func (r *request) WriteOTimestamp(v time.Time) error {
@@ -345,6 +361,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOArrayBools(v)
 	case []string:
 		return r.WriteOArrayOStrings(v)
+	case []Date:
+		return r.WriteOArrayODates(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
 	case Time:
