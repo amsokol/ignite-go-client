@@ -1110,6 +1110,46 @@ func Test_request_WriteOTimestamp(t *testing.T) {
 	}
 }
 
+func Test_request_WriteOArrayOTimestamps(t *testing.T) {
+	r1 := &request{payload: &bytes.Buffer{}}
+	tm1 := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm2 := time.Date(2019, 5, 4, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+
+	type args struct {
+		v []time.Time
+	}
+	tests := []struct {
+		name    string
+		r       *request
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			args: args{
+				v: []time.Time{tm1, tm2, tm3},
+			},
+			want: []byte{34, 3, 0, 0, 0,
+				33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+				33, 0xa3, 0x38, 0x74, 0x83, 0x6a, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+				33, 0x6b, 0x1d, 0x4f, 0x85, 0x72, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.r.WriteOArrayOTimestamps(tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("request.WriteOArrayOTimestamps() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(tt.r.payload.Bytes(), tt.want) {
+				t.Errorf("request.WriteOArrayOTimestamps() = %#v, want %#v", tt.r.payload.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func Test_request_WriteOTime(t *testing.T) {
 	r1 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -1202,6 +1242,10 @@ func Test_request_WriteObject(t *testing.T) {
 	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
 	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
 	r33 := &request{payload: &bytes.Buffer{}}
+	r34 := &request{payload: &bytes.Buffer{}}
+	tm1 := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm2 := time.Date(2019, 5, 4, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	r36 := &request{payload: &bytes.Buffer{}}
 	r101 := &request{payload: &bytes.Buffer{}}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
@@ -1412,6 +1456,17 @@ func Test_request_WriteObject(t *testing.T) {
 				tm,
 			},
 			want: []byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0}[:],
+		},
+		{
+			name: "Timestamp array",
+			r:    r34,
+			args: args{
+				[]time.Time{tm1, tm2, tm3},
+			},
+			want: []byte{34, 3, 0, 0, 0,
+				33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+				33, 0xa3, 0x38, 0x74, 0x83, 0x6a, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+				33, 0x6b, 0x1d, 0x4f, 0x85, 0x72, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0},
 		},
 		{
 			name: "Time",

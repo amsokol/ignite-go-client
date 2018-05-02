@@ -736,6 +736,41 @@ func Test_response_ReadTimestamp(t *testing.T) {
 	}
 }
 
+func Test_response_ReadArrayOTimestamps(t *testing.T) {
+	r1 := &response{message: bytes.NewBuffer([]byte{3, 0, 0, 0,
+		33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+		33, 0xa3, 0x38, 0x74, 0x83, 0x6a, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+		33, 0x6b, 0x1d, 0x4f, 0x85, 0x72, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0})}
+	tm1 := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm2 := time.Date(2019, 5, 4, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+
+	tests := []struct {
+		name    string
+		r       *response
+		want    []time.Time
+		wantErr bool
+	}{
+		{
+			name: "1",
+			r:    r1,
+			want: []time.Time{tm1, tm2, tm3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.r.ReadArrayOTimestamps()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("response.ReadArrayOTimestamps() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("response.ReadArrayOTimestamps() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_response_ReadTime(t *testing.T) {
 	r1 := &response{message: bytes.NewBuffer([]byte{0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0})}
 	tm := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
@@ -817,8 +852,15 @@ func Test_response_ReadObject(t *testing.T) {
 	r33 := &response{message: bytes.NewBuffer([]byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0,
 		0x55, 0xf8, 0x6, 0x0})}
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	r34 := &response{message: bytes.NewBuffer([]byte{34, 3, 0, 0, 0,
+		33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+		33, 0xa3, 0x38, 0x74, 0x83, 0x6a, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+		33, 0x6b, 0x1d, 0x4f, 0x85, 0x72, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0})}
+	tm1 := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm2 := time.Date(2019, 5, 4, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	r36 := &response{message: bytes.NewBuffer([]byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0})}
-	tm2 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+	tm4 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
 	r101 := &response{message: bytes.NewBuffer([]byte{101})}
 
 	tests := []struct {
@@ -943,9 +985,14 @@ func Test_response_ReadObject(t *testing.T) {
 			want: tm,
 		},
 		{
+			name: "Timestamp array",
+			r:    r34,
+			want: []time.Time{tm1, tm2, tm3},
+		},
+		{
 			name: "Time",
 			r:    r36,
-			want: tm2,
+			want: tm4,
 		},
 		{
 			name: "NULL",

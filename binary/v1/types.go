@@ -35,9 +35,9 @@ const (
 	// TODO: Enum Array = 29
 	// TODO: Decimal = 30
 	// TODO: Decimal Array = 31
-	typeTimestamp byte = 33
-	// TODO: Timestamp Array = 34
-	typeTime byte = 36
+	typeTimestamp      = 33
+	typeTimestampArray = 34
+	typeTime           = 36
 	// TODO: Time Array = 37
 	typeNULL byte = 101
 )

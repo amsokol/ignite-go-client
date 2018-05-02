@@ -317,6 +317,22 @@ func (r *request) WriteOTimestamp(v time.Time) error {
 	return r.WriteInt(int32(low))
 }
 
+// WriteOArrayOTimestamps writes "Timestamp" array object value
+func (r *request) WriteOArrayOTimestamps(v []time.Time) error {
+	if err := r.WriteByte(typeTimestampArray); err != nil {
+		return err
+	}
+	if err := r.WriteInt(int32(len(v))); err != nil {
+		return err
+	}
+	for _, d := range v {
+		if err := r.WriteOTimestamp(d); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // WriteOTime writes "Time" object value
 // Time is marshaled as object in all cases.
 func (r *request) WriteOTime(v Time) error {
@@ -383,6 +399,8 @@ func (r *request) WriteObject(o interface{}) error {
 		return r.WriteOArrayOUUIDs(v)
 	case time.Time:
 		return r.WriteOTimestamp(v)
+	case []time.Time:
+		return r.WriteOArrayOTimestamps(v)
 	case Time:
 		return r.WriteOTime(v)
 	default:

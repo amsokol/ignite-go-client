@@ -309,6 +309,23 @@ func (r *response) ReadTimestamp() (time.Time, error) {
 	return time.Unix(high, int64(low)).UTC(), nil
 }
 
+// ReadArrayOTimestamps reads "Timestamp" array value
+func (r *response) ReadArrayOTimestamps() ([]time.Time, error) {
+	l, err := r.ReadInt()
+	if err != nil {
+		return nil, err
+	}
+	b := make([]time.Time, l)
+	for i := 0; i < int(l); i++ {
+		o, err := r.ReadObject()
+		if err != nil {
+			return nil, err
+		}
+		b[i] = o.(time.Time)
+	}
+	return b, nil
+}
+
 // ReadTime reads "Time" object value
 func (r *response) ReadTime() (time.Time, error) {
 	v, err := r.ReadLong()
@@ -372,6 +389,8 @@ func (r *response) ReadObject() (interface{}, error) {
 		return r.ReadArrayOUUIDs()
 	case typeTimestamp:
 		return r.ReadTimestamp()
+	case typeTimestampArray:
+		return r.ReadArrayOTimestamps()
 	case typeTime:
 		return r.ReadTime()
 	case typeNULL:

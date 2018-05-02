@@ -179,7 +179,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | Decimal            | Not supported. Need help.                                              |
 | Decimal array      | Not supported. Need help.                                              |
 | Timestamp          | time.Time                                                              |
-| Timestamp array    | Not supported. Need help.                                              |
+| Timestamp array    | []time.Time                                                            |
 | Time**             | ignite.Time / time.Time                                                |
 | Time array         | Not supported. Need help.                                              |
 | NULL               | nil                                                                    |
