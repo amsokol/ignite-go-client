@@ -53,7 +53,14 @@ Connect to server:
 ctx := context.Background()
 
 // connect
-c, err := ignite.NewClient(ctx, "tcp", "localhost:10800", 1, 0, 0)
+c, err := ignite.Connect(ctx, ignite.ConnInfo{
+    Network: "tcp",
+    Host:    "localhost",
+    Port:    10800,
+    Major:   1,
+    Minor:   0,
+    Patch:   0,
+})
 if err != nil {
     t.Fatalf("failed connect to server: %v", err)
 }
@@ -61,7 +68,7 @@ defer c.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go) for more.
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L97) for more.
 
 See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for other examples.
 
@@ -83,7 +90,7 @@ Connect to server:
 ctx := context.Background()
 
 // open connection
-db, err := sql.Open("ignite", "tcp://localhost:10800/TestDB?version=1.0.0&&page-size=10000&timeout=5000")
+db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?version=1.0.0&&page-size=10000&timeout=5000")
 if err != nil {
     t.Fatalf("failed to open connection: %v", err)
 }
@@ -91,7 +98,7 @@ defer db.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go) for more.
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L14) for more.
 
 Connection URL format:
 
@@ -142,7 +149,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 1. Run tests into the root folder of this project:
 
 ```shell
-# go test -count=1 -parallel 1 ./...
+# go test ./...
 ```
 
 ### Type mapping
