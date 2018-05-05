@@ -195,7 +195,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 If you still need `Date` type use `ignite.ToDate()` function when you **put** date:
 
 ```go
-t := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+t := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123), time.UTC)
 err := c.CachePut("CacheGet", false, "Date", ToDate(t)) // ToDate() converts time.Time to ignite.Date
 ...
 t, err = c.CacheGet("CacheGet", false, "Date") // 't' is time.Time, you don't need any converting
