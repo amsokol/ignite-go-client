@@ -36,7 +36,7 @@ func (r *RequestOperation) WriteTo(w io.Writer) (int64, error) {
 	}
 
 	// write payload
-	n, err := r.payload.WriteTo(w)
+	n, err := r.request.WriteTo(w)
 	return 4 + 2 + 8 + n, err
 }
 

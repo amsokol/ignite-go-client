@@ -38,8 +38,8 @@ func (r *RequestHandshake) WriteTo(w io.Writer) (int64, error) {
 	if err := binary.Write(w, binary.LittleEndian, &l); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake request length")
 	}
-	// write payload
-	n, err := r.payload.WriteTo(w)
+	// write request
+	n, err := r.request.WriteTo(w)
 	return 4 + n, err
 }
 
