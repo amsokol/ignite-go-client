@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
-	// "fmt"
 	"runtime"
 	"sort"
 	"time"
@@ -29,7 +28,7 @@ type conn struct {
 
 // isConnected return true if connection to the cluster is active
 func (c *conn) isConnected() bool {
-	return c.client != nil && c.client.IsConnected()
+	return c.client != nil && c.client.Connected()
 }
 
 // resourceClose closes a resource, such as query cursor.
@@ -216,9 +215,9 @@ func (c *conn) QueryContext(ctx context.Context, query string, args []driver.Nam
 
 // </driver.QueryerContext>
 
-func (c *conn) QueryNexPageContext(ctx context.Context, cursorID int64) (ignite.Response, error) {
+func (c *conn) QueryNexPageContext(ctx context.Context, cursorID int64) (*ignite.ResponseOperation, error) {
 	if !c.isConnected() {
-		return ignite.Response{}, driver.ErrBadConn
+		return nil, driver.ErrBadConn
 	}
 	return c.client.QuerySQLFieldsCursorGetPageRaw(cursorID)
 }
@@ -231,8 +230,7 @@ func Connect(ctx context.Context, ci common.ConnInfo) (driver.Conn, error) {
 		defer cancel()
 	}
 
-	client, err := ignite.NewClient(ctx, ci.Network, ci.Address,
-		int16(ci.Version.Major()), int16(ci.Version.Minor()), int16(ci.Version.Patch()))
+	client, err := ignite.Connect(ctx, ci.ConnInfo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create client: %v", err)
 	}

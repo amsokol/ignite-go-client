@@ -22,30 +22,25 @@ func TestDriver_OpenConnector(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB2",
+				name: "tcp://localhost:10800/OpenConnector",
 			},
 		},
 		{
 			name: "failed test 2",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB2?invalid-param=true",
+				name: "tcp://localhost:10800/OpenConnector?invalid-param=true",
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			/*got*/ _, err := tt.d.OpenConnector(tt.args.name)
+			_, err := tt.d.OpenConnector(tt.args.name)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Driver.OpenConnector() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			/*
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("Driver.OpenConnector() = %v, want %v", got, tt.want)
-				}
-			*/
 		})
 	}
 }

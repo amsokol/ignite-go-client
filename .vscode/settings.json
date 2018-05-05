@@ -1,9 +1,12 @@
 {
     "cSpell.words": [
         "Atomicity",
+        "Bools",
         "Fatalf",
         "Guid",
         "Newff",
+        "OUUID",
+        "OUUIDs",
         "Onheap",
         "Parellelism",
         "Printf",

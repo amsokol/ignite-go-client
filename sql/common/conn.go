@@ -1,20 +1,17 @@
 package common
 
 import (
-	"github.com/Masterminds/semver"
+	"github.com/amsokol/ignite-go-client/binary/v1"
 )
 
 // ConnInfo contains Apache Ignite cluster connection and query execution parameters
 type ConnInfo struct {
 	URL string
 
-	Network string
-
-	Address string
+	// Apache Ignite client connection information
+	ignite.ConnInfo
 
 	Cache string
-
-	Version *semver.Version
 
 	// Schema for the query; can be empty, in which case default PUBLIC schema will be used.
 	Schema string

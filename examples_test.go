@@ -15,7 +15,7 @@ func Test_SQL_Driver(t *testing.T) {
 	ctx := context.Background()
 
 	// open connection
-	db, err := sql.Open("ignite", "tcp://localhost:10800/TestDB3?version=1.0.0&&page-size=10000&timeout=5000")
+	db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?version=1.0.0&&page-size=10000&timeout=5000")
 	if err != nil {
 		t.Fatalf("failed to open connection: %v", err)
 	}
@@ -98,7 +98,14 @@ func Test_Key_Value(t *testing.T) {
 	ctx := context.Background()
 
 	// connect
-	c, err := ignite.NewClient(ctx, "tcp", "localhost:10800", 1, 0, 0)
+	c, err := ignite.Connect(ctx, ignite.ConnInfo{
+		Network: "tcp",
+		Host:    "localhost",
+		Port:    10800,
+		Major:   1,
+		Minor:   0,
+		Patch:   0,
+	})
 	if err != nil {
 		t.Fatalf("failed connect to server: %v", err)
 	}

@@ -7,13 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Masterminds/semver"
+	"github.com/amsokol/ignite-go-client/binary/v1"
 	"github.com/amsokol/ignite-go-client/sql/common"
 )
 
 func TestConnect(t *testing.T) {
-	ver, _ := semver.NewVersion("1.0.0")
-
 	type args struct {
 		ctx context.Context
 		ci  common.ConnInfo
@@ -29,11 +27,16 @@ func TestConnect(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				ci: common.ConnInfo{
-					URL:      "tcp://localhost:10800/TestDB2",
-					Network:  "tcp",
-					Address:  "localhost:10800",
-					Cache:    "TestDB2",
-					Version:  ver,
+					URL: "tcp://localhost:10800/DriverOpen",
+					ConnInfo: ignite.ConnInfo{
+						Network: "tcp",
+						Host:    "localhost",
+						Port:    10800,
+						Major:   1,
+						Minor:   0,
+						Patch:   0,
+					},
+					Cache:    "DriverOpen",
 					PageSize: 10000,
 				},
 			},
@@ -46,24 +49,26 @@ func TestConnect(t *testing.T) {
 				t.Errorf("Connect() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			/*
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("Connect() = %v, want %v", got, tt.want)
-				}
-			*/
-			_ = got.Close()
+
+			if got != nil {
+				_ = got.Close()
+			}
 		})
 	}
 }
 
 func Test_conn_Close(t *testing.T) {
-	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB2",
-		Network:  "tcp",
-		Address:  "localhost:10800",
-		Cache:    "TestDB2",
-		Version:  ver,
+		URL: "tcp://localhost:10800/DriverOpen",
+		ConnInfo: ignite.ConnInfo{
+			Network: "tcp",
+			Host:    "localhost",
+			Port:    10800,
+			Major:   1,
+			Minor:   0,
+			Patch:   0,
+		},
+		Cache:    "DriverOpen",
 		PageSize: 10000,
 	})
 	if err != nil {
@@ -92,13 +97,17 @@ func Test_conn_Close(t *testing.T) {
 }
 
 func Test_conn_ExecContext(t *testing.T) {
-	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB2",
-		Network:  "tcp",
-		Address:  "localhost:10800",
-		Cache:    "TestDB2",
-		Version:  ver,
+		URL: "tcp://localhost:10800/ConnExecContext",
+		ConnInfo: ignite.ConnInfo{
+			Network: "tcp",
+			Host:    "localhost",
+			Port:    10800,
+			Major:   1,
+			Minor:   0,
+			Patch:   0,
+		},
+		Cache:    "ConnExecContext",
 		PageSize: 10000,
 	})
 	if err != nil {
@@ -107,8 +116,8 @@ func Test_conn_ExecContext(t *testing.T) {
 	}
 	c, _ := ci.(*conn)
 	defer c.Close()
-	defer c.client.CacheRemoveAll("TestDB2", false)
-	_ = c.client.CacheRemoveAll("TestDB2", false)
+	defer c.client.CacheRemoveAll("ConnExecContext", false)
+	_ = c.client.CacheRemoveAll("ConnExecContext", false)
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 
 	type args struct {
@@ -193,13 +202,17 @@ func Test_conn_ExecContext(t *testing.T) {
 }
 
 func Test_conn_QueryContext(t *testing.T) {
-	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB2",
-		Network:  "tcp",
-		Address:  "localhost:10800",
-		Cache:    "TestDB2",
-		Version:  ver,
+		URL: "tcp://localhost:10800/ConnQueryContext",
+		ConnInfo: ignite.ConnInfo{
+			Network: "tcp",
+			Host:    "localhost",
+			Port:    10800,
+			Major:   1,
+			Minor:   0,
+			Patch:   0,
+		},
+		Cache:    "ConnQueryContext",
 		PageSize: 2, /* test server cursor */
 	})
 	if err != nil {
@@ -208,8 +221,8 @@ func Test_conn_QueryContext(t *testing.T) {
 	}
 	c, _ := ci.(*conn)
 	defer c.Close()
-	defer c.client.CacheRemoveAll("TestDB2", false)
-	_ = c.client.CacheRemoveAll("TestDB2", false)
+	defer c.client.CacheRemoveAll("ConnQueryContext", false)
+	_ = c.client.CacheRemoveAll("ConnQueryContext", false)
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	_, err = c.ExecContext(context.Background(),
 		"INSERT INTO Organization(_key, name, foundDateTime) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?), (?, ?, ?)",
@@ -296,13 +309,17 @@ func Test_conn_QueryContext(t *testing.T) {
 }
 
 func Test_conn_Ping(t *testing.T) {
-	ver, _ := semver.NewVersion("1.0.0")
 	ci, err := Connect(context.Background(), common.ConnInfo{
-		URL:      "tcp://localhost:10800/TestDB2",
-		Network:  "tcp",
-		Address:  "localhost:10800",
-		Cache:    "TestDB2",
-		Version:  ver,
+		URL: "tcp://localhost:10800/DriverOpen",
+		ConnInfo: ignite.ConnInfo{
+			Network: "tcp",
+			Host:    "localhost",
+			Port:    10800,
+			Major:   1,
+			Minor:   0,
+			Patch:   0,
+		},
+		Cache:    "DriverOpen",
 		PageSize: 10000,
 	})
 	if err != nil {

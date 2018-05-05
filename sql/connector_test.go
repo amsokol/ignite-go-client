@@ -5,13 +5,12 @@ package ignitesql
 import (
 	"context"
 	"database/sql/driver"
-	//"reflect"
 	"testing"
 )
 
 func Test_connector_Connect(t *testing.T) {
 	d := &Driver{}
-	ci, err := d.OpenConnector("tcp://localhost:10800/TestDB2")
+	ci, err := d.OpenConnector("tcp://localhost:10800/DriverOpen")
 	if err != nil {
 		t.Errorf("failed to open connector: %v", err)
 		return
@@ -43,12 +42,9 @@ func Test_connector_Connect(t *testing.T) {
 				t.Errorf("connector.Connect() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			/*
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("connector.Connect() = %v, want %v", got, tt.want)
-				}
-			*/
-			_ = got.Close()
+			if got != nil {
+				_ = got.Close()
+			}
 		})
 	}
 }

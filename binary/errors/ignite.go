@@ -4,11 +4,6 @@ import (
 	"fmt"
 )
 
-const (
-	// StatusSuccess means success
-	StatusSuccess = 0
-)
-
 // IgniteError is Apache Ignite error
 type IgniteError struct {
 	// Apache Ignite specific status and message

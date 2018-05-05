@@ -29,11 +29,11 @@ func (d *Driver) Open(name string) (driver.Conn, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse connection name")
 	}
-	switch ci.Version.Major() {
+	switch ci.Major {
 	case 1:
 		return v1.Connect(ctx, ci)
 	default:
-		return nil, errors.Errorf("unsupported protocol version: %v", ci.Version)
+		return nil, errors.Errorf("unsupported protocol version: v%d.%d.%d", ci.Major, ci.Minor, ci.Patch)
 	}
 }
 
@@ -51,7 +51,7 @@ func (d *Driver) Open(name string) (driver.Conn, error) {
 // URL parameters (param1,...paramN):
 // | Name               | Mandatory | Description                                                   | Default value                     |
 // |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
-// | schema             | no        | Database schema                                               | "" (PUBLIC schema will be used) |
+// | schema             | no        | Database schema                                               | "" (PUBLIC schema will be used)   |
 // | version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
 // | page-size          | no        | Query cursor page size                                        | 10000                             |
 // | max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
@@ -76,19 +76,18 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 		ci.Network = "tcp"
 	}
 
-	if ci.Address = u.Hostname(); len(ci.Address) == 0 {
-		ci.Address = "127.0.0.1"
+	if ci.Host = u.Hostname(); len(ci.Host) == 0 {
+		ci.Host = "127.0.0.1"
 	}
-	if len(u.Port()) == 0 {
-		ci.Address += ":10800"
-	} else {
-		ci.Address += ":" + u.Port()
+	ci.Port, _ = strconv.Atoi(u.Port())
+	if ci.Port == 0 {
+		ci.Port = 10800
 	}
 
 	ci.Cache = strings.Trim(u.Path, "/")
 
 	// default values
-	ci.Version, _ = semver.NewVersion("1.0.0")
+	ver, _ := semver.NewVersion("1.0.0")
 	ci.PageSize = 10000
 
 	for k, v := range u.Query() {
@@ -101,7 +100,7 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 			ci.Schema = val
 		case "version":
 			if len(val) > 0 {
-				ci.Version, err = semver.NewVersion(val)
+				ver, err = semver.NewVersion(val)
 			}
 		case "page-size":
 			if len(val) > 0 {
@@ -136,6 +135,10 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 	}
 
 	ci.URL = name
+	ci.ConnInfo.Major = int(ver.Major())
+	ci.ConnInfo.Minor = int(ver.Minor())
+	ci.ConnInfo.Patch = int(ver.Patch())
+
 	return ci, nil
 }
 

@@ -19,7 +19,7 @@ type Rows interface {
 
 type rows struct {
 	conn     *conn
-	response ignite.Response
+	response *ignite.ResponseOperation
 	id       int64
 	fields   []string
 	rowsLeft int
@@ -56,7 +56,7 @@ func (r *rows) Next(dest []driver.Value) error {
 	var err error
 	if r.rowsLeft == 0 {
 		var hasMore bool
-		if err = r.response.ReadPrimitives(&hasMore); err != nil {
+		if hasMore, err = r.response.ReadBool(); err != nil {
 			// prevent resource leak on server
 			_ = r.Close()
 			return errors.Wrapf(err, "failed to read more records flag")
@@ -71,7 +71,7 @@ func (r *rows) Next(dest []driver.Value) error {
 		}
 		// read data
 		var rowCount int32
-		if err = r.response.ReadPrimitives(&rowCount); err != nil {
+		if rowCount, err = r.response.ReadInt(); err != nil {
 			// prevent resource leak on server
 			_ = r.Close()
 			return errors.Wrapf(err, "failed to read row count")
@@ -91,18 +91,22 @@ func (r *rows) Next(dest []driver.Value) error {
 }
 
 // newRows creates new Rows object
-func newRows(conn *conn, r ignite.Response) (driver.Rows, error) {
+func newRows(conn *conn, r *ignite.ResponseOperation) (driver.Rows, error) {
+	var err error
 	// read field names
 	var id int64
 	var fieldCount int32
-	if err := r.ReadPrimitives(&id, &fieldCount); err != nil {
+	if id, err = r.ReadLong(); err != nil {
+		return nil, errors.Wrapf(err, "failed to read request ID")
+	}
+	if fieldCount, err = r.ReadInt(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read field count")
 	}
 	// response MUST return field names
 	fields := make([]string, 0, fieldCount)
 	for i := 0; i < int(fieldCount); i++ {
 		var s string
-		if err := r.ReadPrimitives(&s); err != nil {
+		if s, err = r.ReadOString(); err != nil {
 			return nil, errors.Wrapf(err, "failed to read field name with index %d", i)
 		}
 		fields = append(fields, s)
@@ -110,7 +114,7 @@ func newRows(conn *conn, r ignite.Response) (driver.Rows, error) {
 
 	// read row count
 	var rowCount int32
-	if err := r.ReadPrimitives(&rowCount); err != nil {
+	if rowCount, err = r.ReadInt(); err != nil {
 		return nil, errors.Wrapf(err, "failed to read row count")
 	}
 

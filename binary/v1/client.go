@@ -1,10 +1,8 @@
 package ignite
 
 import (
-	"bytes"
 	"context"
-	"io"
-	"math/rand"
+	"fmt"
 	"net"
 	"runtime"
 	"strings"
@@ -14,59 +12,21 @@ import (
 	"github.com/amsokol/ignite-go-client/debug"
 )
 
+// ConnInfo contains connections parameters
+type ConnInfo struct {
+	Network, Host       string
+	Port                int
+	Major, Minor, Patch int
+}
+
 // Client is interface to communicate with Apache Ignite cluster.
-// Client is not thread-safe.
+// Client is thread safe.
 type Client interface {
-	// Exec executes request with primitives.
-	// code - code of operation.
-	// uid - request ID.
-	// primitives - primitives to send.
-	// Returns:
-	// Response, nil in case of success.
-	// Empty Response, error object in case of error.
-	Exec(code int16, primitives ...interface{}) (Response, error)
+	// Connected return true if connection to the cluster is active
+	Connected() bool
 
-	// Prepare returns Operation.
-	// Arguments:
-	// code - code of operation.
-	// uid - request ID.
-	// Operation is not thread-safe.
-	Prepare(code int16) Operation
-
-	// Call executes Operation
-	// Arguments:
-	// o - Operation to execute.
-	// Returns:
-	// Response, nil in case of success.
-	// Empty Response, error object in case of error.
-	Call(o Operation) (Response, error)
-
-	// begin starts request by writing data directly to connection with server.
-	// Arguments:
-	// length - length in bytes of request message.
-	// code - code of operation.
-	// uid - request ID.
-	// Returns:
-	// nil in case of success.
-	// error object in case of error.
-	begin(length int32, code int16, uid int64) error
-
-	// write writes primitives directly to connection with server.
-	// Arguments:
-	// primitives - primitives to write.
-	// Returns:
-	// nil in case of success.
-	// error object in case of error.
-	write(primitives ...interface{}) error
-
-	// commit finishes the request and returns response from server.
-	// Returns:
-	// Response, nil in case of success.
-	// Empty Response, error object in case of error.
-	commit() (Response, error)
-
-	// IsConnected return true if connection to the cluster is active
-	IsConnected() bool
+	// Do sends request and receives response
+	Do(req Request, res Response) error
 
 	// Close closes connection.
 	// Returns:
@@ -115,14 +75,6 @@ type Client interface {
 	// See for details:
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations
 
-	// CachePut puts a value with a given key to cache (overwriting existing value if any).
-	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put
-	CachePut(cache string, binary bool, key interface{}, value interface{}) error
-
-	// CachePutAll puts a value with a given key to cache (overwriting existing value if any).
-	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put_all
-	CachePutAll(cache string, binary bool, data map[interface{}]interface{}) error
-
 	// CacheGet retrieves a value from cache by key.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get
 	CacheGet(cache string, binary bool, key interface{}) (interface{}, error)
@@ -130,6 +82,14 @@ type Client interface {
 	// CacheGetAll retrieves multiple key-value pairs from cache.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_all
 	CacheGetAll(cache string, binary bool, keys []interface{}) (map[interface{}]interface{}, error)
+
+	// CachePut puts a value with a given key to cache (overwriting existing value if any).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put
+	CachePut(cache string, binary bool, key interface{}, value interface{}) error
+
+	// CachePutAll puts a value with a given key to cache (overwriting existing value if any).
+	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put_all
+	CachePutAll(cache string, binary bool, data map[interface{}]interface{}) error
 
 	// CacheContainsKey returns a value indicating whether given key is present in cache.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_contains_key
@@ -192,7 +152,7 @@ type Client interface {
 
 	// CacheGetSize gets the number of entries in cache.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_get_size
-	CacheGetSize(cache string, binary bool, count int, modes []byte) (int64, error)
+	CacheGetSize(cache string, binary bool, modes []byte) (int64, error)
 
 	// CacheRemoveKeys removes entries with given keys, notifying listeners and cache writers.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_remove_keys
@@ -214,21 +174,21 @@ type Client interface {
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_cursor_get_page
 	QuerySQLCursorGetPage(id int64) (QuerySQLPage, error)
 
+	// QuerySQLFieldsRaw is equal to QuerySQLFields but return raw Response object.
+	// Used for SQL driver to reduce memory allocations.
+	QuerySQLFieldsRaw(cache string, binary bool, data QuerySQLFieldsData) (*ResponseOperation, error)
+
 	// QuerySQLFields performs SQL fields query.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields
 	QuerySQLFields(cache string, binary bool, data QuerySQLFieldsData) (QuerySQLFieldsResult, error)
 
-	// QuerySQLFieldsRaw is equal to QuerySQLFields but return raw Response object.
+	// QuerySQLFieldsCursorGetPageRaw is equal to QuerySQLFieldsCursorGetPage but return raw Response object.
 	// Used for SQL driver to reduce memory allocations.
-	QuerySQLFieldsRaw(cache string, binary bool, data QuerySQLFieldsData) (Response, error)
+	QuerySQLFieldsCursorGetPageRaw(id int64) (*ResponseOperation, error)
 
 	// QuerySQLFieldsCursorGetPage retrieves the next query result page by cursor id from QuerySQLFields.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields_cursor_get_page
 	QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQLFieldsPage, error)
-
-	// QuerySQLFieldsCursorGetPageRaw is equal to QuerySQLFieldsCursorGetPage but return raw Response object.
-	// Used for SQL driver to reduce memory allocations.
-	QuerySQLFieldsCursorGetPageRaw(id int64) (Response, error)
 
 	// ResourceClose closes a resource, such as query cursor.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_resource_close
@@ -238,14 +198,30 @@ type Client interface {
 type client struct {
 	debugID string
 	conn    net.Conn
-	lock    sync.Mutex
+	mutex   *sync.Mutex
 
 	Client
 }
 
 // IsConnected return true if connection to the cluster is active
-func (c *client) IsConnected() bool {
+func (c *client) Connected() bool {
 	return c.conn != nil
+}
+
+// Do sends request and receives response
+func (c *client) Do(req Request, res Response) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	// send request
+	if _, err := req.WriteTo(c.conn); err != nil {
+		return errors.Wrapf(err, "failed to send request to server")
+	}
+
+	// receive response
+	_, err := res.ReadFrom(c.conn)
+
+	return err
 }
 
 // Close closes connection.
@@ -253,191 +229,52 @@ func (c *client) IsConnected() bool {
 // nil in case of success.
 // error object in case of error.
 func (c *client) Close() error {
-	if c.conn != nil {
+	if c.Connected() {
 		defer func() { c.conn = nil }()
 		return c.conn.Close()
 	}
 	return nil
 }
 
-// Exec executes request with primitives.
-// code - code of operation.
-// uid - request ID.
-// primitives - primitives to send.
-// Returns:
-// Response, nil in case of success.
-// Empty Response, error object in case of error.
-func (c *client) Exec(code OperationCode, primitives ...interface{}) (Response, error) {
-	// prepare operation
-	o := c.Prepare(code)
+// Connect connects to the Apache Ignite cluster
+// Returns: client
+func Connect(ctx context.Context, ci ConnInfo) (Client, error) {
+	address := fmt.Sprintf("%s:%d", ci.Host, ci.Port)
 
-	// write data
-	if err := o.WritePrimitives(primitives...); err != nil {
-		return Response{}, errors.Wrapf(err, "failed to write operation request primitives")
-	}
-
-	// execute operation
-	return c.Call(o)
-}
-
-// Prepare returns Operation.
-// Arguments:
-// code - code of operation.
-// uid - request ID.
-// Operation is not thread-safe.
-func (c *client) Prepare(code OperationCode) Operation {
-	return Operation{Code: code, UID: rand.Int63(), Prefix: &bytes.Buffer{}, Data: &bytes.Buffer{}}
-}
-
-// Call executes Operation
-// Arguments:
-// o - Operation to execute.
-// Returns:
-// Response, nil in case of success.
-// Empty Response, error object in case of error
-func (c *client) Call(o Operation) (Response, error) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-
-	// send request header
-	if err := c.begin(int32(2+8+o.Prefix.Len()+o.Data.Len()), o.Code, o.UID); err != nil {
-		return Response{}, errors.Wrapf(err, "failed to send request header")
-	}
-	if o.Prefix.Len() > 0 {
-		// send request prefix of body
-		if err := c.write(o.Prefix.Bytes()); err != nil {
-			return Response{}, errors.Wrapf(err, "failed to send request prefix of body")
-		}
-	}
-	if o.Data.Len() > 0 {
-		// send request body
-		if err := c.write(o.Data.Bytes()); err != nil {
-			return Response{}, errors.Wrapf(err, "failed to send request body")
-		}
-	}
-
-	// receive server response
-	r, err := c.commit()
-	if err != nil {
-		return r, errors.Wrapf(err, "failed to receive response from server")
-	}
-	if r.UID != o.UID {
-		return r, errors.Errorf("invalid response id (expected %d, but received %d)", o.UID, r.UID)
-	}
-
-	return r, nil
-}
-
-// begin starts request by writing data directly to connection with server.
-// Arguments:
-// length - length in bytes of request message.
-// code - code of operation.
-// uid - request ID.
-// Returns:
-// nil in case of success.
-// error object in case of error.
-func (c *client) begin(length int32, code int16, uid int64) error {
-	return writePrimitives(c.conn, length, code, uid)
-}
-
-// write writes primitives directly to connection with server.
-// Arguments:
-// primitives - primitives to write.
-// Returns:
-// nil in case of success.
-// error object in case of error.
-func (c *client) write(primitives ...interface{}) error {
-	return writePrimitives(c.conn, primitives...)
-}
-
-// commit finishes the request and returns response from server.
-// Returns:
-// Response, nil in case of success.
-// Empty Response, error object in case of error.
-func (c *client) commit() (Response, error) {
-	var r Response
-
-	// read response message length
-	if err := readPrimitives(c.conn, &r.Len); err != nil {
-		return r, errors.Wrapf(err, "failed to read response message length")
-	}
-
-	// read response message
-	b := make([]byte, r.Len, r.Len)
-	if err := readPrimitives(c.conn, &b); err != nil {
-		return r, errors.Wrapf(err, "failed to read response message")
-	}
-	r.Data = bytes.NewReader(b)
-
-	// read response header
-	if err := r.ReadPrimitives(&r.UID, &r.Status); err != nil {
-		return r, errors.Wrapf(err, "failed to read response header")
-	}
-
-	if r.Status != errors.StatusSuccess {
-		// Response status
-		if err := r.ReadPrimitives(&r.Message); err != nil {
-			return r, errors.Wrapf(err, "failed to read error message")
-		}
-	}
-	return r, nil
-}
-
-// NewClient connects to the Apache Ignite cluster
-func NewClient(ctx context.Context, network, address string, major, minor, patch int16) (Client, error) {
+	// connect
 	d := net.Dialer{}
-	conn, err := d.DialContext(ctx, network, address)
+	conn, err := d.DialContext(ctx, ci.Network, address)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open connection")
 	}
-	if err = handshake(conn, major, minor, patch); err != nil {
-		conn.Close()
+
+	c := &client{conn: conn, debugID: strings.Join([]string{"network=", ci.Network, "', address='", address, "'"}, ""),
+		mutex: &sync.Mutex{}}
+	runtime.SetFinalizer(c, clientFinalizer)
+
+	// request and response
+	req := NewRequestHandshake(ci.Major, ci.Minor, ci.Patch)
+	res := &ResponseHandshake{}
+
+	// make handshake
+	if err = c.Do(req, res); err != nil {
+		c.Close()
 		return nil, errors.Wrapf(err, "failed to make handshake")
 	}
-	c := &client{conn: conn, debugID: strings.Join([]string{"network=", network, "', address='", address, "'"}, "")}
-	runtime.SetFinalizer(c, clientFinalizer)
+
+	if !res.Success {
+		c.Close()
+		return nil, errors.Errorf("handshake failed: %s, server supported protocol version is v%d.%d.%d",
+			res.Message, res.Major, res.Minor, res.Patch)
+	}
+
+	// return connected client
 	return c, nil
 }
 
-// handshake - besides socket connection, the thin client protocol requires a connection handshake to ensure
-// that client and server versions are compatible. Note that handshake must be the first message
-// after connection establishment.
-func handshake(rw io.ReadWriter, major int16, minor int16, patch int16) error {
-	// Send handshake request
-	if err := writePrimitives(rw,
-		// Message length
-		int32(8),
-		// Handshake operation
-		byte(1),
-		// Protocol version, e.g. 1,0,0
-		major, minor, patch,
-		// Client code
-		byte(2),
-	); err != nil {
-		return errors.Wrapf(err, "failed to send handshake request")
-	}
-
-	// Receive handshake response
-	var length int32
-	var res byte
-	if err := readPrimitives(rw, &length, &res); err != nil {
-		return errors.Wrapf(err, "failed to read handshake response (length and result)")
-	}
-	if res != 1 {
-		var msg string
-		if err := readPrimitives(rw, &major, &minor, &patch, &msg); err != nil {
-			return errors.Wrapf(err, "failed to read handshake response (supported protocol version and error message)")
-		}
-		return errors.Errorf("handshake failed, code=%d, message='%s', supported protocol version is v%d.%d.%d",
-			res, msg, major, minor, patch)
-	}
-
-	return nil
-}
-
-// clientFinalizer is memory leak spy
+// clientFinalizer is resource leak spy
 func clientFinalizer(c *client) {
-	if c.IsConnected() {
+	if c.Connected() {
 		debug.ResourceLeakLogger.Printf("client \"%s\" is not closed", c.debugID)
 		c.Close()
 	}

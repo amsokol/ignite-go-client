@@ -1,6 +1,7 @@
 package ignite
 
 import (
+	"context"
 	"reflect"
 	"testing"
 	"time"
@@ -9,21 +10,52 @@ import (
 )
 
 func Test_client_CacheGet(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	testClientCachePut(t, c)
+	c.CachePut("CacheGet", false, "byte", byte(123))
+	c.CachePut("CacheGet", false, "short", int16(12345))
+	c.CachePut("CacheGet", false, "int", int32(1234567890))
+	c.CachePut("CacheGet", false, "long", int64(1234567890123456789))
+	c.CachePut("CacheGet", false, "float", float32(123456.789))
+	c.CachePut("CacheGet", false, "double", float64(123456789.12345))
+	c.CachePut("CacheGet", false, "char", Char('A'))
+	c.CachePut("CacheGet", false, "bool", true)
+	c.CachePut("CacheGet", false, "string", "test string")
 	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
+	c.CachePut("CacheGet", false, "UUID", uid)
+	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+	c.CachePut("CacheGet", false, "Date", ToDate(dm))
+	c.CachePut("CacheGet", false, "byte array", []byte{1, 2, 3})
+	c.CachePut("CacheGet", false, "short array", []int16{1, 2, 3})
+	c.CachePut("CacheGet", false, "int array", []int32{1, 2, 3})
+	c.CachePut("CacheGet", false, "long array", []int64{1, 2, 3})
+	c.CachePut("CacheGet", false, "float array", []float32{1.1, 2.2, 3.3})
+	c.CachePut("CacheGet", false, "double array", []float64{1.1, 2.2, 3.3})
+	c.CachePut("CacheGet", false, "char array", []Char{'A', 'B', 'Я'})
+	c.CachePut("CacheGet", false, "bool array", []bool{true, false, true})
+	c.CachePut("CacheGet", false, "string array", []string{"one", "two", "три"})
+	uid1, _ := uuid.Parse("a0c07c4c-7e2e-43d3-8eda-176881477c81")
+	uid2, _ := uuid.Parse("4015b55f-72f0-48a4-8d01-64168d50f627")
+	uid3, _ := uuid.Parse("827d1bf0-c5d4-4443-8708-d8b5de31fe74")
+	c.CachePut("CacheGet", false, "UUID array", []uuid.UUID{uid1, uid2, uid3})
+	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
+	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
+	c.CachePut("CacheGet", false, "date array", []Date{ToDate(dm), ToDate(dm2), ToDate(dm3)})
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	c.CachePut("CacheGet", false, "Timestamp", tm)
+	tm1 := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm2 := time.Date(2019, 5, 4, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	c.CachePut("CacheGet", false, "Timestamp array", []time.Time{tm1, tm2, tm3})
+	tm4 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+	c.CachePut("CacheGet", false, "Time", ToTime(tm4))
+	tm5 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+	tm6 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123), time.UTC)
+	tm7 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123), time.UTC)
+	c.CachePut("CacheGet", false, "Time array", []Time{ToTime(tm5), ToTime(tm6), ToTime(tm7)})
 
 	type args struct {
 		cache  string
@@ -32,262 +64,251 @@ func Test_client_CacheGet(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    interface{}
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "byte",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key1",
+				cache: "CacheGet",
+				key:   "byte",
 			},
 			want: byte(123),
 		},
 		{
-			name: "success test 2",
+			name: "short",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key2",
+				cache: "CacheGet",
+				key:   "short",
 			},
-			want: int16(1234),
+			want: int16(12345),
 		},
 		{
-			name: "success test 3",
+			name: "int",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key3",
+				cache: "CacheGet",
+				key:   "int",
 			},
-			want: int32(1234),
+			want: int32(1234567890),
 		},
 		{
-			name: "success test 4",
+			name: "long",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key4",
+				cache: "CacheGet",
+				key:   "long",
 			},
-			want: int64(123456789),
+			want: int64(1234567890123456789),
 		},
 		{
-			name: "success test 5",
+			name: "float",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key5",
+				cache: "CacheGet",
+				key:   "float",
 			},
-			want: float32(1.123),
+			want: float32(123456.789),
 		},
 		{
-			name: "success test 6",
+			name: "double",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key6",
+				cache: "CacheGet",
+				key:   "double",
 			},
-			want: float64(1.123456),
+			want: float64(123456789.12345),
 		},
 		{
-			name: "success test 7",
+			name: "char",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key7",
+				cache: "CacheGet",
+				key:   "char",
 			},
-			want: Char('W'),
+			want: Char('A'),
 		},
 		{
-			name: "success test 8",
+			name: "bool",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key8",
+				cache: "CacheGet",
+				key:   "bool",
 			},
 			want: true,
 		},
 		{
-			name: "success test 9",
+			name: "string",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key9",
+				cache: "CacheGet",
+				key:   "string",
 			},
-			want: "value",
+			want: "test string",
 		},
 		{
-			name: "success test 10",
+			name: "UUID",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key10",
+				cache: "CacheGet",
+				key:   "UUID",
 			},
 			want: uid,
 		},
 		{
-			name: "success test 11",
+			name: "Date",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key11",
+				cache: "CacheGet",
+				key:   "Date",
 			},
-			want: NativeTime2Date(tm),
+			want: dm,
 		},
 		{
-			name: "success test 12",
+			name: "byte array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key12",
+				cache: "CacheGet",
+				key:   "byte array",
 			},
-			want: []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			want: []byte{1, 2, 3},
 		},
 		{
-			name: "success test 13",
+			name: "short array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key13",
+				cache: "CacheGet",
+				key:   "short array",
 			},
-			want: []int16{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			want: []int16{1, 2, 3},
 		},
 		{
-			name: "success test 14",
+			name: "int array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key14",
+				cache: "CacheGet",
+				key:   "int array",
 			},
-			want: []int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			want: []int32{1, 2, 3},
 		},
 		{
-			name: "success test 15",
+			name: "long array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key15",
+				cache: "CacheGet",
+				key:   "long array",
 			},
-			want: []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			want: []int64{1, 2, 3},
 		},
 		{
-			name: "success test 16",
+			name: "float array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key16",
+				cache: "CacheGet",
+				key:   "float array",
 			},
-			want: []float32{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
+			want: []float32{1.1, 2.2, 3.3},
 		},
 		{
-			name: "success test 17",
+			name: "double array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key17",
+				cache: "CacheGet",
+				key:   "double array",
 			},
-			want: []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
+			want: []float64{1.1, 2.2, 3.3},
 		},
 		{
-			name: "success test 18",
+			name: "char array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key18",
+				cache: "CacheGet",
+				key:   "char array",
 			},
-			want: []Char{'a', 'b', 'c'},
+			want: []Char{'A', 'B', 'Я'},
 		},
 		{
-			name: "success test 19",
+			name: "bool array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key19",
+				cache: "CacheGet",
+				key:   "bool array",
 			},
-			want: []bool{true, false},
+			want: []bool{true, false, true},
 		},
 		{
-			name: "success test 20",
+			name: "string array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key20",
+				cache: "CacheGet",
+				key:   "string array",
 			},
-			want: []string{"abc", "def"},
+			want: []string{"one", "two", "три"},
 		},
-		/*
-			{
-				name: "success test 21",
-				c:    c,
-				args: args{
-					cache:  "TestCache1",
-					binary: false,
-					key:    "key21",
-				},
-				want: []uuid.UUID{uid1, uid2},
-			},
-		*/
-		/*
-			{
-				name: "success test 22",
-				c:    c,
-				args: args{
-					cache:  "TestCache1",
-					binary: false,
-					key:    "key22",
-				},
-				want: []Date{12345, 67890},
-			},
-		*/
 		{
-			name: "success test 33",
+			name: "UUID array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key33",
+				cache: "CacheGet",
+				key:   "UUID array",
+			},
+			want: []uuid.UUID{uid1, uid2, uid3},
+		},
+		{
+			name: "date array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "date array",
+			},
+			want: []time.Time{dm, dm2, dm3},
+		},
+		{
+			name: "Timestamp",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "Timestamp",
 			},
 			want: tm,
 		},
 		{
-			name: "success test 36",
+			name: "Timestamp array",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key36",
+				cache: "CacheGet",
+				key:   "Timestamp array",
 			},
-			want: NativeTime2Time(tm),
+			want: []time.Time{tm1, tm2, tm3},
 		},
 		{
-			name: "success test NULL",
+			name: "Time",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key-does-not-exist",
+				cache: "CacheGet",
+				key:   "Time",
+			},
+			want: tm4,
+		},
+		{
+			name: "Time array",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "Time array",
+			},
+			want: []time.Time{tm5, tm6, tm7},
+		},
+		{
+			name: "NULL",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "NULL",
 			},
 			want: nil,
 		},
@@ -300,25 +321,23 @@ func Test_client_CacheGet(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("client.CacheGet() = %v, want %v", got, tt.want)
+				t.Errorf("client.CacheGet() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
 }
 
 func Test_client_CacheGetAll(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
+	err = c.CachePutAll("CacheGetAll", false,
+		map[interface{}]interface{}{"key1": "value1", Char('Q'): int32(12345), true: float64(123456.789)})
+	if err != nil {
+		t.Fatal(err)
 	}
-	defer c.CacheDestroy("TestCache1")
-
-	testClientCachePutAll(t, c)
 
 	type args struct {
 		cache  string
@@ -327,28 +346,19 @@ func Test_client_CacheGetAll(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    map[interface{}]interface{}
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				keys: []interface{}{
-					byte(123),
-					float64(678),
-					"key",
-				},
+				cache: "CacheGetAll",
+				keys:  []interface{}{"key1", Char('Q'), true},
 			},
-			want: map[interface{}]interface{}{
-				byte(123):    "test",
-				float64(678): Char('w'),
-				"key":        int64(128),
-			},
+			want: map[interface{}]interface{}{"key1": "value1", Char('Q'): int32(12345), true: float64(123456.789)},
 		},
 	}
 	for _, tt := range tests {
@@ -359,362 +369,21 @@ func Test_client_CacheGetAll(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("client.CacheGetAll() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_client_CachePut(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
-	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
-	}
-	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	testClientCachePut(t, c)
-}
-
-func testClientCachePut(t *testing.T, c *client) {
-	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
-	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
-
-	type args struct {
-		cache  string
-		binary bool
-		key    interface{}
-		value  interface{}
-	}
-	tests := []struct {
-		name    string
-		c       *client
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "success test 1",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key1",
-				value:  byte(123),
-			},
-		},
-		{
-			name: "success test 2",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key2",
-				value:  int16(1234),
-			},
-		},
-		{
-			name: "success test 3",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key3",
-				value:  int32(1234),
-			},
-		},
-		{
-			name: "success test 4",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key4",
-				value:  int64(123456789),
-			},
-		},
-		{
-			name: "success test 5",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key5",
-				value:  float32(1.123),
-			},
-		},
-		{
-			name: "success test 6",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key6",
-				value:  float64(1.123456),
-			},
-		},
-		{
-			name: "success test 7",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key7",
-				value:  Char('W'),
-			},
-		},
-		{
-			name: "success test 8",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key8",
-				value:  true,
-			},
-		},
-		{
-			name: "success test 9",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key9",
-				value:  "value",
-			},
-		},
-		{
-			name: "success test 10",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key10",
-				value:  uid,
-			},
-		},
-		{
-			name: "success test 11",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key11",
-				value:  NativeTime2Date(tm),
-			},
-		},
-		{
-			name: "success test 12",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key12",
-				value:  []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			},
-		},
-		{
-			name: "success test 13",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key13",
-				value:  []int16{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			},
-		},
-		{
-			name: "success test 14",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key14",
-				value:  []int32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			},
-		},
-		{
-			name: "success test 15",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key15",
-				value:  []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			},
-		},
-		{
-			name: "success test 16",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key16",
-				value:  []float32{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
-			},
-		},
-		{
-			name: "success test 17",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key17",
-				value:  []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0},
-			},
-		},
-		{
-			name: "success test 18",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key18",
-				value:  []Char{'a', 'b', 'c'},
-			},
-		},
-		{
-			name: "success test 19",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key19",
-				value:  []bool{true, false},
-			},
-		},
-		{
-			name: "success test 20",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key20",
-				value:  []string{"abc", "def"},
-			},
-		},
-		/*
-			{
-				name: "success test 21",
-				c:    c,
-				args: args{
-					cache:  "TestCache1",
-					binary: false,
-					key:    "key21",
-					value:  []uuid.UUID{uid1, uid2},
-					},
-			},
-		*/
-		/*
-			{
-				name: "success test 22",
-				c:    c,
-				args: args{
-					cache:  "TestCache1",
-					binary: false,
-					key:    "key22",
-					value:  []Date{12345, 67890},
-					},
-			},
-		*/
-		{
-			name: "success test 33",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key33",
-				value:  tm,
-			},
-		},
-		{
-			name: "success test 36",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key36",
-				value:  NativeTime2Time(tm),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.c.CachePut(tt.args.cache, tt.args.binary, tt.args.key, tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("client.CachePut() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func Test_client_CachePutAll(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
-	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
-	}
-	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	testClientCachePutAll(t, c)
-}
-
-func testClientCachePutAll(t *testing.T, c *client) {
-	type args struct {
-		cache  string
-		binary bool
-		data   map[interface{}]interface{}
-	}
-	tests := []struct {
-		name    string
-		c       *client
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "success test 1",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				data: map[interface{}]interface{}{
-					byte(123):    "test",
-					float64(678): Char('w'),
-					"key":        int64(128),
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.c.CachePutAll(tt.args.cache, tt.args.binary, tt.args.data); (err != nil) != tt.wantErr {
-				t.Errorf("client.CachePutAll() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("client.CacheGetAll() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
 }
 
 func Test_client_CacheContainsKey(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	err = c.CachePut("CacheContainsKey", false, "key1", "value1")
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -724,28 +393,26 @@ func Test_client_CacheContainsKey(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    bool
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key",
+				cache: "CacheContainsKey",
+				key:   "key1",
 			},
 			want: true,
 		},
 		{
-			name: "success test 2",
+			name: "2",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key-not-found",
+				cache: "CacheContainsKey",
+				key:   "key2",
 			},
 			want: false,
 		},
@@ -765,23 +432,15 @@ func Test_client_CacheContainsKey(t *testing.T) {
 }
 
 func Test_client_CacheContainsKeys(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	if err = c.CachePut("TestCache1", false, "key1", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
-	}
-	if err = c.CachePut("TestCache1", false, "key2", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	err = c.CachePutAll("CacheContainsKeys", false,
+		map[interface{}]interface{}{"key1": "value1", Char('Q'): int32(12345), true: float64(123456.789)})
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -791,28 +450,26 @@ func Test_client_CacheContainsKeys(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    bool
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				keys:   []interface{}{"key1", "key2"},
+				cache: "CacheContainsKeys",
+				keys:  []interface{}{"key1", Char('Q'), true},
 			},
 			want: true,
 		},
 		{
-			name: "success test 2",
+			name: "2",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				keys:   []interface{}{"key1", "key-not-found"},
+				cache: "CacheContainsKeys",
+				keys:  []interface{}{"key2", Char('Q'), true},
 			},
 			want: false,
 		},
@@ -832,21 +489,12 @@ func Test_client_CacheContainsKeys(t *testing.T) {
 }
 
 func Test_client_CacheGetAndPut(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value 1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
-	}
+	c.CachePut("CacheGetAndPut", false, "key", "value 1")
 
 	type args struct {
 		cache  string
@@ -856,30 +504,28 @@ func Test_client_CacheGetAndPut(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    interface{}
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key",
-				value:  "value 2",
+				cache: "CacheGetAndPut",
+				key:   "key",
+				value: "value 2",
 			},
 			want: "value 1",
 		},
 		{
-			name: "success test 2",
+			name: "2",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key-not-exist",
-				value:  "value",
+				cache: "CacheGetAndPut",
+				key:   "key-not-exist",
+				value: "value",
 			},
 			want: nil,
 		},
@@ -899,21 +545,12 @@ func Test_client_CacheGetAndPut(t *testing.T) {
 }
 
 func Test_client_CacheGetAndReplace(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value 1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
-	}
+	c.CachePut("CacheGetAndReplace", false, "key", "value 1")
 
 	type args struct {
 		cache  string
@@ -923,16 +560,16 @@ func Test_client_CacheGetAndReplace(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    interface{}
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheGetAndReplace",
 				binary: false,
 				key:    "key",
 				value:  "value 2",
@@ -940,10 +577,10 @@ func Test_client_CacheGetAndReplace(t *testing.T) {
 			want: "value 1",
 		},
 		{
-			name: "success test 2",
+			name: "2",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheGetAndReplace",
 				binary: false,
 				key:    "key-not-exist",
 				value:  "value",
@@ -966,21 +603,12 @@ func Test_client_CacheGetAndReplace(t *testing.T) {
 }
 
 func Test_client_CacheGetAndRemove(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value 1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
-	}
+	c.CachePut("CacheGetAndRemove", false, "key", "value 1")
 
 	type args struct {
 		cache  string
@@ -989,18 +617,17 @@ func Test_client_CacheGetAndRemove(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    interface{}
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key",
+				cache: "CacheGetAndRemove",
+				key:   "key",
 			},
 			want: "value 1",
 		},
@@ -1020,21 +647,11 @@ func Test_client_CacheGetAndRemove(t *testing.T) {
 }
 
 func Test_client_CachePutIfAbsent(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	if err = c.CachePut("TestCache1", false, "key2", "value 2"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
-	}
 
 	type args struct {
 		cache  string
@@ -1044,29 +661,29 @@ func Test_client_CachePutIfAbsent(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    bool
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CachePutIfAbsent",
 				binary: false,
-				key:    "key1",
+				key:    "key",
 				value:  byte(123),
 			},
 			want: true,
 		},
 		{
-			name: "success test 2",
+			name: "2",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CachePutIfAbsent",
 				binary: false,
-				key:    "key2",
+				key:    "key",
 				value:  byte(45),
 			},
 			want: false,
@@ -1086,21 +703,16 @@ func Test_client_CachePutIfAbsent(t *testing.T) {
 	}
 }
 
-func Test_client_CacheReplace(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+func Test_client_CacheGetAndPutIfAbsent(t *testing.T) {
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value 1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheGetAndPutIfAbsent", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1111,7 +723,69 @@ func Test_client_CacheReplace(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
+		args    args
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache:  "CacheGetAndPutIfAbsent",
+				binary: false,
+				key:    "key",
+				value:  "value 2",
+			},
+			want: "value 1",
+		},
+		{
+			name: "2",
+			c:    c,
+			args: args{
+				cache:  "CacheGetAndPutIfAbsent",
+				binary: false,
+				key:    "key-not-exist",
+				value:  "value",
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.CacheGetAndPutIfAbsent(tt.args.cache, tt.args.binary, tt.args.key, tt.args.value)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.CacheGetAndPutIfAbsent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("client.CacheGetAndPutIfAbsent() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_client_CacheReplace(t *testing.T) {
+	c, err := Connect(context.Background(), testConnInfo)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	// put test values
+	if err = c.CachePut("CacheReplace", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+		key    interface{}
+		value  interface{}
+	}
+	tests := []struct {
+		name    string
+		c       Client
 		args    args
 		want    bool
 		wantErr bool
@@ -1120,7 +794,7 @@ func Test_client_CacheReplace(t *testing.T) {
 			name: "success test 1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheReplace",
 				binary: false,
 				key:    "key",
 				value:  "value 2",
@@ -1131,7 +805,7 @@ func Test_client_CacheReplace(t *testing.T) {
 			name: "success test 2",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheReplace",
 				binary: false,
 				key:    "key-not-found",
 				value:  "value 3",
@@ -1154,19 +828,14 @@ func Test_client_CacheReplace(t *testing.T) {
 }
 
 func Test_client_CacheReplaceIfEquals(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value 1"); err != nil {
+	if err = c.CachePut("CacheReplaceIfEquals", false, "key", "value 1"); err != nil {
 		t.Fatalf("failed to put test pair: %s", err.Error())
 	}
 
@@ -1179,16 +848,16 @@ func Test_client_CacheReplaceIfEquals(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    bool
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:        "TestCache1",
+				cache:        "CacheReplaceIfEquals",
 				binary:       false,
 				key:          "key",
 				valueCompare: "value 1",
@@ -1197,10 +866,10 @@ func Test_client_CacheReplaceIfEquals(t *testing.T) {
 			want: true,
 		},
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:        "TestCache1",
+				cache:        "CacheReplaceIfEquals",
 				binary:       false,
 				key:          "key",
 				valueCompare: "value 1",
@@ -1223,88 +892,16 @@ func Test_client_CacheReplaceIfEquals(t *testing.T) {
 	}
 }
 
-func Test_client_CacheGetAndPutIfAbsent(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
-	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
-	}
-	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-
-	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value 1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
-	}
-
-	type args struct {
-		cache  string
-		binary bool
-		key    interface{}
-		value  interface{}
-	}
-	tests := []struct {
-		name    string
-		c       *client
-		args    args
-		want    interface{}
-		wantErr bool
-	}{
-		{
-			name: "success test 1",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key",
-				value:  "value 2",
-			},
-			want: "value 1",
-		},
-		{
-			name: "success test 2",
-			c:    c,
-			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				key:    "key-not-exist",
-				value:  "value",
-			},
-			want: nil,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.c.CacheGetAndPutIfAbsent(tt.args.cache, tt.args.binary, tt.args.key, tt.args.value)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("client.CacheGetAndPutIfAbsent() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("client.CacheGetAndPutIfAbsent() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_client_CacheClear(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheClear", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1313,15 +910,15 @@ func Test_client_CacheClear(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheClear",
 				binary: false,
 			},
 		},
@@ -1336,20 +933,15 @@ func Test_client_CacheClear(t *testing.T) {
 }
 
 func Test_client_CacheClearKey(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheClearKey", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1359,15 +951,15 @@ func Test_client_CacheClearKey(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheClearKey",
 				binary: false,
 				key:    "key",
 			},
@@ -1383,23 +975,18 @@ func Test_client_CacheClearKey(t *testing.T) {
 }
 
 func Test_client_CacheClearKeys(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key1", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheClearKeys", false, "key1", "value 1"); err != nil {
+		t.Fatal(err)
 	}
-	if err = c.CachePut("TestCache1", false, "key2", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheClearKeys", false, "key2", "value 2"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1409,15 +996,15 @@ func Test_client_CacheClearKeys(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheClearKeys",
 				binary: false,
 				keys:   []interface{}{"key1", "key2"},
 			},
@@ -1433,20 +1020,15 @@ func Test_client_CacheClearKeys(t *testing.T) {
 }
 
 func Test_client_CacheRemoveKey(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheRemoveKey", false, "key", "value 1"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1456,26 +1038,26 @@ func Test_client_CacheRemoveKey(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    bool
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheRemoveKey",
 				binary: false,
 				key:    "key",
 			},
 			want: true,
 		},
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheRemoveKey",
 				binary: false,
 				key:    "key",
 			},
@@ -1497,20 +1079,15 @@ func Test_client_CacheRemoveKey(t *testing.T) {
 }
 
 func Test_client_CacheRemoveIfEquals(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheRemoveIfEquals", false, "key", "value"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1521,16 +1098,16 @@ func Test_client_CacheRemoveIfEquals(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    bool
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheRemoveIfEquals",
 				binary: false,
 				key:    "key",
 				value:  "invalid value",
@@ -1538,10 +1115,10 @@ func Test_client_CacheRemoveIfEquals(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheRemoveIfEquals",
 				binary: false,
 				key:    "key",
 				value:  "value",
@@ -1564,53 +1141,45 @@ func Test_client_CacheRemoveIfEquals(t *testing.T) {
 }
 
 func Test_client_CacheGetSize(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key", "value"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheGetSize", false, "key", "value"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
 		cache  string
 		binary bool
-		count  int
 		modes  []byte
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    int64
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheGetSize",
 				binary: false,
-				count:  0,
 				modes:  []byte{0},
 			},
 			want: 1,
 		},
 		{
-			name: "success test 1",
+			name: "2",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
+				cache:  "CacheGetSize",
 				binary: false,
-				count:  0,
 				modes:  nil,
 			},
 			want: 1,
@@ -1618,7 +1187,7 @@ func Test_client_CacheGetSize(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.c.CacheGetSize(tt.args.cache, tt.args.binary, tt.args.count, tt.args.modes)
+			got, err := tt.c.CacheGetSize(tt.args.cache, tt.args.binary, tt.args.modes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("client.CacheGetSize() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1631,23 +1200,18 @@ func Test_client_CacheGetSize(t *testing.T) {
 }
 
 func Test_client_CacheRemoveKeys(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key1", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheRemoveKeys", false, "key1", "value 1"); err != nil {
+		t.Fatal(err)
 	}
-	if err = c.CachePut("TestCache1", false, "key2", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheRemoveKeys", false, "key2", "value 2"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1657,17 +1221,16 @@ func Test_client_CacheRemoveKeys(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test 1",
+			name: "1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
-				keys:   []interface{}{"key1", "key2"},
+				cache: "CacheRemoveKeys",
+				keys:  []interface{}{"key1", "key2"},
 			},
 		},
 	}
@@ -1681,23 +1244,18 @@ func Test_client_CacheRemoveKeys(t *testing.T) {
 }
 
 func Test_client_CacheRemoveAll(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	// put test values
-	if err = c.CachePut("TestCache1", false, "key1", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheRemoveAll", false, "key1", "value 1"); err != nil {
+		t.Fatal(err)
 	}
-	if err = c.CachePut("TestCache1", false, "key2", "value1"); err != nil {
-		t.Fatalf("failed to put test pair: %s", err.Error())
+	if err = c.CachePut("CacheRemoveAll", false, "key2", "value 2"); err != nil {
+		t.Fatal(err)
 	}
 
 	type args struct {
@@ -1706,7 +1264,7 @@ func Test_client_CacheRemoveAll(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
@@ -1714,8 +1272,7 @@ func Test_client_CacheRemoveAll(t *testing.T) {
 			name: "success test 1",
 			c:    c,
 			args: args{
-				cache:  "TestCache1",
-				binary: false,
+				cache: "CacheRemoveAll",
 			},
 		},
 	}

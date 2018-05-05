@@ -29,11 +29,11 @@ type connector struct {
 // The returned connection is only used by one goroutine at a
 // time.
 func (c *connector) Connect(ctx context.Context) (driver.Conn, error) {
-	switch c.info.Version.Major() {
+	switch c.info.Major {
 	case 1:
 		return v1.Connect(ctx, c.info)
 	default:
-		return nil, errors.Errorf("unsupported protocol version: %v", c.info.Version)
+		return nil, errors.Errorf("unsupported protocol version: v%d.%d.%d", c.info.Major, c.info.Minor, c.info.Patch)
 	}
 }
 

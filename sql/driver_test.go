@@ -5,8 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Masterminds/semver"
-
+	"github.com/amsokol/ignite-go-client/binary/v1"
 	"github.com/amsokol/ignite-go-client/sql/common"
 )
 
@@ -77,9 +76,6 @@ func TestDriver_parseYesNo(t *testing.T) {
 }
 
 func TestDriver_parseURL(t *testing.T) {
-	ver1, _ := semver.NewVersion("1.1.1")
-	ver2, _ := semver.NewVersion("1.0.0")
-
 	type args struct {
 		name string
 	}
@@ -120,10 +116,15 @@ func TestDriver_parseURL(t *testing.T) {
 					"&enforce-join-order=yes" +
 					"&collocated=yes" +
 					"&lazy-query=yes",
-				Network:          "tcp",
-				Address:          "localhost:10800",
+				ConnInfo: ignite.ConnInfo{
+					Network: "tcp",
+					Host:    "localhost",
+					Port:    10800,
+					Major:   1,
+					Minor:   1,
+					Patch:   1,
+				},
 				Cache:            "TestDB2",
-				Version:          ver1,
 				Schema:           "SCHEMA",
 				PageSize:         100,
 				MaxRows:          99,
@@ -143,11 +144,16 @@ func TestDriver_parseURL(t *testing.T) {
 				name: "tcp://localhost/TestDB2",
 			},
 			want: common.ConnInfo{
-				URL:      "tcp://localhost/TestDB2",
-				Network:  "tcp",
-				Address:  "localhost:10800",
+				URL: "tcp://localhost/TestDB2",
+				ConnInfo: ignite.ConnInfo{
+					Network: "tcp",
+					Host:    "localhost",
+					Port:    10800,
+					Major:   1,
+					Minor:   0,
+					Patch:   0,
+				},
 				Cache:    "TestDB2",
-				Version:  ver2,
 				PageSize: 10000,
 			},
 		},
@@ -158,11 +164,16 @@ func TestDriver_parseURL(t *testing.T) {
 				name: "tcp://localhost/TestDB2?invalid-param=true",
 			},
 			want: common.ConnInfo{
-				URL:      "tcp://localhost/TestDB2",
-				Network:  "tcp",
-				Address:  "localhost:10800",
+				URL: "tcp://localhost/TestDB2",
+				ConnInfo: ignite.ConnInfo{
+					Network: "tcp",
+					Host:    "localhost",
+					Port:    10800,
+					Major:   1,
+					Minor:   0,
+					Patch:   0,
+				},
 				Cache:    "TestDB2",
-				Version:  ver2,
 				PageSize: 10000,
 			},
 			wantErr: true,
@@ -197,30 +208,28 @@ func TestDriver_Open(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB2",
+				name: "tcp://localhost:10800/DriverOpen",
 			},
 		},
 		{
 			name: "failed test 2",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/TestDB2?invalid-param=true",
+				name: "tcp://localhost:10800/DriverOpen?invalid-param=true",
 			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			/*got*/ _, err := tt.d.Open(tt.args.name)
+			got, err := tt.d.Open(tt.args.name)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Driver.Open() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			/*
-				if !reflect.DeepEqual(got, tt.want) {
-					t.Errorf("Driver.Open() = %v, want %v", got, tt.want)
-				}
-			*/
+			if got != nil {
+				_ = got.Close()
+			}
 		})
 	}
 }

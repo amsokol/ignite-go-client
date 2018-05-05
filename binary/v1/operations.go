@@ -1,12 +1,5 @@
 package ignite
 
-import (
-	"bytes"
-)
-
-// OperationCode is operation code type
-type OperationCode = int16
-
 const (
 	// Cache Configuration
 
@@ -92,27 +85,3 @@ const (
 	// OpResourceClose closes a resource, such as query cursor.
 	OpResourceClose = 0
 )
-
-// Operation allows to prepare operation to execute
-type Operation struct {
-	Code   OperationCode
-	UID    int64
-	Prefix *bytes.Buffer
-	Data   *bytes.Buffer
-}
-
-// WritePrefix writes promitives to the prefix buffer.
-// Prefix is sent to the server before data.
-func (o *Operation) WritePrefix(data ...interface{}) error {
-	return writePrimitives(o.Prefix, data...)
-}
-
-// WritePrimitives writes primitives to the data buffer
-func (o *Operation) WritePrimitives(data ...interface{}) error {
-	return writePrimitives(o.Data, data...)
-}
-
-// WriteObjects writes objects to the data buffer
-func (o *Operation) WriteObjects(data ...interface{}) error {
-	return writeObjects(o.Data, data...)
-}

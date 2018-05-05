@@ -14,9 +14,9 @@ func Test_HashCode(t *testing.T) {
 		{
 			name: "success test",
 			args: args{
-				s: "T",
+				s: "test string",
 			},
-			want: 84,
+			want: -318923937,
 		},
 	}
 	for _, tt := range tests {

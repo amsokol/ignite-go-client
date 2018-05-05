@@ -1,16 +1,24 @@
 package ignite
 
 import (
+	"context"
 	"reflect"
-	"sort"
 	"testing"
 )
 
+var testConnInfo = ConnInfo{
+	Network: "tcp",
+	Host:    "localhost",
+	Port:    10800,
+	Major:   1,
+	Minor:   0,
+	Patch:   0,
+}
+
 func Test_client_CacheCreateWithName(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
 
@@ -19,22 +27,22 @@ func Test_client_CacheCreateWithName(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test",
+			name: "1",
 			c:    c,
 			args: args{
-				cache: "TestCache1",
+				cache: "CacheCreateWithName",
 			},
 		},
 		{
-			name: "failed test",
+			name: "2",
 			c:    c,
 			args: args{
-				cache: "TestCache1",
+				cache: "CacheCreateWithName",
 			},
 			wantErr: true,
 		},
@@ -46,16 +54,12 @@ func Test_client_CacheCreateWithName(t *testing.T) {
 			}
 		})
 	}
-
-	// clear test data
-	c.CacheDestroy("TestCache1")
 }
 
 func Test_client_CacheGetOrCreateWithName(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
 
@@ -64,22 +68,22 @@ func Test_client_CacheGetOrCreateWithName(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test",
+			name: "1",
 			c:    c,
 			args: args{
-				cache: "TestCache1",
+				cache: "CacheGetOrCreateWithName",
 			},
 		},
 		{
-			name: "success test",
+			name: "2",
 			c:    c,
 			args: args{
-				cache: "TestCache1",
+				cache: "CacheGetOrCreateWithName",
 			},
 		},
 	}
@@ -90,41 +94,25 @@ func Test_client_CacheGetOrCreateWithName(t *testing.T) {
 			}
 		})
 	}
-
-	// clear test data
-	c.CacheDestroy("TestCache1")
 }
 
 func Test_client_CacheGetNames(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
-	if err = c.CacheCreateWithName("TestCache2"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache2")
-	if err = c.CacheCreateWithName("TestCache3"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache3")
 
 	tests := []struct {
 		name    string
-		c       *client
-		want    []string
+		c       Client
+		want    string
 		wantErr bool
 	}{
 		{
-			name: "test success",
+			name: "1",
 			c:    c,
-			want: []string{"TestCache1", "TestCache2", "TestCache3", "TestDB1", "TestDB2", "TestDB3"},
+			want: "CacheGetNames",
 		},
 	}
 	for _, tt := range tests {
@@ -134,25 +122,26 @@ func Test_client_CacheGetNames(t *testing.T) {
 				t.Errorf("client.CacheGetNames() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			sort.Strings(got)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("client.CacheGetNames() = %v, want %v", got, tt.want)
+			var found bool
+			for _, v := range got {
+				if v == tt.want {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Errorf("client.CacheGetNames() , want \"%v\", but not found", tt.want)
 			}
 		})
 	}
 }
 
 func Test_client_CacheGetConfiguration(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
-	defer c.CacheDestroy("TestCache1")
 
 	type args struct {
 		cache string
@@ -160,60 +149,85 @@ func Test_client_CacheGetConfiguration(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		want    *CacheConfiguration
 		wantErr bool
 	}{
 		{
-			name: "success test",
+			name: "1",
 			c:    c,
 			args: args{
-				cache: "TestCache1",
-				flag:  0,
+				cache: "CacheGetConfiguration",
 			},
-		},
-		{
-			name: "failed test",
-			c:    c,
-			args: args{
-				cache: "TestCache2",
-				flag:  0,
+			want: &CacheConfiguration{
+				AtomicityMode:                 0,
+				Backups:                       0,
+				CacheMode:                     2,
+				CopyOnRead:                    true,
+				DataRegionName:                "",
+				EagerTTL:                      true,
+				EnableStatistics:              false,
+				GroupName:                     "",
+				LockTimeout:                   0,
+				MaxConcurrentAsyncOperations:  500,
+				MaxQueryIterators:             1024,
+				Name:                          "CacheGetConfiguration",
+				OnheapCacheEnabled:            false,
+				PartitionLossPolicy:           4,
+				QueryDetailMetricsSize:        0,
+				QueryParellelism:              1,
+				ReadFromBackup:                true,
+				RebalanceBatchSize:            524288,
+				RebalanceBatchesPrefetchCount: 2,
+				RebalanceDelay:                0,
+				RebalanceMode:                 1,
+				RebalanceOrder:                0,
+				RebalanceThrottle:             0,
+				RebalanceTimeout:              10000,
+				SQLEscapeAll:                  false,
+				SQLIndexInlineMaxSize:         -1,
+				SQLSchema:                     "",
+				WriteSynchronizationMode:      0,
+				CacheKeyConfigurations:        []CacheKeyConfiguration{},
+				QueryEntities:                 []QueryEntity{},
 			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := tt.c.CacheGetConfiguration(tt.args.cache, tt.args.flag)
+			got, err := tt.c.CacheGetConfiguration(tt.args.cache, tt.args.flag)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("client.CacheGetConfiguration() error = %v, wantErr %v", err, tt.wantErr)
 				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("client.CacheGetConfiguration() = %#v, want %#v", got, tt.want)
 			}
 		})
 	}
 }
 
 func Test_client_CacheCreateWithConfiguration(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	cache := "TestCache1"
+
+	cache := "CacheCreateWithConfiguration"
 
 	type args struct {
 		cc *CacheConfigurationRefs
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test",
+			name: "1",
 			c:    c,
 			args: args{
 				cc: &CacheConfigurationRefs{
@@ -222,7 +236,7 @@ func Test_client_CacheCreateWithConfiguration(t *testing.T) {
 			},
 		},
 		{
-			name: "failed test",
+			name: "2",
 			c:    c,
 			args: args{
 				cc: &CacheConfigurationRefs{
@@ -239,31 +253,28 @@ func Test_client_CacheCreateWithConfiguration(t *testing.T) {
 			}
 		})
 	}
-
-	// clear test data
-	c.CacheDestroy(cache)
 }
 
 func Test_client_CacheGetOrCreateWithConfiguration(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	cache := "TestCache1"
+
+	cache := "CacheGetOrCreateWithConfiguration"
 
 	type args struct {
 		cc *CacheConfigurationRefs
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test",
+			name: "1",
 			c:    c,
 			args: args{
 				cc: &CacheConfigurationRefs{
@@ -272,7 +283,7 @@ func Test_client_CacheGetOrCreateWithConfiguration(t *testing.T) {
 			},
 		},
 		{
-			name: "success test",
+			name: "2",
 			c:    c,
 			args: args{
 				cc: &CacheConfigurationRefs{
@@ -288,43 +299,36 @@ func Test_client_CacheGetOrCreateWithConfiguration(t *testing.T) {
 			}
 		})
 	}
-
-	// clear test data
-	c.CacheDestroy(cache)
 }
 
 func Test_client_CacheDestroy(t *testing.T) {
-	// get test data
-	c, err := getTestClient()
+	c, err := Connect(context.Background(), testConnInfo)
 	if err != nil {
-		t.Fatalf("failed to open test connection: %s", err.Error())
+		t.Fatal(err)
 	}
 	defer c.Close()
-	if err = c.CacheCreateWithName("TestCache1"); err != nil {
-		t.Fatalf("failed to create test cache: %s", err.Error())
-	}
 
 	type args struct {
 		cache string
 	}
 	tests := []struct {
 		name    string
-		c       *client
+		c       Client
 		args    args
 		wantErr bool
 	}{
 		{
-			name: "success test",
+			name: "1",
 			c:    c,
 			args: args{
-				cache: "TestCache1",
+				cache: "CacheDestroy",
 			},
 		},
 		{
-			name: "failed test",
+			name: "1",
 			c:    c,
 			args: args{
-				cache: "TestCache1",
+				cache: "CacheDestroy",
 			},
 			wantErr: true,
 		},

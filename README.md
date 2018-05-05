@@ -53,7 +53,14 @@ Connect to server:
 ctx := context.Background()
 
 // connect
-c, err := ignite.NewClient(ctx, "tcp", "localhost:10800", 1, 0, 0)
+c, err := ignite.Connect(ctx, ignite.ConnInfo{
+    Network: "tcp",
+    Host:    "localhost",
+    Port:    10800,
+    Major:   1,
+    Minor:   0,
+    Patch:   0,
+})
 if err != nil {
     t.Fatalf("failed connect to server: %v", err)
 }
@@ -61,7 +68,7 @@ defer c.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go) for more.
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L97) for more.
 
 See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for other examples.
 
@@ -83,7 +90,7 @@ Connect to server:
 ctx := context.Background()
 
 // open connection
-db, err := sql.Open("ignite", "tcp://localhost:10800/TestDB?version=1.0.0&&page-size=10000&timeout=5000")
+db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?version=1.0.0&&page-size=10000&timeout=5000")
 if err != nil {
     t.Fatalf("failed to open connection: %v", err)
 }
@@ -91,7 +98,7 @@ defer db.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go) for more.
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L14) for more.
 
 Connection URL format:
 
@@ -112,7 +119,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 | Name               | Mandatory | Description                                                   | Default value                     |
 |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
-| schema             | no        | Database schema                                               | "" (PUBLIC schema will be used) |
+| schema             | no        | Database schema                                               | "" (PUBLIC schema will be used)   |
 | version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
 | page-size          | no        | Query cursor page size                                        | 10000                             |
 | max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
@@ -142,7 +149,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 1. Run tests into the root folder of this project:
 
 ```shell
-# go test -count=1 -parallel 1 ./...
+# go test ./...
 ```
 
 ### Type mapping
@@ -159,7 +166,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | bool               | bool                                                                   |
 | String             | string                                                                 |
 | UUID (Guid)        | uuid.UUID ([UUID library from Google](https://github.com/google/uuid)) |
-| date*              | ignite.Date                                                            |
+| Date*              | ignite.Date / time.Time                                                |
 | byte array         | []byte                                                                 |
 | short array        | []int16                                                                |
 | int array          | []int32                                                                |
@@ -169,8 +176,8 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | char array         | []ignite.Char                                                          |
 | bool array         | []bool                                                                 |
 | String array       | []string                                                               |
-| UUID (Guid) array  | Not supported. Need help from Apache Ignite team.                      |
-| Date array         | Not supported. Need help from Apache Ignite team.                      |
+| UUID (Guid) array  | []uuid.UUID                                                            |
+| Date array*        | []ignite.Date / []time.Time                                            |
 | Object array       | Not supported. Need help.                                              |
 | Collection         | Not supported. Need help.                                              |
 | Map                | Not supported. Need help.                                              |
@@ -179,16 +186,30 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | Decimal            | Not supported. Need help.                                              |
 | Decimal array      | Not supported. Need help.                                              |
 | Timestamp          | time.Time                                                              |
-| Timestamp array    | Not supported. Need help.                                              |
-| Time**             | ignite.Time                                                            |
-| Time array         | Not supported. Need help.                                              |
+| Timestamp array    | []time.Time                                                            |
+| Time**             | ignite.Time / time.Time                                                |
+| Time array**       | []ignite.Time / []time.Time                                            |
 | NULL               | nil                                                                    |
 
-*`date` is outdated type. It's recommended to use `Timestamp` type.
-If you still need `date` type use `ignite.NativeTime2Date` and `ignite.Date2NativeTime` functions to convert between Golang `time.Time` and `ignite.Date` types.
+*`Date` is outdated type. It's recommended to use `Timestamp` type.
+If you still need `Date` type use `ignite.ToDate()` function when you **put** date:
 
-**`Time` is outdated type. It's recommended to use `Timestamp` type.
-If you still need `Time` type use `ignite.NativeTime2Time` and `ignite.Time2NativeTime` functions to convert between Golang `time.Time` and `ignite.Time` types.
+```go
+t := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
+err := c.CachePut("CacheGet", false, "Date", ToDate(t)) // ToDate() converts time.Time to ignite.Date
+...
+t, err = c.CacheGet("CacheGet", false, "Date") // 't' is time.Time, you don't need any converting
+```
+
+*`Time` is outdated type. It's recommended to use `Timestamp` type.
+If you still need `Time` type use `ignite.ToTime()` function when you **put** time:
+
+```go
+t := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
+err := c.CachePut("CacheGet", false, "Time", ToTime(t)) // ToTime() converts time.Time to ignite.Time (year, month and day are ignored)
+...
+t, err = c.CacheGet("CacheGet", false, "Time") // 't' is time.Time (where year=1, month=1 and day=1), you don't need any converting
+```
 
 ### SQL and Scan Queries supported operations
 
