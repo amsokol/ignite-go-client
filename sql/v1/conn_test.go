@@ -13,8 +13,7 @@ import (
 
 func TestConnect(t *testing.T) {
 	type args struct {
-		ctx context.Context
-		ci  common.ConnInfo
+		ci common.ConnInfo
 	}
 	tests := []struct {
 		name    string
@@ -25,7 +24,6 @@ func TestConnect(t *testing.T) {
 		{
 			name: "success test 1",
 			args: args{
-				ctx: context.Background(),
 				ci: common.ConnInfo{
 					URL: "tcp://localhost:10800/DriverOpen",
 					ConnInfo: ignite.ConnInfo{
@@ -44,7 +42,7 @@ func TestConnect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Connect(tt.args.ctx, tt.args.ci)
+			got, err := Connect(tt.args.ci)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Connect() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -58,7 +56,7 @@ func TestConnect(t *testing.T) {
 }
 
 func Test_conn_Close(t *testing.T) {
-	ci, err := Connect(context.Background(), common.ConnInfo{
+	ci, err := Connect(common.ConnInfo{
 		URL: "tcp://localhost:10800/DriverOpen",
 		ConnInfo: ignite.ConnInfo{
 			Network: "tcp",
@@ -97,7 +95,7 @@ func Test_conn_Close(t *testing.T) {
 }
 
 func Test_conn_ExecContext(t *testing.T) {
-	ci, err := Connect(context.Background(), common.ConnInfo{
+	ci, err := Connect(common.ConnInfo{
 		URL: "tcp://localhost:10800/ConnExecContext",
 		ConnInfo: ignite.ConnInfo{
 			Network: "tcp",
@@ -202,7 +200,7 @@ func Test_conn_ExecContext(t *testing.T) {
 }
 
 func Test_conn_QueryContext(t *testing.T) {
-	ci, err := Connect(context.Background(), common.ConnInfo{
+	ci, err := Connect(common.ConnInfo{
 		URL: "tcp://localhost:10800/ConnQueryContext",
 		ConnInfo: ignite.ConnInfo{
 			Network: "tcp",
@@ -309,7 +307,7 @@ func Test_conn_QueryContext(t *testing.T) {
 }
 
 func Test_conn_Ping(t *testing.T) {
-	ci, err := Connect(context.Background(), common.ConnInfo{
+	ci, err := Connect(common.ConnInfo{
 		URL: "tcp://localhost:10800/DriverOpen",
 		ConnInfo: ignite.ConnInfo{
 			Network: "tcp",

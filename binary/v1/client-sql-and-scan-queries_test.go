@@ -1,14 +1,13 @@
 package ignite
 
 import (
-	"context"
 	"reflect"
 	"testing"
 	"time"
 )
 
 func Test_client_QuerySQLFields(t *testing.T) {
-	c, err := Connect(context.Background(), testConnInfo)
+	c, err := Connect(testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -131,7 +130,7 @@ func Test_client_QuerySQLFields(t *testing.T) {
 }
 
 func Test_client_QuerySQLFieldsCursorGetPage(t *testing.T) {
-	c, err := Connect(context.Background(), testConnInfo)
+	c, err := Connect(testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,7 +202,7 @@ func Test_client_QuerySQLFieldsCursorGetPage(t *testing.T) {
 }
 
 func Test_client_ResourceClose(t *testing.T) {
-	c, err := Connect(context.Background(), testConnInfo)
+	c, err := Connect(testConnInfo)
 	if err != nil {
 		t.Fatal(err)
 	}

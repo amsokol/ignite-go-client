@@ -223,14 +223,12 @@ func (c *conn) QueryNexPageContext(ctx context.Context, cursorID int64) (*ignite
 }
 
 // Connect opens connection with protocol version v1
-func Connect(ctx context.Context, ci common.ConnInfo) (driver.Conn, error) {
-	var cancel context.CancelFunc
+func Connect(ci common.ConnInfo) (driver.Conn, error) {
 	if ci.Timeout > 0 {
-		ctx, cancel = context.WithTimeout(ctx, time.Duration(ci.Timeout)*time.Millisecond)
-		defer cancel()
+		ci.ConnInfo.Dealer.Timeout = time.Duration(ci.Timeout) * time.Millisecond
 	}
 
-	client, err := ignite.Connect(ctx, ci.ConnInfo)
+	client, err := ignite.Connect(ci.ConnInfo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create client: %v", err)
 	}

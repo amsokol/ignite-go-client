@@ -1,7 +1,6 @@
 package ignitesql
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"net/url"
@@ -23,15 +22,13 @@ type Driver struct {
 
 // Open a Connection to the server.
 func (d *Driver) Open(name string) (driver.Conn, error) {
-	ctx := context.Background()
-
 	ci, err := d.parseURL(name)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to parse connection name")
 	}
 	switch ci.Major {
 	case 1:
-		return v1.Connect(ctx, ci)
+		return v1.Connect(ci)
 	default:
 		return nil, errors.Errorf("unsupported protocol version: v%d.%d.%d", ci.Major, ci.Minor, ci.Patch)
 	}

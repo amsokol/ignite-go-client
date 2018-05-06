@@ -1,14 +1,12 @@
 package ignite
 
 import (
-	"context"
 	"testing"
 )
 
 func TestConnect(t *testing.T) {
 	type args struct {
-		ctx context.Context
-		ci  ConnInfo
+		ci ConnInfo
 	}
 	tests := []struct {
 		name    string
@@ -19,7 +17,6 @@ func TestConnect(t *testing.T) {
 		{
 			name: "1",
 			args: args{
-				ctx: context.Background(),
 				ci: ConnInfo{
 					Network: "tcp",
 					Host:    "localhost",
@@ -33,7 +30,6 @@ func TestConnect(t *testing.T) {
 		{
 			name: "2",
 			args: args{
-				ctx: context.Background(),
 				ci: ConnInfo{
 					Network: "tcp",
 					Host:    "localhost",
@@ -48,7 +44,7 @@ func TestConnect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Connect(tt.args.ctx, tt.args.ci)
+			got, err := Connect(tt.args.ci)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Connect() error = %v, wantErr %v", err, tt.wantErr)
 				return

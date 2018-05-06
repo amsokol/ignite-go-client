@@ -1,7 +1,7 @@
 package ignite
 
 import (
-	"context"
+	"crypto/tls"
 	"fmt"
 	"net"
 	"runtime"
@@ -17,6 +17,8 @@ type ConnInfo struct {
 	Network, Host       string
 	Port                int
 	Major, Minor, Patch int
+	Dealer              net.Dialer
+	TLSConfig           *tls.Config
 }
 
 // Client is interface to communicate with Apache Ignite cluster.
@@ -238,12 +240,17 @@ func (c *client) Close() error {
 
 // Connect connects to the Apache Ignite cluster
 // Returns: client
-func Connect(ctx context.Context, ci ConnInfo) (Client, error) {
+func Connect(ci ConnInfo) (Client, error) {
 	address := fmt.Sprintf("%s:%d", ci.Host, ci.Port)
 
 	// connect
-	d := net.Dialer{}
-	conn, err := d.DialContext(ctx, ci.Network, address)
+	var conn net.Conn
+	var err error
+	if ci.TLSConfig != nil {
+		conn, err = tls.DialWithDialer(&ci.Dealer, ci.Network, address, ci.TLSConfig)
+	} else {
+		conn, err = ci.Dealer.Dial(ci.Network, address)
+	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open connection")
 	}

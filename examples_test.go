@@ -95,10 +95,8 @@ func Test_SQL_Driver(t *testing.T) {
 }
 
 func Test_Key_Value(t *testing.T) {
-	ctx := context.Background()
-
 	// connect
-	c, err := ignite.Connect(ctx, ignite.ConnInfo{
+	c, err := ignite.Connect(ignite.ConnInfo{
 		Network: "tcp",
 		Host:    "localhost",
 		Port:    10800,
