@@ -158,3 +158,99 @@ func Test_Key_Value(t *testing.T) {
 	c1 = v.(ignite.ComplexObject)
 	log.Printf("key=\"%s\", value=\"%#v\"", "complexField1", c1)
 }
+
+func Test_SQL_Queries(t *testing.T) {
+	// connect
+	c, err := ignite.Connect(ignite.ConnInfo{
+		Network: "tcp",
+		Host:    "localhost",
+		Port:    10800,
+		Major:   1,
+		Minor:   0,
+		Patch:   0,
+		Dialer: net.Dialer{
+			Timeout: 10 * time.Second,
+		},
+	})
+	if err != nil {
+		t.Fatalf("failed connect to server: %v", err)
+	}
+	defer c.Close()
+
+	cache := "ExampleSQLQueries"
+
+	// insert data
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	_, err = c.QuerySQLFields(cache, false, ignite.QuerySQLFieldsData{
+		PageSize: 10,
+		Query: "INSERT INTO Organization(_key, name, foundDateTime) VALUES" +
+			"(?, ?, ?)," +
+			"(?, ?, ?)," +
+			"(?, ?, ?)",
+		QueryArgs: []interface{}{
+			int64(1), "Org 1", tm,
+			int64(2), "Org 2", tm,
+			int64(3), "Org 3", tm},
+	})
+	if err != nil {
+		t.Fatal("failed insert data: %v", err)
+	}
+
+	// select data using QuerySQL
+	r, err := c.QuerySQL(cache, false, ignite.QuerySQLData{
+		Table:    "Organization",
+		Query:    "SELECT * FROM Organization ORDER BY name ASC",
+		PageSize: 10000,
+	})
+	if err != nil {
+		t.Fatal("failed query data: %v", err)
+	}
+	row := r.Rows[int64(1)].(ignite.ComplexObject)
+	log.Printf("%d=\"%s\", %d=%#v", 1, row.Fields[1], 2, row.Fields[2])
+	row = r.Rows[int64(2)].(ignite.ComplexObject)
+	log.Printf("%d=\"%s\", %d=%#v", 1, row.Fields[1], 2, row.Fields[2])
+	row = r.Rows[int64(3)].(ignite.ComplexObject)
+	log.Printf("%d=\"%s\", %d=%#v", 1, row.Fields[1], 2, row.Fields[2])
+
+	// insert more data
+	_, err = c.QuerySQLFields(cache, false, ignite.QuerySQLFieldsData{
+		PageSize: 10,
+		Query: "INSERT INTO Person(_key, orgId, firstName, lastName, resume, salary) VALUES" +
+			"(?, ?, ?, ?, ?, ?)," +
+			"(?, ?, ?, ?, ?, ?)," +
+			"(?, ?, ?, ?, ?, ?)," +
+			"(?, ?, ?, ?, ?, ?)," +
+			"(?, ?, ?, ?, ?, ?)",
+		QueryArgs: []interface{}{
+			int64(4), int64(1), "First name 1", "Last name 1", "Resume 1", float64(100.0),
+			int64(5), int64(1), "First name 2", "Last name 2", "Resume 2", float64(200.0),
+			int64(6), int64(2), "First name 3", "Last name 3", "Resume 3", float64(300.0),
+			int64(7), int64(2), "First name 4", "Last name 4", "Resume 4", float64(400.0),
+			int64(8), int64(3), "First name 5", "Last name 5", "Resume 5", float64(500.0)},
+	})
+	if err != nil {
+		t.Fatal("failed insert data: %v", err)
+	}
+
+	// select data using QuerySQLFields
+	r2, err := c.QuerySQLFields(cache, false, ignite.QuerySQLFieldsData{
+		PageSize: 10,
+		Query: "SELECT " +
+			"o.name AS Name, " +
+			"o.foundDateTime AS Found, " +
+			"p.firstName AS FirstName, " +
+			"p.lastName AS LastName, " +
+			"p.salary AS Salary " +
+			"FROM Person p INNER JOIN Organization o ON p.orgId = o._key " +
+			"WHERE o._key = ? " +
+			"ORDER BY p.firstName",
+		QueryArgs: []interface{}{
+			int64(2)},
+		Timeout:           10000,
+		IncludeFieldNames: true,
+	})
+	if err != nil {
+		t.Fatal("failed query data: %v", err)
+	}
+	log.Printf("res=%#v", r2.Rows)
+}

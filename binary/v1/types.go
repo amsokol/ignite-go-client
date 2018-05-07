@@ -59,10 +59,18 @@ const (
 	// ComplexObjectVersion is version of complex format
 	ComplexObjectVersion = 1
 
-	// ComplexObjectUserType is USER_TYPE = 1
-	ComplexObjectUserType = 1
-	// ComplexObjectHasSchema is HAS_SCHEMA = 2
-	ComplexObjectHasSchema = 2
+	// ComplexObjectUserType is user type FLAG_USR_TYP = 0x0001
+	ComplexObjectUserType = 0x0001
+	// ComplexObjectHasSchema is only raw data exists FLAG_HAS_SCHEMA = 0x0002
+	ComplexObjectHasSchema = 0x0002
+	// ComplexObjectHasRaw is indicating that object has raw data FLAG_HAS_RAW = 0x0004
+	ComplexObjectHasRaw = 0x0004
+	// ComplexObjectOffsetOneByte is offsets take 1 byte FLAG_OFFSET_ONE_BYTE = 0x0008
+	ComplexObjectOffsetOneByte = 0x0008
+	// ComplexObjectOffsetTwoBytes is offsets take 2 bytes FLAG_OFFSET_TWO_BYTES = 0x0010
+	ComplexObjectOffsetTwoBytes = 0x0010
+	// ComplexObjectCompactFooter is compact footer, no field IDs. FLAG_COMPACT_FOOTER = 0x0020
+	ComplexObjectCompactFooter = 0x0020
 )
 
 // Char is Apache Ignite "char" type
@@ -965,11 +973,12 @@ func ReadComplexObject(r io.Reader) (ComplexObject, error) {
 		return ComplexObject{}, err
 	}
 	if ver != ComplexObjectVersion {
-		errors.Errorf("invalid complex object version %d, but expected %d", ver, ComplexObjectVersion)
+		return ComplexObject{}, errors.Errorf("invalid complex object version %d, but expected %d", ver, ComplexObjectVersion)
 	}
 
-	// read flags - USER_TYPE = 1, HAS_SCHEMA = 2
-	if _, err = ReadShort(r); err != nil {
+	// read flags
+	flags, err := ReadShort(r)
+	if err != nil {
 		return ComplexObject{}, err
 	}
 
@@ -1009,21 +1018,53 @@ func ReadComplexObject(r io.Reader) (ComplexObject, error) {
 
 	// read field schemas and data
 	left := size - schemaOffset
-	var i int
+	var step int32
+	if flags&ComplexObjectOffsetOneByte != 0 {
+		step = 1
+	} else if flags&ComplexObjectOffsetTwoBytes != 0 {
+		step = 2
+	} else {
+		step = 4
+	}
+	i := int32(1)
 	c := ComplexObject{Type: typeID, Fields: map[int32]interface{}{}}
 	for left > 0 {
-		// get field ID
-		fieldID, err := ReadInt(r)
-		if err != nil {
-			return ComplexObject{}, errors.Wrapf(err, "failed to read field ID with index %d", i)
+		var fieldID int32
+		if flags&ComplexObjectCompactFooter == 0 {
+			// get field ID
+			fieldID, err = ReadInt(r)
+			if err != nil {
+				return ComplexObject{}, errors.Wrapf(err, "failed to read field ID with index %d", i)
+			}
+			left -= 4
+		} else {
+			fieldID = i
 		}
-		left -= 4
+
 		// get field offset
-		fieldOffset, err := ReadInt(r)
-		if err != nil {
-			return ComplexObject{}, errors.Wrapf(err, "failed to read field offset with index %d", i)
+		var fieldOffset int
+		switch step {
+		case 1:
+			offset, err := ReadByte(r)
+			if err != nil {
+				return ComplexObject{}, errors.Wrapf(err, "failed to read field offset with index %d", i)
+			}
+			fieldOffset = int(offset)
+		case 2:
+			offset, err := ReadShort(r)
+			if err != nil {
+				return ComplexObject{}, errors.Wrapf(err, "failed to read field offset with index %d", i)
+			}
+			fieldOffset = int(offset)
+		default:
+			offset, err := ReadInt(r)
+			if err != nil {
+				return ComplexObject{}, errors.Wrapf(err, "failed to read field offset with index %d", i)
+			}
+			fieldOffset = int(offset)
 		}
-		left -= 4
+		left -= step
+
 		// read field data
 		field := bytes.NewBuffer(fields[fieldOffset-ComplexObjectHeaderLength:])
 		o, err := ReadObject(field)

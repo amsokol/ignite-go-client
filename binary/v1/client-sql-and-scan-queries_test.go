@@ -6,6 +6,141 @@ import (
 	"time"
 )
 
+func Test_client_QuerySQL(t *testing.T) {
+	c, err := Connect(testConnInfo)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	// insert test values
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	_, err = c.QuerySQLFields("QuerySQL", false, QuerySQLFieldsData{
+		PageSize: 10,
+		Query: "INSERT INTO Organization(_key, name, foundDateTime) VALUES" +
+			"(?, ?, ?)," +
+			"(?, ?, ?)," +
+			"(?, ?, ?)",
+		QueryArgs: []interface{}{
+			int64(1), "Org 1", tm,
+			int64(2), "Org 2", tm,
+			int64(3), "Org 3", tm},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		cache  string
+		binary bool
+		data   QuerySQLData
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				cache: "QuerySQL",
+				data: QuerySQLData{
+					Table:    "Organization",
+					Query:    "SELECT * FROM Organization ORDER BY name ASC",
+					PageSize: 10,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.QuerySQL(tt.args.cache, tt.args.binary, tt.args.data)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.QuerySQL() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			row := got.Rows[int64(1)].(ComplexObject)
+			if !reflect.DeepEqual(row.Fields[1], "Org 1") || !reflect.DeepEqual(row.Fields[2], tm) {
+				t.Errorf("client.QuerySQL() = %#v", got)
+			}
+			row = got.Rows[int64(2)].(ComplexObject)
+			if !reflect.DeepEqual(row.Fields[1], "Org 2") || !reflect.DeepEqual(row.Fields[2], tm) {
+				t.Errorf("client.QuerySQL() = %#v", got)
+			}
+			row = got.Rows[int64(3)].(ComplexObject)
+			if !reflect.DeepEqual(row.Fields[1], "Org 3") || !reflect.DeepEqual(row.Fields[2], tm) {
+				t.Errorf("client.QuerySQL() = %#v", got)
+			}
+		})
+	}
+}
+
+func Test_client_QuerySQLCursorGetPage(t *testing.T) {
+	c, err := Connect(testConnInfo)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Close()
+	// insert test values
+	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	_, err = c.QuerySQLFields("QuerySQLCursorGetPage", false, QuerySQLFieldsData{
+		PageSize: 10,
+		Query: "INSERT INTO Organization(_key, name, foundDateTime) VALUES" +
+			"(?, ?, ?)," +
+			"(?, ?, ?)," +
+			"(?, ?, ?)",
+		QueryArgs: []interface{}{
+			int64(1), "Org 1", tm,
+			int64(2), "Org 2", tm,
+			int64(3), "Org 3", tm},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := c.QuerySQL("QuerySQLCursorGetPage", false, QuerySQLData{
+		Table:    "Organization",
+		Query:    "SELECT * FROM Organization ORDER BY name ASC",
+		PageSize: 2,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		id int64
+	}
+	tests := []struct {
+		name    string
+		c       Client
+		args    args
+		want    QuerySQLPage
+		wantErr bool
+	}{
+		{
+			name: "1",
+			c:    c,
+			args: args{
+				id: r.ID,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.c.QuerySQLCursorGetPage(tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("client.QuerySQLCursorGetPage() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			row := got.Rows[int64(3)].(ComplexObject)
+			if !reflect.DeepEqual(row.Fields[1], "Org 3") || !reflect.DeepEqual(row.Fields[2], tm) {
+				t.Errorf("client.QuerySQL() = %#v", got)
+			}
+		})
+	}
+}
+
 func Test_client_QuerySQLFields(t *testing.T) {
 	c, err := Connect(testConnInfo)
 	if err != nil {

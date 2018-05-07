@@ -71,7 +71,9 @@ defer c.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L98) for more.
+See [example of Key-Value Queries](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L98) for more.
+
+See [example of SQL Queries](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L162) for more.
 
 See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for other examples.
 
@@ -248,8 +250,8 @@ log.Printf("key=\"%s\", value=\"%#v\"", "complexField1", c1)
 
 | Operation                           | Status of implementation                                |
 |-------------------------------------|---------------------------------------------------------|
-| OP_QUERY_SQL                        | Done without unit test. Need help to develop unit test. |
-| OP_QUERY_SQL_CURSOR_GET_PAGE        | Done without unit test. Need help to develop unit test. |
+| OP_QUERY_SQL                        | Done.                                                   |
+| OP_QUERY_SQL_CURSOR_GET_PAGE        | Done.                                                   |
 | OP_QUERY_SQL_FIELDS                 | Done.                                                   |
 | OP_QUERY_SQL_FIELDS_CURSOR_GET_PAGE | Done.                                                   |
 | OP_QUERY_SCAN                       | Not started. Need help.                                 |

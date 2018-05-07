@@ -44,11 +44,8 @@ type QuerySQLData struct {
 
 // QuerySQLPage is query result page
 type QuerySQLPage struct {
-	// Keys (field names)
-	Keys []interface{}
-
-	// Values
-	Values []interface{}
+	// Key -> Values
+	Rows map[interface{}]interface{}
 
 	// Indicates whether more results are available to be fetched with QuerySQLCursorGetPage.
 	// When true, query cursor is closed automatically.
@@ -143,7 +140,7 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 	req := NewRequestOperation(OpQuerySQL)
 	res := NewResponseOperation(req.UID)
 
-	var r QuerySQLResult
+	r := QuerySQLResult{QuerySQLPage: QuerySQLPage{Rows: map[interface{}]interface{}{}}}
 	var err error
 
 	// set parameters
@@ -208,8 +205,6 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 	if err != nil {
 		return r, errors.Wrapf(err, "failed to read row count")
 	}
-	r.Keys = make([]interface{}, 0, int(count))
-	r.Values = make([]interface{}, 0, int(count))
 	// read data
 	for i := 0; i < int(count); i++ {
 		key, err := ReadObject(res)
@@ -220,8 +215,7 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 		if err != nil {
 			return r, errors.Wrapf(err, "failed to read value with index %d", i)
 		}
-		r.Keys = append(r.Keys, key)
-		r.Values = append(r.Values, value)
+		r.Rows[key] = value
 	}
 	if r.HasMore, err = ReadBool(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read has more flag")
@@ -235,7 +229,7 @@ func (c *client) QuerySQLCursorGetPage(id int64) (QuerySQLPage, error) {
 	req := NewRequestOperation(OpQuerySQLCursorGetPage)
 	res := NewResponseOperation(req.UID)
 
-	var r QuerySQLPage
+	r := QuerySQLPage{Rows: map[interface{}]interface{}{}}
 	var err error
 
 	// set parameters
@@ -256,8 +250,6 @@ func (c *client) QuerySQLCursorGetPage(id int64) (QuerySQLPage, error) {
 	if err != nil {
 		return r, errors.Wrapf(err, "failed to read row count")
 	}
-	r.Keys = make([]interface{}, 0, int(count))
-	r.Values = make([]interface{}, 0, int(count))
 	// read data
 	for i := 0; i < int(count); i++ {
 		key, err := ReadObject(res)
@@ -268,8 +260,7 @@ func (c *client) QuerySQLCursorGetPage(id int64) (QuerySQLPage, error) {
 		if err != nil {
 			return r, errors.Wrapf(err, "failed to read value with index %d", i)
 		}
-		r.Keys = append(r.Keys, key)
-		r.Values = append(r.Values, value)
+		r.Rows[key] = value
 	}
 	if r.HasMore, err = ReadBool(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read has more flag")

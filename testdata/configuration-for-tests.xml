@@ -162,6 +162,58 @@
                     <property name="writeSynchronizationMode" value="FULL_SYNC"/>
                 </bean>
                 <bean class="org.apache.ignite.configuration.CacheConfiguration">
+                    <property name="name" value="QuerySQL"/>
+                    <property name="cacheMode" value="PARTITIONED"/>
+                    <property name="atomicityMode" value="TRANSACTIONAL"/>
+                    <property name="writeSynchronizationMode" value="FULL_SYNC"/>
+
+                    <property name="queryEntities">
+                        <list>
+                            <bean class="org.apache.ignite.cache.QueryEntity">
+                                <property name="keyType" value="java.lang.Long"/>
+                                <property name="valueType" value="Organization"/>
+
+                                <property name="fields">
+                                    <map>
+                                        <entry key="name" value="java.lang.String"/>
+                                        <entry key="foundDateTime" value="java.sql.Timestamp"/>
+                                    </map>
+                                </property>
+
+                                <property name="keyFields">
+                                    <list></list>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.apache.ignite.configuration.CacheConfiguration">
+                    <property name="name" value="QuerySQLCursorGetPage"/>
+                    <property name="cacheMode" value="PARTITIONED"/>
+                    <property name="atomicityMode" value="TRANSACTIONAL"/>
+                    <property name="writeSynchronizationMode" value="FULL_SYNC"/>
+
+                    <property name="queryEntities">
+                        <list>
+                            <bean class="org.apache.ignite.cache.QueryEntity">
+                                <property name="keyType" value="java.lang.Long"/>
+                                <property name="valueType" value="Organization"/>
+
+                                <property name="fields">
+                                    <map>
+                                        <entry key="name" value="java.lang.String"/>
+                                        <entry key="foundDateTime" value="java.sql.Timestamp"/>
+                                    </map>
+                                </property>
+
+                                <property name="keyFields">
+                                    <list></list>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean class="org.apache.ignite.configuration.CacheConfiguration">
                     <property name="name" value="QuerySQLFields"/>
                     <property name="cacheMode" value="PARTITIONED"/>
                     <property name="atomicityMode" value="TRANSACTIONAL"/>
@@ -524,26 +576,58 @@
                             </bean>
                         </list>
                     </property>
-                    <!-- 
-                    <property name="clientConnectorConfiguration">
-                        <bean class="org.apache.ignite.configuration.ClientConnectorConfiguration">
-                            <property name="host" value="127.0.0.1"/>
-                            <property name="port" value="11110"/>
-                            <property name="portRange" value="10"/>
-                            <property name="sslEnabled" value="true"/>
-                            <property name="useIgniteSslContextFactory" value="false"/>
-                            <property name="sslClientAuth" value="true"/>
-                            <property name="sslContextFactory">
-                                <bean class="org.apache.ignite.ssl.SslContextFactory">
-                                    <property name="keyStoreFilePath" value="./ssl/server.jks"/>
-                                    <property name="keyStorePassword" value="123456"/>
-                                    <property name="trustStoreFilePath" value="./ssl/trust.jks"/>
-                                    <property name="trustStorePassword" value="123456"/>
-                                </bean>
-                            </property>
-                        </bean>
+                </bean>
+                <bean class="org.apache.ignite.configuration.CacheConfiguration">
+                    <property name="name" value="ExampleSQLQueries"/>
+                    <property name="cacheMode" value="PARTITIONED"/>
+                    <property name="atomicityMode" value="TRANSACTIONAL"/>
+                    <property name="writeSynchronizationMode" value="FULL_SYNC"/>
+
+                    <property name="queryEntities">
+                        <list>
+                            <bean class="org.apache.ignite.cache.QueryEntity">
+                                <property name="keyType" value="java.lang.Long"/>
+                                <property name="valueType" value="Person"/>
+
+                                <property name="fields">
+                                    <map>
+                                        <entry key="orgId" value="java.lang.Long"/>
+                                        <entry key="firstName" value="java.lang.String"/>
+                                        <entry key="lastName" value="java.lang.String"/>
+                                        <entry key="resume" value="java.lang.String"/>
+                                        <entry key="salary" value="java.lang.Double"/>
+                                    </map>
+                                </property>
+
+                                <property name="keyFields">
+                                    <list></list>
+                                </property>
+
+                                <property name="indexes">
+                                    <list>
+                                        <bean class="org.apache.ignite.cache.QueryIndex">
+                                            <constructor-arg value="orgId"/>
+                                        </bean>
+                                    </list>
+                                </property>
+                            </bean>
+                            <bean class="org.apache.ignite.cache.QueryEntity">
+                                <property name="keyType" value="java.lang.Long"/>
+                                <property name="valueType" value="Organization"/>
+
+                                <property name="fields">
+                                    <map>
+                                        <entry key="name" value="java.lang.String"/>
+                                        <entry key="foundDateTime" value="java.sql.Timestamp"/>
+                                    </map>
+                                </property>
+
+                                <property name="keyFields">
+                                    <list></list>
+                                </property>
+                            </bean>
+                        </list>
                     </property>
-                    -->
                 </bean>
             </list>
         </property>
@@ -569,5 +653,25 @@
                 </property>
             </bean>
         </property>
+        <!-- 
+        <property name="clientConnectorConfiguration">
+            <bean class="org.apache.ignite.configuration.ClientConnectorConfiguration">
+                <property name="host" value="127.0.0.1"/>
+                <property name="port" value="11110"/>
+                <property name="portRange" value="10"/>
+                <property name="sslEnabled" value="true"/>
+                <property name="useIgniteSslContextFactory" value="false"/>
+                <property name="sslClientAuth" value="true"/>
+                <property name="sslContextFactory">
+                    <bean class="org.apache.ignite.ssl.SslContextFactory">
+                        <property name="keyStoreFilePath" value="./ssl/server.jks"/>
+                        <property name="keyStorePassword" value="123456"/>
+                        <property name="trustStoreFilePath" value="./ssl/trust.jks"/>
+                        <property name="trustStorePassword" value="123456"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        -->
     </bean>
 </beans>
