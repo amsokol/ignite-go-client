@@ -193,7 +193,7 @@ func Test_SQL_Queries(t *testing.T) {
 			int64(3), "Org 3", tm},
 	})
 	if err != nil {
-		t.Fatal("failed insert data: %v", err)
+		t.Fatalf("failed insert data: %v", err)
 	}
 
 	// select data using QuerySQL
@@ -203,7 +203,7 @@ func Test_SQL_Queries(t *testing.T) {
 		PageSize: 10000,
 	})
 	if err != nil {
-		t.Fatal("failed query data: %v", err)
+		t.Fatalf("failed query data: %v", err)
 	}
 	row := r.Rows[int64(1)].(ignite.ComplexObject)
 	log.Printf("%d=\"%s\", %d=%#v", 1, row.Fields[1], 2, row.Fields[2])
@@ -229,7 +229,7 @@ func Test_SQL_Queries(t *testing.T) {
 			int64(8), int64(3), "First name 5", "Last name 5", "Resume 5", float64(500.0)},
 	})
 	if err != nil {
-		t.Fatal("failed insert data: %v", err)
+		t.Fatalf("failed insert data: %v", err)
 	}
 
 	// select data using QuerySQLFields
@@ -250,7 +250,7 @@ func Test_SQL_Queries(t *testing.T) {
 		IncludeFieldNames: true,
 	})
 	if err != nil {
-		t.Fatal("failed query data: %v", err)
+		t.Fatalf("failed query data: %v", err)
 	}
 	log.Printf("res=%#v", r2.Rows)
 }
