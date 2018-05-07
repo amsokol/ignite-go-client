@@ -17,19 +17,19 @@ type RequestHandshake struct {
 // WriteTo is function to write handshake request data to io.Writer.
 // Returns written bytes.
 func (r *RequestHandshake) WriteTo(w io.Writer) (int64, error) {
-	if err := r.WriteByte(1); err != nil {
+	if err := WriteByte(r, 1); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake code")
 	}
-	if err := r.WriteShort(int16(r.major)); err != nil {
+	if err := WriteShort(r, int16(r.major)); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake version major")
 	}
-	if err := r.WriteShort(int16(r.minor)); err != nil {
+	if err := WriteShort(r, int16(r.minor)); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake version minor")
 	}
-	if err := r.WriteShort(int16(r.patch)); err != nil {
+	if err := WriteShort(r, int16(r.patch)); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake version patch")
 	}
-	if err := r.WriteByte(2); err != nil {
+	if err := WriteByte(r, 2); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake client code")
 	}
 

@@ -55,6 +55,13 @@ func Test_client_CacheGet(t *testing.T) {
 	tm6 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123), time.UTC)
 	tm7 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123), time.UTC)
 	c.CachePut("CacheGet", false, "Time array", []Time{ToTime(tm5), ToTime(tm6), ToTime(tm7)})
+	v := NewComplexObject("TestComplexObject")
+	v.Set("field1", "value 1")
+	v.Set("field2", int64(2))
+	v.Set("field3", true)
+	if err = c.CachePut("CacheGet", false, "complex object", v); err != nil {
+		t.Fatal(err)
+	}
 
 	type args struct {
 		cache  string
@@ -311,6 +318,15 @@ func Test_client_CacheGet(t *testing.T) {
 			},
 			want: nil,
 		},
+		{
+			name: "complex object",
+			c:    c,
+			args: args{
+				cache: "CacheGet",
+				key:   "complex object",
+			},
+			want: v,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -319,8 +335,32 @@ func Test_client_CacheGet(t *testing.T) {
 				t.Errorf("client.CacheGet() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("client.CacheGet() = %#v, want %#v", got, tt.want)
+			if got != nil {
+				switch got.(type) {
+				case ComplexObject:
+					c1 := got.(ComplexObject)
+					c2 := tt.want.(ComplexObject)
+					if !reflect.DeepEqual(c1.Type, c2.Type) {
+						t.Errorf("client.CacheGet() = %#v, want %#v", got, tt.want)
+					} else {
+						for k := range c1.Fields {
+							v1 := c1.Fields[k]
+							v2 := c2.Fields[k]
+							if !reflect.DeepEqual(v1, v2) {
+								t.Errorf("client.CacheGet() = %#v, want %#v", got, tt.want)
+								break
+							}
+						}
+					}
+				default:
+					if !reflect.DeepEqual(got, tt.want) {
+						t.Errorf("client.CacheGet() = %#v, want %#v", got, tt.want)
+					}
+				}
+			} else {
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Errorf("client.CacheGet() = %#v, want %#v", got, tt.want)
+				}
 			}
 		})
 	}

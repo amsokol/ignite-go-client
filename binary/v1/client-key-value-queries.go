@@ -26,13 +26,13 @@ func (c *client) CacheGet(cache string, binary bool, key interface{}) (interface
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache key")
 	}
 
@@ -44,7 +44,7 @@ func (c *client) CacheGet(cache string, binary bool, key interface{}) (interface
 		return nil, err
 	}
 
-	return res.ReadObject()
+	return ReadObject((res))
 }
 
 // CacheGetAll retrieves multiple key-value pairs from cache.
@@ -54,17 +54,17 @@ func (c *client) CacheGetAll(cache string, binary bool, keys []interface{}) (map
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteInt(int32(len(keys))); err != nil {
+	if err := WriteInt(req, int32(len(keys))); err != nil {
 		return nil, errors.Wrapf(err, "failed to write key count")
 	}
 	for i, k := range keys {
-		if err := req.WriteObject(k); err != nil {
+		if err := WriteObject(req, k); err != nil {
 			return nil, errors.Wrapf(err, "failed to write cache key with index %d", i)
 		}
 	}
@@ -78,17 +78,17 @@ func (c *client) CacheGetAll(cache string, binary bool, keys []interface{}) (map
 	}
 
 	// read response data
-	count, err := res.ReadInt()
+	count, err := ReadInt(res)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to read pairs count")
 	}
 	data := map[interface{}]interface{}{}
 	for i := 0; i < int(count); i++ {
-		key, err := res.ReadObject()
+		key, err := ReadObject(res)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read key with index %d", i)
 		}
-		value, err := res.ReadObject()
+		value, err := ReadObject(res)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to read value with index %d", i)
 		}
@@ -105,16 +105,16 @@ func (c *client) CachePut(cache string, binary bool, key interface{}, value inte
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(value); err != nil {
+	if err := WriteObject(req, value); err != nil {
 		return errors.Wrapf(err, "failed to write cache value")
 	}
 
@@ -133,20 +133,20 @@ func (c *client) CachePutAll(cache string, binary bool, data map[interface{}]int
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteInt(int32(len(data))); err != nil {
+	if err := WriteInt(req, int32(len(data))); err != nil {
 		return errors.Wrapf(err, "failed to write key count")
 	}
 	for k, v := range data {
-		if err := req.WriteObject(k); err != nil {
+		if err := WriteObject(req, k); err != nil {
 			return errors.Wrapf(err, "failed to write cache key")
 		}
-		if err := req.WriteObject(v); err != nil {
+		if err := WriteObject(req, v); err != nil {
 			return errors.Wrapf(err, "failed to write cache value")
 		}
 	}
@@ -166,13 +166,13 @@ func (c *client) CacheContainsKey(cache string, binary bool, key interface{}) (b
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache key")
 	}
 
@@ -184,7 +184,7 @@ func (c *client) CacheContainsKey(cache string, binary bool, key interface{}) (b
 		return false, err
 	}
 
-	return res.ReadBool()
+	return ReadBool(res)
 }
 
 // CacheContainsKeys returns a value indicating whether all given keys are present in cache.
@@ -194,17 +194,17 @@ func (c *client) CacheContainsKeys(cache string, binary bool, keys []interface{}
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteInt(int32(len(keys))); err != nil {
+	if err := WriteInt(req, int32(len(keys))); err != nil {
 		return false, errors.Wrapf(err, "failed to write key count")
 	}
 	for i, k := range keys {
-		if err := req.WriteObject(k); err != nil {
+		if err := WriteObject(req, k); err != nil {
 			return false, errors.Wrapf(err, "failed to write cache key with index %d", i)
 		}
 	}
@@ -217,7 +217,7 @@ func (c *client) CacheContainsKeys(cache string, binary bool, keys []interface{}
 		return false, err
 	}
 
-	return res.ReadBool()
+	return ReadBool(res)
 }
 
 // CacheGetAndPut puts a value with a given key to cache, and returns the previous value for that key.
@@ -227,16 +227,16 @@ func (c *client) CacheGetAndPut(cache string, binary bool, key interface{}, valu
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(value); err != nil {
+	if err := WriteObject(req, value); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache value")
 	}
 
@@ -248,7 +248,7 @@ func (c *client) CacheGetAndPut(cache string, binary bool, key interface{}, valu
 		return nil, err
 	}
 
-	return res.ReadObject()
+	return ReadObject(res)
 }
 
 // CacheGetAndReplace puts a value with a given key to cache, returning previous value for that key,
@@ -259,16 +259,16 @@ func (c *client) CacheGetAndReplace(cache string, binary bool, key interface{}, 
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(value); err != nil {
+	if err := WriteObject(req, value); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache value")
 	}
 
@@ -280,7 +280,7 @@ func (c *client) CacheGetAndReplace(cache string, binary bool, key interface{}, 
 		return nil, err
 	}
 
-	return res.ReadObject()
+	return ReadObject(res)
 }
 
 // CacheGetAndRemove removes the cache entry with specified key, returning the value.
@@ -290,13 +290,13 @@ func (c *client) CacheGetAndRemove(cache string, binary bool, key interface{}) (
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache key")
 	}
 
@@ -308,7 +308,7 @@ func (c *client) CacheGetAndRemove(cache string, binary bool, key interface{}) (
 		return nil, err
 	}
 
-	return res.ReadObject()
+	return ReadObject(res)
 }
 
 // CachePutIfAbsent puts a value with a given key to cache only if the key does not already exist.
@@ -318,16 +318,16 @@ func (c *client) CachePutIfAbsent(cache string, binary bool, key interface{}, va
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(value); err != nil {
+	if err := WriteObject(req, value); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache value")
 	}
 
@@ -339,7 +339,7 @@ func (c *client) CachePutIfAbsent(cache string, binary bool, key interface{}, va
 		return false, err
 	}
 
-	return res.ReadBool()
+	return ReadBool(res)
 }
 
 // CacheGetAndPutIfAbsent puts a value with a given key to cache only if the key does not already exist.
@@ -349,16 +349,16 @@ func (c *client) CacheGetAndPutIfAbsent(cache string, binary bool, key interface
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(value); err != nil {
+	if err := WriteObject(req, value); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache value")
 	}
 
@@ -370,7 +370,7 @@ func (c *client) CacheGetAndPutIfAbsent(cache string, binary bool, key interface
 		return nil, err
 	}
 
-	return res.ReadObject()
+	return ReadObject(res)
 }
 
 // CacheReplace puts a value with a given key to cache only if the key already exists.
@@ -380,16 +380,16 @@ func (c *client) CacheReplace(cache string, binary bool, key interface{}, value 
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(value); err != nil {
+	if err := WriteObject(req, value); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache value")
 	}
 
@@ -401,7 +401,7 @@ func (c *client) CacheReplace(cache string, binary bool, key interface{}, value 
 		return false, err
 	}
 
-	return res.ReadBool()
+	return ReadBool(res)
 }
 
 // CacheReplaceIfEquals puts a value with a given key to cache only if
@@ -412,19 +412,19 @@ func (c *client) CacheReplaceIfEquals(cache string, binary bool, key interface{}
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(valueCompare); err != nil {
+	if err := WriteObject(req, valueCompare); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache value to compare")
 	}
-	if err := req.WriteObject(valueNew); err != nil {
+	if err := WriteObject(req, valueNew); err != nil {
 		return false, errors.Wrapf(err, "failed to write new cache value")
 	}
 
@@ -436,7 +436,7 @@ func (c *client) CacheReplaceIfEquals(cache string, binary bool, key interface{}
 		return false, err
 	}
 
-	return res.ReadBool()
+	return ReadBool(res)
 }
 
 // CacheClear clears the cache without notifying listeners or cache writers.
@@ -446,10 +446,10 @@ func (c *client) CacheClear(cache string, binary bool) error {
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
 
@@ -467,13 +467,13 @@ func (c *client) CacheClearKey(cache string, binary bool, key interface{}) error
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return errors.Wrapf(err, "failed to write cache key")
 	}
 
@@ -491,17 +491,17 @@ func (c *client) CacheClearKeys(cache string, binary bool, keys []interface{}) e
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteInt(int32(len(keys))); err != nil {
+	if err := WriteInt(req, int32(len(keys))); err != nil {
 		return errors.Wrapf(err, "failed to write key count")
 	}
 	for i, k := range keys {
-		if err := req.WriteObject(k); err != nil {
+		if err := WriteObject(req, k); err != nil {
 			return errors.Wrapf(err, "failed to write cache key with index %d", i)
 		}
 	}
@@ -521,13 +521,13 @@ func (c *client) CacheRemoveKey(cache string, binary bool, key interface{}) (boo
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache key")
 	}
 
@@ -539,7 +539,7 @@ func (c *client) CacheRemoveKey(cache string, binary bool, key interface{}) (boo
 		return false, err
 	}
 
-	return res.ReadBool()
+	return ReadBool(res)
 }
 
 // CacheRemoveIfEquals removes an entry with a given key if provided value is equal to actual value,
@@ -550,16 +550,16 @@ func (c *client) CacheRemoveIfEquals(cache string, binary bool, key interface{},
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return false, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteObject(key); err != nil {
+	if err := WriteObject(req, key); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache key")
 	}
-	if err := req.WriteObject(value); err != nil {
+	if err := WriteObject(req, value); err != nil {
 		return false, errors.Wrapf(err, "failed to write cache value")
 	}
 
@@ -571,7 +571,7 @@ func (c *client) CacheRemoveIfEquals(cache string, binary bool, key interface{},
 		return false, err
 	}
 
-	return res.ReadBool()
+	return ReadBool(res)
 }
 
 // CacheGetSize gets the number of entries in cache.
@@ -581,22 +581,22 @@ func (c *client) CacheGetSize(cache string, binary bool, modes []byte) (int64, e
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return 0, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return 0, errors.Wrapf(err, "failed to write binary flag")
 	}
 	var count int32
 	if modes != nil || len(modes) > 0 {
 		count = int32(len(modes))
 	}
-	if err := req.WriteInt(count); err != nil {
+	if err := WriteInt(req, count); err != nil {
 		return 0, errors.Wrapf(err, "failed to write binary flag")
 	}
 	if count > 0 {
 		for i, m := range modes {
-			if err := req.WriteByte(m); err != nil {
+			if err := WriteByte(req, m); err != nil {
 				return 0, errors.Wrapf(err, "failed to write mode with index %d", i)
 			}
 		}
@@ -610,7 +610,7 @@ func (c *client) CacheGetSize(cache string, binary bool, modes []byte) (int64, e
 		return 0, err
 	}
 
-	return res.ReadLong()
+	return ReadLong(res)
 }
 
 // CacheRemoveKeys removes entries with given keys, notifying listeners and cache writers.
@@ -620,17 +620,17 @@ func (c *client) CacheRemoveKeys(cache string, binary bool, keys []interface{}) 
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := req.WriteInt(int32(len(keys))); err != nil {
+	if err := WriteInt(req, int32(len(keys))); err != nil {
 		return errors.Wrapf(err, "failed to write key count")
 	}
 	for i, k := range keys {
-		if err := req.WriteObject(k); err != nil {
+		if err := WriteObject(req, k); err != nil {
 			return errors.Wrapf(err, "failed to write cache key with index %d", i)
 		}
 	}
@@ -650,10 +650,10 @@ func (c *client) CacheRemoveAll(cache string, binary bool) error {
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
 

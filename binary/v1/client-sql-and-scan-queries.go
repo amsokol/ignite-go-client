@@ -147,16 +147,16 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 	var err error
 
 	// set parameters
-	if err = req.WriteInt(HashCode(cache)); err != nil {
+	if err = WriteInt(req, HashCode(cache)); err != nil {
 		return r, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err = req.WriteBool(binary); err != nil {
+	if err = WriteBool(req, binary); err != nil {
 		return r, errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err = req.WriteOString(data.Table); err != nil {
+	if err = WriteOString(req, data.Table); err != nil {
 		return r, errors.Wrapf(err, "failed to write table name")
 	}
-	if err = req.WriteOString(data.Query); err != nil {
+	if err = WriteOString(req, data.Query); err != nil {
 		return r, errors.Wrapf(err, "failed to write query")
 	}
 
@@ -165,30 +165,30 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 		l = int32(len(data.QueryArgs))
 	}
 	// write args
-	if err = req.WriteInt(l); err != nil {
+	if err = WriteInt(req, l); err != nil {
 		return r, errors.Wrapf(err, "failed to write query arg count")
 	}
 	if l > 0 {
 		for i, v := range data.QueryArgs {
-			if err = req.WriteObject(v); err != nil {
+			if err = WriteObject(req, v); err != nil {
 				return r, errors.Wrapf(err, "failed to write query arg with index %d", i)
 			}
 		}
 	}
 
-	if err = req.WriteBool(data.DistributedJoins); err != nil {
+	if err = WriteBool(req, data.DistributedJoins); err != nil {
 		return r, errors.Wrapf(err, "failed to write distributed joins flag")
 	}
-	if err = req.WriteBool(data.LocalQuery); err != nil {
+	if err = WriteBool(req, data.LocalQuery); err != nil {
 		return r, errors.Wrapf(err, "failed to write local query flag")
 	}
-	if err = req.WriteBool(data.ReplicatedOnly); err != nil {
+	if err = WriteBool(req, data.ReplicatedOnly); err != nil {
 		return r, errors.Wrapf(err, "failed to write replicated only flag")
 	}
-	if err = req.WriteInt(int32(data.PageSize)); err != nil {
+	if err = WriteInt(req, int32(data.PageSize)); err != nil {
 		return r, errors.Wrapf(err, "failed to write page size")
 	}
-	if err = req.WriteLong(data.Timeout); err != nil {
+	if err = WriteLong(req, data.Timeout); err != nil {
 		return r, errors.Wrapf(err, "failed to write timeout")
 	}
 
@@ -201,10 +201,10 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 	}
 
 	// process result
-	if r.ID, err = res.ReadLong(); err != nil {
+	if r.ID, err = ReadLong(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read cursor ID")
 	}
-	count, err := res.ReadInt()
+	count, err := ReadInt(res)
 	if err != nil {
 		return r, errors.Wrapf(err, "failed to read row count")
 	}
@@ -212,18 +212,18 @@ func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQ
 	r.Values = make([]interface{}, 0, int(count))
 	// read data
 	for i := 0; i < int(count); i++ {
-		key, err := res.ReadObject()
+		key, err := ReadObject(res)
 		if err != nil {
 			return r, errors.Wrapf(err, "failed to read key with index %d", i)
 		}
-		value, err := res.ReadObject()
+		value, err := ReadObject(res)
 		if err != nil {
 			return r, errors.Wrapf(err, "failed to read value with index %d", i)
 		}
 		r.Keys = append(r.Keys, key)
 		r.Values = append(r.Values, value)
 	}
-	if r.HasMore, err = res.ReadBool(); err != nil {
+	if r.HasMore, err = ReadBool(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read has more flag")
 	}
 	return r, nil
@@ -239,7 +239,7 @@ func (c *client) QuerySQLCursorGetPage(id int64) (QuerySQLPage, error) {
 	var err error
 
 	// set parameters
-	if err = req.WriteLong(id); err != nil {
+	if err = WriteLong(req, id); err != nil {
 		return r, errors.Wrapf(err, "failed to write cursor id")
 	}
 
@@ -252,7 +252,7 @@ func (c *client) QuerySQLCursorGetPage(id int64) (QuerySQLPage, error) {
 	}
 
 	// process result
-	count, err := res.ReadInt()
+	count, err := ReadInt(res)
 	if err != nil {
 		return r, errors.Wrapf(err, "failed to read row count")
 	}
@@ -260,18 +260,18 @@ func (c *client) QuerySQLCursorGetPage(id int64) (QuerySQLPage, error) {
 	r.Values = make([]interface{}, 0, int(count))
 	// read data
 	for i := 0; i < int(count); i++ {
-		key, err := res.ReadObject()
+		key, err := ReadObject(res)
 		if err != nil {
 			return r, errors.Wrapf(err, "failed to read key with index %d", i)
 		}
-		value, err := res.ReadObject()
+		value, err := ReadObject(res)
 		if err != nil {
 			return r, errors.Wrapf(err, "failed to read value with index %d", i)
 		}
 		r.Keys = append(r.Keys, key)
 		r.Values = append(r.Values, value)
 	}
-	if r.HasMore, err = res.ReadBool(); err != nil {
+	if r.HasMore, err = ReadBool(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read has more flag")
 	}
 
@@ -286,28 +286,28 @@ func (c *client) QuerySQLFieldsRaw(cache string, binary bool, data QuerySQLField
 	var err error
 
 	// set parameters
-	if err := req.WriteInt(HashCode(cache)); err != nil {
+	if err := WriteInt(req, HashCode(cache)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cache name")
 	}
-	if err := req.WriteBool(binary); err != nil {
+	if err := WriteBool(req, binary); err != nil {
 		return nil, errors.Wrapf(err, "failed to write binary flag")
 	}
 	if len(data.Schema) > 0 {
-		if err := req.WriteOString(data.Schema); err != nil {
+		if err := WriteOString(req, data.Schema); err != nil {
 			return nil, errors.Wrapf(err, "failed to write schema for the query")
 		}
 	} else {
-		if err := req.WriteNull(); err != nil {
+		if err := WriteNull(req); err != nil {
 			return nil, errors.Wrapf(err, "failed to write nil for schema for the query")
 		}
 	}
-	if err = req.WriteInt(int32(data.PageSize)); err != nil {
+	if err = WriteInt(req, int32(data.PageSize)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write page size")
 	}
-	if err = req.WriteInt(int32(data.MaxRows)); err != nil {
+	if err = WriteInt(req, int32(data.MaxRows)); err != nil {
 		return nil, errors.Wrapf(err, "failed to write max rows")
 	}
-	if err = req.WriteOString(data.Query); err != nil {
+	if err = WriteOString(req, data.Query); err != nil {
 		return nil, errors.Wrapf(err, "failed to write query")
 	}
 
@@ -316,42 +316,42 @@ func (c *client) QuerySQLFieldsRaw(cache string, binary bool, data QuerySQLField
 		l = int32(len(data.QueryArgs))
 	}
 	// write args
-	if err = req.WriteInt(l); err != nil {
+	if err = WriteInt(req, l); err != nil {
 		return nil, errors.Wrapf(err, "failed to write query arg count")
 	}
 	if l > 0 {
 		for i, v := range data.QueryArgs {
-			if err = req.WriteObject(v); err != nil {
+			if err = WriteObject(req, v); err != nil {
 				return nil, errors.Wrapf(err, "failed to write query arg with index %d", i)
 			}
 		}
 	}
 
-	if err = req.WriteByte(data.StatementType); err != nil {
+	if err = WriteByte(req, data.StatementType); err != nil {
 		return nil, errors.Wrapf(err, "failed to write statement type")
 	}
-	if err = req.WriteBool(data.DistributedJoins); err != nil {
+	if err = WriteBool(req, data.DistributedJoins); err != nil {
 		return nil, errors.Wrapf(err, "failed to write distributed joins flag")
 	}
-	if err = req.WriteBool(data.LocalQuery); err != nil {
+	if err = WriteBool(req, data.LocalQuery); err != nil {
 		return nil, errors.Wrapf(err, "failed to write local query flag")
 	}
-	if err = req.WriteBool(data.ReplicatedOnly); err != nil {
+	if err = WriteBool(req, data.ReplicatedOnly); err != nil {
 		return nil, errors.Wrapf(err, "failed to write replicated only flag")
 	}
-	if err = req.WriteBool(data.EnforceJoinOrder); err != nil {
+	if err = WriteBool(req, data.EnforceJoinOrder); err != nil {
 		return nil, errors.Wrapf(err, "failed to write enforce join order flag")
 	}
-	if err = req.WriteBool(data.Collocated); err != nil {
+	if err = WriteBool(req, data.Collocated); err != nil {
 		return nil, errors.Wrapf(err, "failed to write collocated flag")
 	}
-	if err = req.WriteBool(data.LazyQuery); err != nil {
+	if err = WriteBool(req, data.LazyQuery); err != nil {
 		return nil, errors.Wrapf(err, "failed to write lazy query flag")
 	}
-	if err = req.WriteLong(data.Timeout); err != nil {
+	if err = WriteLong(req, data.Timeout); err != nil {
 		return nil, errors.Wrapf(err, "failed to write timeout")
 	}
-	if err = req.WriteBool(data.IncludeFieldNames); err != nil {
+	if err = WriteBool(req, data.IncludeFieldNames); err != nil {
 		return nil, errors.Wrapf(err, "failed to write include field names flag")
 	}
 
@@ -376,10 +376,10 @@ func (c *client) QuerySQLFields(cache string, binary bool, data QuerySQLFieldsDa
 	}
 
 	// read field names
-	if r.ID, err = res.ReadLong(); err != nil {
+	if r.ID, err = ReadLong(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read cursor ID")
 	}
-	fieldCount, err := res.ReadInt()
+	fieldCount, err := ReadInt(res)
 	if err != nil {
 		return r, errors.Wrapf(err, "failed to read field count")
 	}
@@ -388,7 +388,7 @@ func (c *client) QuerySQLFields(cache string, binary bool, data QuerySQLFieldsDa
 		r.Fields = make([]string, 0, fieldCount)
 		for i := 0; i < r.FieldCount; i++ {
 			var s string
-			if s, err = res.ReadOString(); err != nil {
+			if s, err = ReadOString(res); err != nil {
 				return r, errors.Wrapf(err, "failed to read field name with index %d", i)
 			}
 			r.Fields = append(r.Fields, s)
@@ -398,7 +398,7 @@ func (c *client) QuerySQLFields(cache string, binary bool, data QuerySQLFieldsDa
 	}
 
 	// read data
-	rowCount, err := res.ReadInt()
+	rowCount, err := ReadInt(res)
 	if err != nil {
 		return r, errors.Wrapf(err, "failed to read row count")
 	}
@@ -406,13 +406,13 @@ func (c *client) QuerySQLFields(cache string, binary bool, data QuerySQLFieldsDa
 	for i := 0; i < int(rowCount); i++ {
 		r.Rows[i] = make([]interface{}, r.FieldCount)
 		for j := 0; j < r.FieldCount; j++ {
-			r.Rows[i][j], err = res.ReadObject()
+			r.Rows[i][j], err = ReadObject(res)
 			if err != nil {
 				return r, errors.Wrapf(err, "failed to read value (row with index %d, column with index %d", i, j)
 			}
 		}
 	}
-	if r.HasMore, err = res.ReadBool(); err != nil {
+	if r.HasMore, err = ReadBool(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read has more flag")
 	}
 
@@ -425,7 +425,7 @@ func (c *client) QuerySQLFieldsCursorGetPageRaw(id int64) (*ResponseOperation, e
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteLong(id); err != nil {
+	if err := WriteLong(req, id); err != nil {
 		return nil, errors.Wrapf(err, "failed to write cursor id")
 	}
 
@@ -450,7 +450,7 @@ func (c *client) QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQL
 	}
 
 	// read data
-	rowCount, err := res.ReadInt()
+	rowCount, err := ReadInt(res)
 	if err != nil {
 		return r, errors.Wrapf(err, "failed to read row count")
 	}
@@ -458,13 +458,13 @@ func (c *client) QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQL
 	for i := 0; i < int(rowCount); i++ {
 		r.Rows[i] = make([]interface{}, fieldCount)
 		for j := 0; j < int(fieldCount); j++ {
-			r.Rows[i][j], err = res.ReadObject()
+			r.Rows[i][j], err = ReadObject(res)
 			if err != nil {
 				return r, errors.Wrapf(err, "failed to read value (row with index %d, column with index %d", i, j)
 			}
 		}
 	}
-	if r.HasMore, err = res.ReadBool(); err != nil {
+	if r.HasMore, err = ReadBool(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read has more flag")
 	}
 
@@ -478,7 +478,7 @@ func (c *client) ResourceClose(id int64) error {
 	res := NewResponseOperation(req.UID)
 
 	// set parameters
-	if err := req.WriteLong(id); err != nil {
+	if err := WriteLong(req, id); err != nil {
 		return errors.Wrapf(err, "failed to write cursor id")
 	}
 

@@ -32,18 +32,18 @@ func (r *ResponseOperation) ReadFrom(rr io.Reader) (int64, error) {
 		return 0, errors.Wrapf(err, "failed to read operation response")
 	}
 
-	uid, err := r.ReadLong()
+	uid, err := ReadLong(r)
 	if err != nil {
 		return 0, errors.Wrapf(err, "failed to read operation request id")
 	}
 
-	r.Status, err = r.ReadInt()
+	r.Status, err = ReadInt(r)
 	if err != nil {
 		return 0, errors.Wrapf(err, "failed to read status code")
 	}
 
 	if r.Status != OperationStatusSuccess {
-		r.Message, err = r.ReadOString()
+		r.Message, err = ReadOString(r)
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read error message")
 		}

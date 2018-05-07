@@ -225,7 +225,7 @@ func (c *conn) QueryNexPageContext(ctx context.Context, cursorID int64) (*ignite
 // Connect opens connection with protocol version v1
 func Connect(ci common.ConnInfo) (driver.Conn, error) {
 	if ci.Timeout > 0 {
-		ci.ConnInfo.Dealer.Timeout = time.Duration(ci.Timeout) * time.Millisecond
+		ci.ConnInfo.Dialer.Timeout = time.Duration(ci.Timeout) * time.Millisecond
 	}
 
 	client, err := ignite.Connect(ci.ConnInfo)

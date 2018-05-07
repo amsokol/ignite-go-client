@@ -60,6 +60,9 @@ c, err := ignite.Connect(ctx, ignite.ConnInfo{
     Major:   1,
     Minor:   0,
     Patch:   0,
+    Dialer: net.Dialer{
+        Timeout: 10 * time.Second,
+    },
 })
 if err != nil {
     t.Fatalf("failed connect to server: %v", err)
@@ -148,8 +151,8 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 1. Run tests into the root folder of this project:
 
-```shell
-# go test ./...
+```bash
+go test ./...
 ```
 
 ### Type mapping
@@ -190,6 +193,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 | Time**             | ignite.Time / time.Time                                                |
 | Time array**       | []ignite.Time / []time.Time                                            |
 | NULL               | nil                                                                    |
+| Complex Object     | ignite.ComplexObject                                                   |
 
 *`Date` is outdated type. It's recommended to use `Timestamp` type.
 If you still need `Date` type use `ignite.ToDate()` function when you **put** date:
@@ -198,6 +202,7 @@ If you still need `Date` type use `ignite.ToDate()` function when you **put** da
 t := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123), time.UTC)
 err := c.CachePut("CacheGet", false, "Date", ToDate(t)) // ToDate() converts time.Time to ignite.Date
 ...
+
 t, err = c.CacheGet("CacheGet", false, "Date") // 't' is time.Time, you don't need any converting
 ```
 
@@ -208,7 +213,31 @@ If you still need `Time` type use `ignite.ToTime()` function when you **put** ti
 t := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
 err := c.CachePut("CacheGet", false, "Time", ToTime(t)) // ToTime() converts time.Time to ignite.Time (year, month and day are ignored)
 ...
+
 t, err = c.CacheGet("CacheGet", false, "Time") // 't' is time.Time (where year=1, month=1 and day=1), you don't need any converting
+```
+
+### Example how to use `Complex Object` type
+
+```go
+// put complex object
+c1 := ignite.NewComplexObject("ComplexObject1")
+c1.Set("field1", "value 1")
+c1.Set("field2", int32(2))
+c1.Set("field3", true)
+c2 := ignite.NewComplexObject("ComplexObject2")
+c2.Set("complexField1", c1)
+if err := c.CachePut(cache, false, "key3", c2); err != nil {
+    return err
+}
+...
+
+// get complex object
+v, err := c.CacheGet(cache, false, "key3")
+if err != nil {
+    return err
+}
+log.Printf("key=\"%s\", value=\"%#v\"", "key3", v)
 ```
 
 ### SQL and Scan Queries supported operations

@@ -27,31 +27,31 @@ func (r *ResponseHandshake) ReadFrom(rr io.Reader) (int64, error) {
 		return 0, errors.Wrapf(err, "failed to read handshare response")
 	}
 
-	r.Success, err = r.ReadBool()
+	r.Success, err = ReadBool(r)
 	if err != nil {
 		return 0, errors.Wrapf(err, "failed to read success flag")
 	}
 
 	if !r.Success {
-		v, err := r.ReadShort()
+		v, err := ReadShort(r)
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read server version major")
 		}
 		r.Major = int(v)
 
-		v, err = r.ReadShort()
+		v, err = ReadShort(r)
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read server version minor")
 		}
 		r.Minor = int(v)
 
-		v, err = r.ReadShort()
+		v, err = ReadShort(r)
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read server version patch")
 		}
 		r.Patch = int(v)
 
-		r.Message, err = r.ReadOString()
+		r.Message, err = ReadOString(r)
 		if err != nil {
 			return 0, errors.Wrapf(err, "failed to read error message")
 		}

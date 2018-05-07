@@ -17,7 +17,7 @@ type ConnInfo struct {
 	Network, Host       string
 	Port                int
 	Major, Minor, Patch int
-	Dealer              net.Dialer
+	Dialer              net.Dialer
 	TLSConfig           *tls.Config
 }
 
@@ -247,9 +247,9 @@ func Connect(ci ConnInfo) (Client, error) {
 	var conn net.Conn
 	var err error
 	if ci.TLSConfig != nil {
-		conn, err = tls.DialWithDialer(&ci.Dealer, ci.Network, address, ci.TLSConfig)
+		conn, err = tls.DialWithDialer(&ci.Dialer, ci.Network, address, ci.TLSConfig)
 	} else {
-		conn, err = ci.Dealer.Dial(ci.Network, address)
+		conn, err = ci.Dialer.Dial(ci.Network, address)
 	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to open connection")

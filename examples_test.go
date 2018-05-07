@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"net"
 	"testing"
 	"time"
 
@@ -103,6 +104,9 @@ func Test_Key_Value(t *testing.T) {
 		Major:   1,
 		Minor:   0,
 		Patch:   0,
+		Dialer: net.Dialer{
+			Timeout: 10 * time.Second,
+		},
 	})
 	if err != nil {
 		t.Fatalf("failed connect to server: %v", err)
@@ -131,4 +135,22 @@ func Test_Key_Value(t *testing.T) {
 		t.Fatalf("failed to get key value: %v", err)
 	}
 	log.Printf("key=\"%s\", value=\"%v\"", "key1", v)
+
+	// put complex object
+	c1 := ignite.NewComplexObject("ComplexObject1")
+	c1.Set("field1", "value 1")
+	c1.Set("field2", int32(2))
+	c1.Set("field3", true)
+	c2 := ignite.NewComplexObject("ComplexObject2")
+	c2.Set("complexField1", c1)
+	if err = c.CachePut(cache, false, "key3", c2); err != nil {
+		t.Fatalf("failed to put complex value: %v", err)
+	}
+
+	// get complex object
+	v, err = c.CacheGet(cache, false, "key3")
+	if err != nil {
+		t.Fatalf("failed to get complex value: %v", err)
+	}
+	log.Printf("key=\"%s\", value=\"%#v\"", "key3", v)
 }

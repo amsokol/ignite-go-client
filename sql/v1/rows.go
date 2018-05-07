@@ -56,7 +56,7 @@ func (r *rows) Next(dest []driver.Value) error {
 	var err error
 	if r.rowsLeft == 0 {
 		var hasMore bool
-		if hasMore, err = r.response.ReadBool(); err != nil {
+		if hasMore, err = ignite.ReadBool(r.response); err != nil {
 			// prevent resource leak on server
 			_ = r.Close()
 			return errors.Wrapf(err, "failed to read more records flag")
@@ -71,7 +71,7 @@ func (r *rows) Next(dest []driver.Value) error {
 		}
 		// read data
 		var rowCount int32
-		if rowCount, err = r.response.ReadInt(); err != nil {
+		if rowCount, err = ignite.ReadInt(r.response); err != nil {
 			// prevent resource leak on server
 			_ = r.Close()
 			return errors.Wrapf(err, "failed to read row count")
@@ -82,7 +82,7 @@ func (r *rows) Next(dest []driver.Value) error {
 		return errors.Errorf("destination slice size must be %d but got %d", len(r.fields), len(dest))
 	}
 	for i := 0; i < len(r.fields); i++ {
-		if dest[i], err = r.response.ReadObject(); err != nil {
+		if dest[i], err = ignite.ReadObject(r.response); err != nil {
 			return fmt.Errorf("failed to read field value with index %d: %v", i, err)
 		}
 	}
@@ -96,17 +96,17 @@ func newRows(conn *conn, r *ignite.ResponseOperation) (driver.Rows, error) {
 	// read field names
 	var id int64
 	var fieldCount int32
-	if id, err = r.ReadLong(); err != nil {
+	if id, err = ignite.ReadLong(r); err != nil {
 		return nil, errors.Wrapf(err, "failed to read request ID")
 	}
-	if fieldCount, err = r.ReadInt(); err != nil {
+	if fieldCount, err = ignite.ReadInt(r); err != nil {
 		return nil, errors.Wrapf(err, "failed to read field count")
 	}
 	// response MUST return field names
 	fields := make([]string, 0, fieldCount)
 	for i := 0; i < int(fieldCount); i++ {
 		var s string
-		if s, err = r.ReadOString(); err != nil {
+		if s, err = ignite.ReadOString(r); err != nil {
 			return nil, errors.Wrapf(err, "failed to read field name with index %d", i)
 		}
 		fields = append(fields, s)
@@ -114,7 +114,7 @@ func newRows(conn *conn, r *ignite.ResponseOperation) (driver.Rows, error) {
 
 	// read row count
 	var rowCount int32
-	if rowCount, err = r.ReadInt(); err != nil {
+	if rowCount, err = ignite.ReadInt(r); err != nil {
 		return nil, errors.Wrapf(err, "failed to read row count")
 	}
 
