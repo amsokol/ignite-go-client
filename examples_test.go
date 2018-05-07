@@ -152,5 +152,9 @@ func Test_Key_Value(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get complex value: %v", err)
 	}
-	log.Printf("key=\"%s\", value=\"%#v\"", "key3", v)
+	c2 = v.(ignite.ComplexObject)
+	log.Printf("key=\"%s\", value=\"%#v\"", "key3", c2)
+	v, _ = c2.Get("complexField1")
+	c1 = v.(ignite.ComplexObject)
+	log.Printf("key=\"%s\", value=\"%#v\"", "complexField1", c1)
 }

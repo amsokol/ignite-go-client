@@ -71,7 +71,7 @@ defer c.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L97) for more.
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L98) for more.
 
 See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for other examples.
 
@@ -101,7 +101,7 @@ defer db.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L14) for more.
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L15) for more.
 
 Connection URL format:
 
@@ -237,7 +237,11 @@ v, err := c.CacheGet(cache, false, "key3")
 if err != nil {
     return err
 }
-log.Printf("key=\"%s\", value=\"%#v\"", "key3", v)
+c2 = v.(ignite.ComplexObject)
+log.Printf("key=\"%s\", value=\"%#v\"", "key3", c2)
+v, _ = c2.Get("complexField1")
+c1 = v.(ignite.ComplexObject)
+log.Printf("key=\"%s\", value=\"%#v\"", "complexField1", c1)
 ```
 
 ### SQL and Scan Queries supported operations
