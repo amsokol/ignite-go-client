@@ -157,6 +157,12 @@ func Test_Key_Value(t *testing.T) {
 	v, _ = c2.Get("complexField1")
 	c1 = v.(ignite.ComplexObject)
 	log.Printf("key=\"%s\", value=\"%#v\"", "complexField1", c1)
+	v, _ = c1.Get("field1")
+	log.Printf("key=\"%s\", value=\"%s\"", "field1", v)
+	v, _ = c1.Get("field2")
+	log.Printf("key=\"%s\", value=%d", "field2", v)
+	v, _ = c1.Get("field3")
+	log.Printf("key=\"%s\", value=%t", "field3", v)
 }
 
 func Test_SQL_Queries(t *testing.T) {

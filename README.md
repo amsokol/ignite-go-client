@@ -219,7 +219,7 @@ err := c.CachePut("CacheGet", false, "Time", ToTime(t)) // ToTime() converts tim
 t, err = c.CacheGet("CacheGet", false, "Time") // 't' is time.Time (where year=1, month=1 and day=1), you don't need any converting
 ```
 
-### Example how to use `Complex Object` type
+### Example how to use **Complex Object** type
 
 ```go
 // put complex object
@@ -235,7 +235,7 @@ if err := c.CachePut(cache, false, "key3", c2); err != nil {
 ...
 
 // get complex object
-v, err := c.CacheGet(cache, false, "key3")
+v, err = c.CacheGet(cache, false, "key3")
 if err != nil {
     return err
 }
@@ -244,6 +244,12 @@ log.Printf("key=\"%s\", value=\"%#v\"", "key3", c2)
 v, _ = c2.Get("complexField1")
 c1 = v.(ignite.ComplexObject)
 log.Printf("key=\"%s\", value=\"%#v\"", "complexField1", c1)
+v, _ = c1.Get("field1")
+log.Printf("key=\"%s\", value=\"%s\"", "field1", v)
+v, _ = c1.Get("field2")
+log.Printf("key=\"%s\", value=%d", "field2", v)
+v, _ = c1.Get("field3")
+log.Printf("key=\"%s\", value=%t", "field3", v)
 ```
 
 ### SQL and Scan Queries supported operations
