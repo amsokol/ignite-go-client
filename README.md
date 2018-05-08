@@ -124,7 +124,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 | Name               | Mandatory | Description                                                   | Default value                     |
 |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
-| schema             | no        | Database schema                                               | "" (PUBLIC schema will be used)   |
+| schema             | no        | Database schema                                               | "" (PUBLIC schema is used)   |
 | version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
 | page-size          | no        | Query cursor page size                                        | 10000                             |
 | max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
