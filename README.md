@@ -17,13 +17,11 @@ Project status:
 
 1. Develop "[Cache Configuration](https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations)" methods (Completed)
 1. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
-1. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (Completed**)
+1. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (Completed)
 1. Develop SQL driver (Completed)
 1. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (Not started)
 
 *Not all types are supported. See **[type mapping](#type-mapping)** for detail.
-
-**Not all operations are supported. See **[table](#sql-and-scan-queries-supported-operations)** for detail.
 
 ### How to install
 
@@ -260,8 +258,8 @@ log.Printf("key=\"%s\", value=%t", "field3", v)
 | OP_QUERY_SQL_CURSOR_GET_PAGE        | Done.                                                   |
 | OP_QUERY_SQL_FIELDS                 | Done.                                                   |
 | OP_QUERY_SQL_FIELDS_CURSOR_GET_PAGE | Done.                                                   |
-| OP_QUERY_SCAN                       | Not started. Need help.                                 |
-| OP_QUERY_SCAN_CURSOR_GET_PAGE       | Not started. Need help.                                 |
+| OP_QUERY_SCAN                       | Done (without filter object support).                   |
+| OP_QUERY_SCAN_CURSOR_GET_PAGE       | Done (without filter object support).                   |
 | OP_RESOURCE_CLOSE                   | Done.                                                   |
 
 ### Error handling

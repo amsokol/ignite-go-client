@@ -192,6 +192,14 @@ type Client interface {
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_sql_fields_cursor_get_page
 	QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQLFieldsPage, error)
 
+	// QueryScan performs scan query.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_scan
+	QueryScan(cache string, binary bool, data QueryScanData) (QueryScanResult, error)
+
+	// QueryScanCursorGetPage fetches the next SQL query cursor page by cursor id that is obtained from OP_QUERY_SCAN.
+	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_query_scan_cursor_get_page
+	QueryScanCursorGetPage(id int64) (QueryScanPage, error)
+
 	// ResourceClose closes a resource, such as query cursor.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations#section-op_resource_close
 	ResourceClose(id int64) error

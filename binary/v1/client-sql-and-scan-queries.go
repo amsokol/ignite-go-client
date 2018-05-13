@@ -135,6 +135,37 @@ type QuerySQLFieldsResult struct {
 	QuerySQLFieldsPage
 }
 
+// QueryScanData input parameter for QueryScan func
+type QueryScanData struct {
+	// Cursor page size.
+	PageSize int
+
+	// Number of partitions to query (negative to query entire cache).
+	Partitions int
+
+	// Local flag - whether this query should be executed on local node only.
+	LocalQuery bool
+}
+
+// QueryScanPage is query result page
+type QueryScanPage struct {
+	// Key -> Values
+	Rows map[interface{}]interface{}
+
+	// Indicates whether more results are available to be fetched with QueryScanCursorGetPage.
+	// When true, query cursor is closed automatically.
+	HasMore bool
+}
+
+// QueryScanResult output from QueryScan func
+type QueryScanResult struct {
+	// Cursor id. Can be closed with ResourceClose func.
+	ID int64
+
+	// Query result first page
+	QueryScanPage
+}
+
 func (c *client) QuerySQL(cache string, binary bool, data QuerySQLData) (QuerySQLResult, error) {
 	// request and response
 	req := NewRequestOperation(OpQuerySQL)
@@ -454,6 +485,116 @@ func (c *client) QuerySQLFieldsCursorGetPage(id int64, fieldCount int) (QuerySQL
 				return r, errors.Wrapf(err, "failed to read value (row with index %d, column with index %d", i, j)
 			}
 		}
+	}
+	if r.HasMore, err = ReadBool(res); err != nil {
+		return r, errors.Wrapf(err, "failed to read has more flag")
+	}
+
+	return r, nil
+}
+
+func (c *client) QueryScan(cache string, binary bool, data QueryScanData) (QueryScanResult, error) {
+	// request and response
+	req := NewRequestOperation(OpQueryScan)
+	res := NewResponseOperation(req.UID)
+
+	r := QueryScanResult{QueryScanPage: QueryScanPage{Rows: map[interface{}]interface{}{}}}
+	var err error
+
+	// set parameters
+	if err = WriteInt(req, HashCode(cache)); err != nil {
+		return r, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err = WriteBool(req, binary); err != nil {
+		return r, errors.Wrapf(err, "failed to write binary flag")
+	}
+	// filtering is not supported
+	if err = WriteNull(req); err != nil {
+		return r, errors.Wrapf(err, "failed to write null as filter object")
+	}
+
+	if err = WriteInt(req, int32(data.PageSize)); err != nil {
+		return r, errors.Wrapf(err, "failed to write page size")
+	}
+	if err = WriteInt(req, int32(data.Partitions)); err != nil {
+		return r, errors.Wrapf(err, "failed to write number of partitions to query")
+	}
+	if err = WriteBool(req, data.LocalQuery); err != nil {
+		return r, errors.Wrapf(err, "failed to write local query flag")
+	}
+
+	// execute operation
+	if err = c.Do(req, res); err != nil {
+		return r, errors.Wrapf(err, "failed to execute OP_QUERY_SCAN operation")
+	}
+	if err = res.CheckStatus(); err != nil {
+		return r, err
+	}
+
+	// process result
+	if r.ID, err = ReadLong(res); err != nil {
+		return r, errors.Wrapf(err, "failed to read cursor ID")
+	}
+	count, err := ReadInt(res)
+	if err != nil {
+		return r, errors.Wrapf(err, "failed to read row count")
+	}
+	// read data
+	for i := 0; i < int(count); i++ {
+		key, err := ReadObject(res)
+		if err != nil {
+			return r, errors.Wrapf(err, "failed to read key with index %d", i)
+		}
+		value, err := ReadObject(res)
+		if err != nil {
+			return r, errors.Wrapf(err, "failed to read value with index %d", i)
+		}
+		r.Rows[key] = value
+	}
+	if r.HasMore, err = ReadBool(res); err != nil {
+		return r, errors.Wrapf(err, "failed to read has more flag")
+	}
+	return r, nil
+}
+
+// QueryScanCursorGetPage fetches the next SQL query cursor page by cursor id that is obtained from OP_QUERY_SCAN.
+func (c *client) QueryScanCursorGetPage(id int64) (QueryScanPage, error) {
+	// request and response
+	req := NewRequestOperation(OpQueryScanCursorGetPage)
+	res := NewResponseOperation(req.UID)
+
+	r := QueryScanPage{Rows: map[interface{}]interface{}{}}
+	var err error
+
+	// set parameters
+	if err = WriteLong(req, id); err != nil {
+		return r, errors.Wrapf(err, "failed to write cursor id")
+	}
+
+	// execute operation
+	if err = c.Do(req, res); err != nil {
+		return r, errors.Wrapf(err, "failed to execute OP_QUERY_SCAN_CURSOR_GET_PAGE operation")
+	}
+	if err = res.CheckStatus(); err != nil {
+		return r, err
+	}
+
+	// process result
+	count, err := ReadInt(res)
+	if err != nil {
+		return r, errors.Wrapf(err, "failed to read row count")
+	}
+	// read data
+	for i := 0; i < int(count); i++ {
+		key, err := ReadObject(res)
+		if err != nil {
+			return r, errors.Wrapf(err, "failed to read key with index %d", i)
+		}
+		value, err := ReadObject(res)
+		if err != nil {
+			return r, errors.Wrapf(err, "failed to read value with index %d", i)
+		}
+		r.Rows[key] = value
 	}
 	if r.HasMore, err = ReadBool(res); err != nil {
 		return r, errors.Wrapf(err, "failed to read has more flag")
