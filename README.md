@@ -227,18 +227,18 @@ c1.Set("field2", int32(2))
 c1.Set("field3", true)
 c2 := ignite.NewComplexObject("ComplexObject2")
 c2.Set("complexField1", c1)
-if err := c.CachePut(cache, false, "key3", c2); err != nil {
+if err := c.CachePut(cache, false, "key", c2); err != nil {
     return err
 }
 ...
 
 // get complex object
-v, err = c.CacheGet(cache, false, "key3")
+v, err = c.CacheGet(cache, false, "key")
 if err != nil {
     return err
 }
 c2 = v.(ignite.ComplexObject)
-log.Printf("key=\"%s\", value=\"%#v\"", "key3", c2)
+log.Printf("key=\"%s\", value=\"%#v\"", "key", c2)
 v, _ = c2.Get("complexField1")
 c1 = v.(ignite.ComplexObject)
 log.Printf("key=\"%s\", value=\"%#v\"", "complexField1", c1)
