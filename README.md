@@ -200,7 +200,7 @@ If you still need `Date` type use `ignite.ToDate()` function when you **put** da
 
 ```go
 t := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123), time.UTC)
-err := c.CachePut("CacheGet", false, "Date", ToDate(t)) // ToDate() converts time.Time to ignite.Date
+err := c.CachePut("CacheGet", false, "Date", ignite.ToDate(t)) // ToDate() converts time.Time to ignite.Date
 ...
 
 t, err = c.CacheGet("CacheGet", false, "Date") // 't' is time.Time, you don't need any converting
@@ -211,7 +211,7 @@ If you still need `Time` type use `ignite.ToTime()` function when you **put** ti
 
 ```go
 t := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123), time.UTC)
-err := c.CachePut("CacheGet", false, "Time", ToTime(t)) // ToTime() converts time.Time to ignite.Time (year, month and day are ignored)
+err := c.CachePut("CacheGet", false, "Time", ignite.ToTime(t)) // ToTime() converts time.Time to ignite.Time (year, month and day are ignored)
 ...
 
 t, err = c.CacheGet("CacheGet", false, "Time") // 't' is time.Time (where year=1, month=1 and day=1), you don't need any converting
