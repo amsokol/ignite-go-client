@@ -233,7 +233,7 @@ if err := c.CachePut(cache, false, "key", c2); err != nil {
 ...
 
 // get complex object
-v, err = c.CacheGet(cache, false, "key")
+v, err := c.CacheGet(cache, false, "key")
 if err != nil {
     return err
 }
