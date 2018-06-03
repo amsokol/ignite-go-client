@@ -148,7 +148,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 1. Download `Apache Ignite 2.5` from [official site](https://ignite.apache.org/download.cgi#binaries)
 1. Extract distributive to any folder
-1. Persistance mode is enabled to run test. So you need to remove `<path_with_ignite>\work` folder each time to clean test data before run tests.
+1. Persistance mode is enabled to run tests. So you need to remove `<path_with_ignite>\work` folder each time to clean up test data before run tests.
 1. `cd` to `testdata` folder with `configuration-for-tests.xml` file
 1. Start Ignite server with `configuration-for-tests.xml` configuration file:
 
