@@ -719,15 +719,14 @@
 
         <property name="authenticationEnabled" value="true"/>
 
-        <!-- 
         <property name="clientConnectorConfiguration">
             <bean class="org.apache.ignite.configuration.ClientConnectorConfiguration">
                 <property name="host" value="127.0.0.1"/>
-                <property name="port" value="11110"/>
+                <property name="port" value="10800"/>
                 <property name="portRange" value="10"/>
                 <property name="sslEnabled" value="true"/>
                 <property name="useIgniteSslContextFactory" value="false"/>
-                <property name="sslClientAuth" value="true"/>
+                <property name="sslClientAuth" value="false"/>
                 <property name="sslContextFactory">
                     <bean class="org.apache.ignite.ssl.SslContextFactory">
                         <property name="keyStoreFilePath" value="./ssl/server.jks"/>
@@ -738,6 +737,5 @@
                 </property>
             </bean>
         </property>
-        -->
     </bean>
 </beans>

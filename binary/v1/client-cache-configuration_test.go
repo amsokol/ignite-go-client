@@ -1,6 +1,7 @@
 package ignite
 
 import (
+	"crypto/tls"
 	"reflect"
 	"testing"
 )
@@ -14,6 +15,9 @@ var testConnInfo = ConnInfo{
 	Patch:    0,
 	Username: "ignite",
 	Password: "ignite",
+	TLSConfig: &tls.Config{
+		InsecureSkipVerify: true,
+	},
 }
 
 func Test_client_CacheCreateWithName(t *testing.T) {

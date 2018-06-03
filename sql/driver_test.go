@@ -1,6 +1,7 @@
 package ignitesql
 
 import (
+	"crypto/tls"
 	"database/sql/driver"
 	"reflect"
 	"testing"
@@ -95,6 +96,8 @@ func TestDriver_parseURL(t *testing.T) {
 					"&version=1.1.1" +
 					"&username=ignite" +
 					"&password=ignite" +
+					"&tls=yes" +
+					"&tls-insecure-skip-verify=yes" +
 					"&page-size=100" +
 					"&max-rows=99" +
 					"&timeout=5555" +
@@ -111,6 +114,8 @@ func TestDriver_parseURL(t *testing.T) {
 					"&version=1.1.1" +
 					"&username=ignite" +
 					"&password=ignite" +
+					"&tls=yes" +
+					"&tls-insecure-skip-verify=yes" +
 					"&page-size=100" +
 					"&max-rows=99" +
 					"&timeout=5555" +
@@ -129,6 +134,9 @@ func TestDriver_parseURL(t *testing.T) {
 					Patch:    1,
 					Username: "ignite",
 					Password: "ignite",
+					TLSConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
 				},
 				Cache:            "TestDB2",
 				Schema:           "SCHEMA",
@@ -214,7 +222,7 @@ func TestDriver_Open(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite",
+				name: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite&tls=yes&tls-insecure-skip-verify=yes",
 			},
 		},
 		{

@@ -2,6 +2,7 @@ package examples
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql"
 	"log"
 	"net"
@@ -16,7 +17,14 @@ func Test_SQL_Driver(t *testing.T) {
 	ctx := context.Background()
 
 	// open connection
-	db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?version=1.1.0&username=ignite&password=ignite&page-size=10000&timeout=5000")
+	db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?"+
+		"version=1.1.0"+
+		"&username=ignite"+
+		"&password=ignite"+
+		"&tls=yes"+
+		"&tls-insecure-skip-verify=yes"+
+		"&page-size=10000"+
+		"&timeout=5000")
 	if err != nil {
 		t.Fatalf("failed to open connection: %v", err)
 	}
@@ -109,6 +117,9 @@ func Test_Key_Value(t *testing.T) {
 		Dialer: net.Dialer{
 			Timeout: 10 * time.Second,
 		},
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	})
 	if err != nil {
 		t.Fatalf("failed connect to server: %v", err)
@@ -180,6 +191,9 @@ func Test_SQL_Queries(t *testing.T) {
 		Password: "ignite",
 		Dialer: net.Dialer{
 			Timeout: 10 * time.Second,
+		},
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify: true,
 		},
 	})
 	if err != nil {

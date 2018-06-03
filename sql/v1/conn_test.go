@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"crypto/tls"
 	"database/sql/driver"
 	"reflect"
 	"testing"
@@ -25,7 +26,7 @@ func TestConnect(t *testing.T) {
 			name: "success test 1",
 			args: args{
 				ci: common.ConnInfo{
-					URL: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite",
+					URL: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite&tls=yes&tls-insecure-skip-verify=yes",
 					ConnInfo: ignite.ConnInfo{
 						Network:  "tcp",
 						Host:     "localhost",
@@ -35,6 +36,9 @@ func TestConnect(t *testing.T) {
 						Patch:    0,
 						Username: "ignite",
 						Password: "ignite",
+						TLSConfig: &tls.Config{
+							InsecureSkipVerify: true,
+						},
 					},
 					Cache:    "DriverOpen",
 					PageSize: 10000,
@@ -59,7 +63,7 @@ func TestConnect(t *testing.T) {
 
 func Test_conn_Close(t *testing.T) {
 	ci, err := Connect(common.ConnInfo{
-		URL: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite",
+		URL: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite&tls=yes&tls-insecure-skip-verify=yes",
 		ConnInfo: ignite.ConnInfo{
 			Network:  "tcp",
 			Host:     "localhost",
@@ -69,6 +73,9 @@ func Test_conn_Close(t *testing.T) {
 			Patch:    0,
 			Username: "ignite",
 			Password: "ignite",
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 		Cache:    "DriverOpen",
 		PageSize: 10000,
@@ -100,7 +107,7 @@ func Test_conn_Close(t *testing.T) {
 
 func Test_conn_ExecContext(t *testing.T) {
 	ci, err := Connect(common.ConnInfo{
-		URL: "tcp://localhost:10800/ConnExecContext?version=1.1.0&username=ignite&password=ignite",
+		URL: "tcp://localhost:10800/ConnExecContext?version=1.1.0&username=ignite&password=ignite&tls=yes&tls-insecure-skip-verify=yes",
 		ConnInfo: ignite.ConnInfo{
 			Network:  "tcp",
 			Host:     "localhost",
@@ -110,6 +117,9 @@ func Test_conn_ExecContext(t *testing.T) {
 			Patch:    0,
 			Username: "ignite",
 			Password: "ignite",
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 		Cache:    "ConnExecContext",
 		PageSize: 10000,
@@ -207,7 +217,7 @@ func Test_conn_ExecContext(t *testing.T) {
 
 func Test_conn_QueryContext(t *testing.T) {
 	ci, err := Connect(common.ConnInfo{
-		URL: "tcp://localhost:10800/ConnQueryContext?version=1.1.0&username=ignite&password=ignite",
+		URL: "tcp://localhost:10800/ConnQueryContext?version=1.1.0&username=ignite&password=ignite&tls=yes&tls-insecure-skip-verify=yes",
 		ConnInfo: ignite.ConnInfo{
 			Network:  "tcp",
 			Host:     "localhost",
@@ -217,6 +227,9 @@ func Test_conn_QueryContext(t *testing.T) {
 			Patch:    0,
 			Username: "ignite",
 			Password: "ignite",
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 		Cache:    "ConnQueryContext",
 		PageSize: 2, /* test server cursor */
@@ -316,7 +329,7 @@ func Test_conn_QueryContext(t *testing.T) {
 
 func Test_conn_Ping(t *testing.T) {
 	ci, err := Connect(common.ConnInfo{
-		URL: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite",
+		URL: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite&tls=yes&tls-insecure-skip-verify=yes",
 		ConnInfo: ignite.ConnInfo{
 			Network:  "tcp",
 			Host:     "localhost",
@@ -326,6 +339,9 @@ func Test_conn_Ping(t *testing.T) {
 			Patch:    0,
 			Username: "ignite",
 			Password: "ignite",
+			TLSConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
 		},
 		Cache:    "DriverOpen",
 		PageSize: 10000,

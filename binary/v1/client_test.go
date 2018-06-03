@@ -1,6 +1,7 @@
 package ignite
 
 import (
+	"crypto/tls"
 	"testing"
 )
 
@@ -26,6 +27,9 @@ func TestConnect(t *testing.T) {
 					Patch:    0,
 					Username: "ignite",
 					Password: "ignite",
+					TLSConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
 				},
 			},
 		},
@@ -41,6 +45,9 @@ func TestConnect(t *testing.T) {
 					Patch:    0,
 					Username: "ignite",
 					Password: "ignite",
+					TLSConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
 				},
 			},
 			wantErr: true,

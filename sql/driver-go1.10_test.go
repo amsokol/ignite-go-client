@@ -22,7 +22,7 @@ func TestDriver_OpenConnector(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/OpenConnector?version=1.1.0&username=ignite&password=ignite",
+				name: "tcp://localhost:10800/OpenConnector?version=1.1.0&username=ignite&password=ignite&tls=yes&tls-insecure-skip-verify=yes",
 			},
 		},
 		{
