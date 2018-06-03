@@ -50,6 +50,8 @@ func (d *Driver) Open(name string) (driver.Conn, error) {
 // |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
 // | schema             | no        | Database schema                                               | "" (PUBLIC schema will be used)   |
 // | version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
+// | username           | no        | Username                                                      | no                                |
+// | password           | no        | Password                                                      | no                                |
 // | page-size          | no        | Query cursor page size                                        | 10000                             |
 // | max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
 // | timeout            | no        | Timeout in milliseconds to execute query                      | 0 (disable timeout)               |
@@ -99,6 +101,10 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 			if len(val) > 0 {
 				ver, err = semver.NewVersion(val)
 			}
+		case "username":
+			ci.Username = val
+		case "password":
+			ci.Password = val
 		case "page-size":
 			if len(val) > 0 {
 				ci.PageSize, err = strconv.Atoi(val)

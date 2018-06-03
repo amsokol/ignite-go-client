@@ -705,6 +705,20 @@
                 </property>
             </bean>
         </property>
+
+        <!-- Enabling Apache Ignite Persistent Store. -->
+        <property name="dataStorageConfiguration">
+            <bean class="org.apache.ignite.configuration.DataStorageConfiguration">
+                <property name="defaultDataRegionConfiguration">
+                    <bean class="org.apache.ignite.configuration.DataRegionConfiguration">
+                        <property name="persistenceEnabled" value="true"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+
+        <property name="authenticationEnabled" value="true"/>
+
         <!-- 
         <property name="clientConnectorConfiguration">
             <bean class="org.apache.ignite.configuration.ClientConnectorConfiguration">

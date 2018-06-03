@@ -6,12 +6,14 @@ import (
 )
 
 var testConnInfo = ConnInfo{
-	Network: "tcp",
-	Host:    "localhost",
-	Port:    10800,
-	Major:   1,
-	Minor:   0,
-	Patch:   0,
+	Network:  "tcp",
+	Host:     "localhost",
+	Port:     10800,
+	Major:    1,
+	Minor:    1,
+	Patch:    0,
+	Username: "ignite",
+	Password: "ignite",
 }
 
 func Test_client_CacheCreateWithName(t *testing.T) {

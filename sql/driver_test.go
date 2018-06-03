@@ -93,6 +93,8 @@ func TestDriver_parseURL(t *testing.T) {
 				name: "tcp://localhost:10800/TestDB2?" +
 					"schema=SCHEMA" +
 					"&version=1.1.1" +
+					"&username=ignite" +
+					"&password=ignite" +
 					"&page-size=100" +
 					"&max-rows=99" +
 					"&timeout=5555" +
@@ -107,6 +109,8 @@ func TestDriver_parseURL(t *testing.T) {
 				URL: "tcp://localhost:10800/TestDB2?" +
 					"schema=SCHEMA" +
 					"&version=1.1.1" +
+					"&username=ignite" +
+					"&password=ignite" +
 					"&page-size=100" +
 					"&max-rows=99" +
 					"&timeout=5555" +
@@ -117,12 +121,14 @@ func TestDriver_parseURL(t *testing.T) {
 					"&collocated=yes" +
 					"&lazy-query=yes",
 				ConnInfo: ignite.ConnInfo{
-					Network: "tcp",
-					Host:    "localhost",
-					Port:    10800,
-					Major:   1,
-					Minor:   1,
-					Patch:   1,
+					Network:  "tcp",
+					Host:     "localhost",
+					Port:     10800,
+					Major:    1,
+					Minor:    1,
+					Patch:    1,
+					Username: "ignite",
+					Password: "ignite",
 				},
 				Cache:            "TestDB2",
 				Schema:           "SCHEMA",
@@ -208,7 +214,7 @@ func TestDriver_Open(t *testing.T) {
 			name: "success test 1",
 			d:    &Driver{},
 			args: args{
-				name: "tcp://localhost:10800/DriverOpen",
+				name: "tcp://localhost:10800/DriverOpen?version=1.1.0&username=ignite&password=ignite",
 			},
 		},
 		{
