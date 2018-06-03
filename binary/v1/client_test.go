@@ -1,6 +1,7 @@
 package ignite
 
 import (
+	"crypto/tls"
 	"testing"
 )
 
@@ -18,12 +19,17 @@ func TestConnect(t *testing.T) {
 			name: "1",
 			args: args{
 				ci: ConnInfo{
-					Network: "tcp",
-					Host:    "localhost",
-					Port:    10800,
-					Major:   1,
-					Minor:   0,
-					Patch:   0,
+					Network:  "tcp",
+					Host:     "localhost",
+					Port:     10800,
+					Major:    1,
+					Minor:    1,
+					Patch:    0,
+					Username: "ignite",
+					Password: "ignite",
+					TLSConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
 				},
 			},
 		},
@@ -31,12 +37,17 @@ func TestConnect(t *testing.T) {
 			name: "2",
 			args: args{
 				ci: ConnInfo{
-					Network: "tcp",
-					Host:    "localhost",
-					Port:    10800,
-					Major:   999,
-					Minor:   0,
-					Patch:   0,
+					Network:  "tcp",
+					Host:     "localhost",
+					Port:     10800,
+					Major:    999,
+					Minor:    0,
+					Patch:    0,
+					Username: "ignite",
+					Password: "ignite",
+					TLSConfig: &tls.Config{
+						InsecureSkipVerify: true,
+					},
 				},
 			},
 			wantErr: true,

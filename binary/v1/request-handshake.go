@@ -10,6 +10,7 @@ import (
 // RequestHandshake is struct handshake request
 type RequestHandshake struct {
 	major, minor, patch int
+	username, password  string
 
 	request
 }
@@ -32,6 +33,14 @@ func (r *RequestHandshake) WriteTo(w io.Writer) (int64, error) {
 	if err := WriteByte(r, 2); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake client code")
 	}
+	if len(r.username) > 0 {
+		if err := WriteOString(r, r.username); err != nil {
+			return 0, errors.Wrapf(err, "failed to write handshake username")
+		}
+		if err := WriteOString(r, r.password); err != nil {
+			return 0, errors.Wrapf(err, "failed to write handshake password")
+		}
+	}
 
 	// write payload length
 	l := int32(r.payload.Len())
@@ -44,7 +53,7 @@ func (r *RequestHandshake) WriteTo(w io.Writer) (int64, error) {
 }
 
 // NewRequestHandshake creates new handshake request object
-func NewRequestHandshake(major, minor, patch int) *RequestHandshake {
+func NewRequestHandshake(major, minor, patch int, username, password string) *RequestHandshake {
 	return &RequestHandshake{request: newRequest(),
-		major: major, minor: minor, patch: patch}
+		major: major, minor: minor, patch: patch, username: username, password: password}
 }

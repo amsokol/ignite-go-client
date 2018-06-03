@@ -1,6 +1,7 @@
 package ignitesql
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"database/sql/driver"
 	"net/url"
@@ -38,27 +39,31 @@ func (d *Driver) Open(name string) (driver.Conn, error) {
 // url format: <protocol>://<host>:<port>/<cache>?param1=<value1>&param2=<value2>&paramN=<valueN>
 //
 // URL parts:
-// | Name               | Mandatory | Description                                   | Default value                   |
-// |--------------------|-----------|-----------------------------------------------|---------------------------------|
-// | protocol           | no        | Connection protocol                           | tcp                             |
-// | host               | no        | Apache Ignite Cluster host name or IP address | 127.0.0.1                       |
-// | port               | no        | Max rows to return by query                   | 10800                           |
-// | cache              | yes       | Cache name                                    |                                 |
+// | Name                     | Mandatory | Description                                                                     | Default value                     |
+// |--------------------------|-----------|---------------------------------------------------------------------------------|-----------------------------------|
+// | protocol                 | no        | Connection protocol                                                             | tcp                               |
+// | host                     | no        | Apache Ignite Cluster host name or IP address                                   | 127.0.0.1                         |
+// | port                     | no        | Max rows to return by query                                                     | 10800                             |
+// | cache                    | yes       | Cache name                                                                      |                                   |
 //
 // URL parameters (param1,...paramN):
-// | Name               | Mandatory | Description                                                   | Default value                     |
-// |--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
-// | schema             | no        | Database schema                                               | "" (PUBLIC schema will be used)   |
-// | version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
-// | page-size          | no        | Query cursor page size                                        | 10000                             |
-// | max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
-// | timeout            | no        | Timeout in milliseconds to execute query                      | 0 (disable timeout)               |
-// | distributed-joins  | no        | Distributed joins (yes/no)                                    | no                                |
-// | local-query        | no        | Local query (yes/no)                                          | no                                |
-// | replicated-only    | no        | Whether query contains only replicated tables or not (yes/no) | no                                |
-// | enforce-join-order | no        | Enforce join order (yes/no)                                   | no                                |
-// | collocated         | no        | Whether your data is co-located or not (yes/no)               | no                                |
-// | lazy-query         | no        | Lazy query execution (yes/no)                                 | no                                |
+// | Name                     | Mandatory | Description                                                                     | Default value                     |
+// |--------------------------|-----------|---------------------------------------------------------------------------------|-----------------------------------|
+// | schema                   | no        | Database schema                                                                 | "" (PUBLIC schema will be used)   |
+// | version                  | no        | Binary protocol version in Semantic Version format                              | 1.0.0                             |
+// | username                 | no        | Username                                                                        | no                                |
+// | password                 | no        | Password                                                                        | no                                |
+// | tls                      | no        | Connect using TLS                                                               | no                                |
+// | tls-insecure-skip-verify | no        | Controls whether a client verifies the server's certificate chain and host name | no                                |
+// | page-size                | no        | Query cursor page size                                                          | 10000                             |
+// | max-rows                 | no        | Max rows to return by query                                                     | 0 (looks like it means unlimited) |
+// | timeout                  | no        | Timeout in milliseconds to execute query                                        | 0 (disable timeout)               |
+// | distributed-joins        | no        | Distributed joins (yes/no)                                                      | no                                |
+// | local-query              | no        | Local query (yes/no)                                                            | no                                |
+// | replicated-only          | no        | Whether query contains only replicated tables or not (yes/no)                   | no                                |
+// | enforce-join-order       | no        | Enforce join order (yes/no)                                                     | no                                |
+// | collocated               | no        | Whether your data is co-located or not (yes/no)                                 | no                                |
+// | lazy-query               | no        | Lazy query execution (yes/no)                                                   | no                                |
 //
 // url example: tcp://127.0.0.1:10800/?version=v1.0.0&page-size=100000
 func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
@@ -87,6 +92,8 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 	ver, _ := semver.NewVersion("1.0.0")
 	ci.PageSize = 10000
 
+	var tlsEnabled, tlsInsecureSkipVerify bool
+
 	for k, v := range u.Query() {
 		var val string
 		if len(v) > 0 {
@@ -99,6 +106,14 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 			if len(val) > 0 {
 				ver, err = semver.NewVersion(val)
 			}
+		case "username":
+			ci.Username = val
+		case "password":
+			ci.Password = val
+		case "tls":
+			tlsEnabled, err = d.parseYesNo(val)
+		case "tls-insecure-skip-verify":
+			tlsInsecureSkipVerify, err = d.parseYesNo(val)
 		case "page-size":
 			if len(val) > 0 {
 				ci.PageSize, err = strconv.Atoi(val)
@@ -135,6 +150,10 @@ func (d *Driver) parseURL(name string) (common.ConnInfo, error) {
 	ci.ConnInfo.Major = int(ver.Major())
 	ci.ConnInfo.Minor = int(ver.Minor())
 	ci.ConnInfo.Patch = int(ver.Patch())
+
+	if tlsEnabled {
+		ci.TLSConfig = &tls.Config{InsecureSkipVerify: tlsInsecureSkipVerify}
+	}
 
 	return ci, nil
 }

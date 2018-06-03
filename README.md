@@ -56,10 +56,15 @@ c, err := ignite.Connect(ctx, ignite.ConnInfo{
     Host:    "localhost",
     Port:    10800,
     Major:   1,
-    Minor:   0,
+    Minor:   1,
     Patch:   0,
+    Username: "ignite",
+    Password: "ignite",
     Dialer: net.Dialer{
         Timeout: 10 * time.Second,
+    },
+    TLSConfig: &tls.Config{
+        InsecureSkipVerify: true,
     },
 })
 if err != nil {
@@ -69,9 +74,9 @@ defer c.Close()
 
 ```
 
-See [example of Key-Value Queries](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L98) for more.
+See [example of Key-Value Queries](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L106) for more.
 
-See [example of SQL Queries](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L162) for more.
+See [example of SQL Queries](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L181) for more.
 
 See ["_test.go" files](https://github.com/amsokol/ignite-go-client/tree/master/binary/v1) for other examples.
 
@@ -93,7 +98,8 @@ Connect to server:
 ctx := context.Background()
 
 // open connection
-db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?version=1.0.0&&page-size=10000&timeout=5000")
+db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?version=1.1.0&username=ignite&password=ignite"+
+    "&tls=yes&tls-insecure-skip-verify=yes&page-size=10000&timeout=5000")
 if err != nil {
     t.Fatalf("failed to open connection: %v", err)
 }
@@ -101,7 +107,7 @@ defer db.Close()
 
 ```
 
-See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L15) for more.
+See [example](https://github.com/amsokol/ignite-go-client/blob/master/examples_test.go#L16) for more.
 
 Connection URL format:
 
@@ -120,24 +126,29 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 **URL parameters (param1,...paramN):**
 
-| Name               | Mandatory | Description                                                   | Default value                     |
-|--------------------|-----------|---------------------------------------------------------------|-----------------------------------|
-| schema             | no        | Database schema                                               | "" (PUBLIC schema is used)   |
-| version            | no        | Binary protocol version in Semantic Version format            | 1.0.0                             |
-| page-size          | no        | Query cursor page size                                        | 10000                             |
-| max-rows           | no        | Max rows to return by query                                   | 0 (looks like it means unlimited) |
-| timeout            | no        | Timeout in milliseconds to execute query                      | 0 (disable timeout)               |
-| distributed-joins  | no        | Distributed joins (yes/no)                                    | no                                |
-| local-query        | no        | Local query (yes/no)                                          | no                                |
-| replicated-only    | no        | Whether query contains only replicated tables or not (yes/no) | no                                |
-| enforce-join-order | no        | Enforce join order (yes/no)                                   | no                                |
-| collocated         | no        | Whether your data is co-located or not (yes/no)               | no                                |
-| lazy-query         | no        | Lazy query execution (yes/no)                                 | no                                |
+| Name                     | Mandatory | Description                                                                     | Default value                     |
+|--------------------------|-----------|---------------------------------------------------------------------------------|-----------------------------------|
+| schema                   | no        | Database schema                                                                 | "" (PUBLIC schema is used)        |
+| version                  | no        | Binary protocol version in Semantic Version format                              | 1.0.0                             |
+| username                 | no        | Username                                                                        | no                                |
+| password                 | no        | Password                                                                        | no                                |
+| tls                      | no        | Connect using TLS                                                               | no                                |
+| tls-insecure-skip-verify | no        | Controls whether a client verifies the server's certificate chain and host name | no                                |
+| page-size                | no        | Query cursor page size                                                          | 10000                             |
+| max-rows                 | no        | Max rows to return by query                                                     | 0 (looks like it means unlimited) |
+| timeout                  | no        | Timeout in milliseconds to execute query                                        | 0 (disable timeout)               |
+| distributed-joins        | no        | Distributed joins (yes/no)                                                      | no                                |
+| local-query              | no        | Local query (yes/no)                                                            | no                                |
+| replicated-only          | no        | Whether query contains only replicated tables or not (yes/no)                   | no                                |
+| enforce-join-order       | no        | Enforce join order (yes/no)                                                     | no                                |
+| collocated               | no        | Whether your data is co-located or not (yes/no)                                 | no                                |
+| lazy-query               | no        | Lazy query execution (yes/no)                                                   | no                                |
 
 ### How to run tests
 
-1. Download `Apache Ignite 2.4+` from [official site](https://ignite.apache.org/download.cgi#binaries)
+1. Download `Apache Ignite 2.5` from [official site](https://ignite.apache.org/download.cgi#binaries)
 1. Extract distributive to any folder
+1. Persistance mode is enabled to run test. So you need to remove `<path_with_ignite>\work` folder each time to clean test data before run tests.
 1. `cd` to `testdata` folder with `configuration-for-tests.xml` file
 1. Start Ignite server with `configuration-for-tests.xml` configuration file:
 
@@ -149,7 +160,17 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 <path_with_ignite>/bin/ignite.sh ./configuration-for-tests.xml
 ```
 
-1. Run tests into the root folder of this project:
+6. Activate cluster:
+
+```bash
+# For Windows:
+<path_with_ignite>\bin\control.bat --activate --user ignite --password ignite
+
+# For Linux:
+<path_with_ignite>/bin/control.bat --activate --user ignite --password ignite
+```
+
+7. Run tests into the root folder of this project:
 
 ```bash
 go test ./...

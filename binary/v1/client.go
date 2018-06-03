@@ -17,6 +17,7 @@ type ConnInfo struct {
 	Network, Host       string
 	Port                int
 	Major, Minor, Patch int
+	Username, Password  string
 	Dialer              net.Dialer
 	TLSConfig           *tls.Config
 }
@@ -268,7 +269,7 @@ func Connect(ci ConnInfo) (Client, error) {
 	runtime.SetFinalizer(c, clientFinalizer)
 
 	// request and response
-	req := NewRequestHandshake(ci.Major, ci.Minor, ci.Patch)
+	req := NewRequestHandshake(ci.Major, ci.Minor, ci.Patch, ci.Username, ci.Password)
 	res := &ResponseHandshake{}
 
 	// make handshake
