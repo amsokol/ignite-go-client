@@ -154,7 +154,7 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 <path_with_ignite>/bin/ignite.sh ./configuration-for-tests.xml
 ```
 
-6. Active cluster:
+6. Activate cluster:
 
 ```bash
 # For Windows:
