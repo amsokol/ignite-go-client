@@ -4,6 +4,8 @@
 
 This library is production ready.
 
+**Note: Driver is not tested with Apache Ignite v2.7 yet. In progress...** 
+
 Version is less than v1.0 because not all functionality is implemented yet (see [Road map](#road-map) for details). But the implemented functionality is production ready.
 
 ### Requirements
