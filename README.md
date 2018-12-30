@@ -1,5 +1,7 @@
 # ignite-go-client
 
+[![GoDoc](http://www.godoc.org/github.com/amsokol/ignite-go-client?status.svg)](http://www.godoc.org/github.com/amsokol/ignite-go-client)
+
 ## Apache Ignite (GridGain) v2.4+ client for Go programming language
 
 This library is production ready.
