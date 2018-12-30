@@ -33,13 +33,11 @@ func (r *RequestHandshake) WriteTo(w io.Writer) (int64, error) {
 	if err := WriteByte(r, 2); err != nil {
 		return 0, errors.Wrapf(err, "failed to write handshake client code")
 	}
-	if len(r.username) > 0 {
-		if err := WriteOString(r, r.username); err != nil {
-			return 0, errors.Wrapf(err, "failed to write handshake username")
-		}
-		if err := WriteOString(r, r.password); err != nil {
-			return 0, errors.Wrapf(err, "failed to write handshake password")
-		}
+	if err := WriteOString(r, r.username); err != nil {
+		return 0, errors.Wrapf(err, "failed to write handshake username")
+	}
+	if err := WriteOString(r, r.password); err != nil {
+		return 0, errors.Wrapf(err, "failed to write handshake password")
 	}
 
 	// write payload length
