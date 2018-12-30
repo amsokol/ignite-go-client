@@ -54,12 +54,16 @@ c, err := ignite.Connect(ctx, ignite.ConnInfo{
     Major:   1,
     Minor:   1,
     Patch:   0,
+    // Credentials are only needed if they're configured in your Ignite server.
     Username: "ignite",
     Password: "ignite",
     Dialer: net.Dialer{
         Timeout: 10 * time.Second,
     },
+    // Don't set the TLSConfig if your Ignite server
+    // isn't configured with any TLS certificates.
     TLSConfig: &tls.Config{
+        // You should only set this to true for testing purposes.
         InsecureSkipVerify: true,
     },
 })
