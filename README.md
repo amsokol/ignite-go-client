@@ -28,7 +28,7 @@ Project status:
 ### How to install
 
 ```shell
-go get -u github.com/amsokol/ignite-go-client
+go get -u github.com/amsokol/ignite-go-client/...
 ```
 
 ### How to use client
