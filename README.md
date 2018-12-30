@@ -31,12 +31,6 @@ Project status:
 go get -u github.com/amsokol/ignite-go-client
 ```
 
-or use go [dep](https://golang.github.io/dep/) tool:
-
-```shell
-dep ensure -add github.com/amsokol/ignite-go-client
-```
-
 ### How to use client
 
 Import client package:
@@ -119,17 +113,17 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 
 **URL parts:**
 
-| Name               | Mandatory | Description                                   | Default value                   |
-|--------------------|-----------|-----------------------------------------------|---------------------------------|
-| protocol           | no        | Connection protocol                           | tcp                             |
-| host               | no        | Apache Ignite Cluster host name or IP address | 127.0.0.1                       |
-| port               | no        | Max rows to return by query                   | 10800                           |
-| cache              | yes       | Cache name                                    |                                 |
+| Name     | Mandatory | Description                                   | Default value |
+| -------- | --------- | --------------------------------------------- | ------------- |
+| protocol | no        | Connection protocol                           | tcp           |
+| host     | no        | Apache Ignite Cluster host name or IP address | 127.0.0.1     |
+| port     | no        | Max rows to return by query                   | 10800         |
+| cache    | yes       | Cache name                                    |               |
 
 **URL parameters (param1,...paramN):**
 
 | Name                     | Mandatory | Description                                                                     | Default value                     |
-|--------------------------|-----------|---------------------------------------------------------------------------------|-----------------------------------|
+| ------------------------ | --------- | ------------------------------------------------------------------------------- | --------------------------------- |
 | schema                   | no        | Database schema                                                                 | "" (PUBLIC schema is used)        |
 | version                  | no        | Binary protocol version in Semantic Version format                              | 1.0.0                             |
 | username                 | no        | Username                                                                        | no                                |
@@ -149,10 +143,10 @@ protocol://host:port/cache?param1=value1&param2=value2&paramN=valueN
 ### How to run tests
 
 1. Download `Apache Ignite 2.5` from [official site](https://ignite.apache.org/download.cgi#binaries)
-1. Extract distributive to any folder
-1. Persistance mode is enabled to run tests. So you need to remove `<path_with_ignite>\work` folder each time to clean up test data before run tests.
-1. `cd` to `testdata` folder with `configuration-for-tests.xml` file
-1. Start Ignite server with `configuration-for-tests.xml` configuration file:
+2. Extract distributive to any folder
+3. Persistance mode is enabled to run tests. So you need to remove `<path_with_ignite>\work` folder each time to clean up test data before run tests.
+4. `cd` to `testdata` folder with `configuration-for-tests.xml` file
+5. Start Ignite server with `configuration-for-tests.xml` configuration file:
 
 ```bash
 # For Windows:
@@ -181,7 +175,7 @@ go test ./...
 ### Type mapping
 
 | Apache Ignite Type | Go language type                                                       |
-|--------------------|------------------------------------------------------------------------|
+| ------------------ | ---------------------------------------------------------------------- |
 | byte               | byte                                                                   |
 | short              | int16                                                                  |
 | int                | int32                                                                  |
@@ -275,15 +269,15 @@ log.Printf("key=\"%s\", value=%t", "field3", v)
 
 ### SQL and Scan Queries supported operations
 
-| Operation                           | Status of implementation                                |
-|-------------------------------------|---------------------------------------------------------|
-| OP_QUERY_SQL                        | Done.                                                   |
-| OP_QUERY_SQL_CURSOR_GET_PAGE        | Done.                                                   |
-| OP_QUERY_SQL_FIELDS                 | Done.                                                   |
-| OP_QUERY_SQL_FIELDS_CURSOR_GET_PAGE | Done.                                                   |
-| OP_QUERY_SCAN                       | Done (without filter object support).                   |
-| OP_QUERY_SCAN_CURSOR_GET_PAGE       | Done (without filter object support).                   |
-| OP_RESOURCE_CLOSE                   | Done.                                                   |
+| Operation                           | Status of implementation              |
+| ----------------------------------- | ------------------------------------- |
+| OP_QUERY_SQL                        | Done.                                 |
+| OP_QUERY_SQL_CURSOR_GET_PAGE        | Done.                                 |
+| OP_QUERY_SQL_FIELDS                 | Done.                                 |
+| OP_QUERY_SQL_FIELDS_CURSOR_GET_PAGE | Done.                                 |
+| OP_QUERY_SCAN                       | Done (without filter object support). |
+| OP_QUERY_SCAN_CURSOR_GET_PAGE       | Done (without filter object support). |
+| OP_RESOURCE_CLOSE                   | Done.                                 |
 
 ### Error handling
 
