@@ -6,8 +6,6 @@
 
 This library is production ready.
 
-**Note: Driver is not tested with Apache Ignite v2.7 yet. In progress...** 
-
 Version is less than v1.0 because not all functionality is implemented yet (see [Road map](#road-map) for details). But the implemented functionality is production ready.
 
 ### Requirements
@@ -20,10 +18,10 @@ Version is less than v1.0 because not all functionality is implemented yet (see 
 Project status:
 
 1. Develop "[Cache Configuration](https://apacheignite.readme.io/docs/binary-client-protocol-cache-configuration-operations)" methods (Completed)
-1. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
-1. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (Completed)
-1. Develop SQL driver (Completed)
-1. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (Not started)
+2. Develop "[Key-Value Queries](https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations)" methods (Completed*)
+3. Develop "[SQL and Scan Queries](https://apacheignite.readme.io/docs/binary-client-protocol-sql-operations)" methods (Completed)
+4. Develop SQL driver (Completed)
+5. Develop "[Binary Types](https://apacheignite.readme.io/docs/binary-client-protocol-binary-type-operations)" methods (Not started)
 
 *Not all types are supported. See **[type mapping](#type-mapping)** for detail.
 
