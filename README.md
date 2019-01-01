@@ -1,6 +1,11 @@
 # ignite-go-client
 
-[![GoDoc](http://www.godoc.org/github.com/amsokol/ignite-go-client?status.svg)](http://www.godoc.org/github.com/amsokol/ignite-go-client)
+[![GoDoc](https://www.godoc.org/github.com/amsokol/ignite-go-client?status.svg)](https://www.godoc.org/github.com/amsokol/ignite-go-client)
+[![GitHub release](https://img.shields.io/github/release/amsokol/ignite-go-client.svg)](https://github.com/amsokol/ignite-go-client/releases)
+[![GitHub issues](https://img.shields.io/github/issues/amsokol/ignite-go-client.svg)](https://github.com/amsokol/ignite-go-client/issues)
+[![GitHub issues closed](https://img.shields.io/github/issues-closed/amsokol/ignite-go-client.svg)](https://github.com/amsokol/ignite-go-client/issues)
+[![Go Report Card](https://goreportcard.com/badge/amsokol/ignite-go-client)](http://goreportcard.com/report/amsokol/ignite-go-client)
+[![license](https://img.shields.io/github/license/amsokol/ignite-go-client.svg)](https://github.com/amsokol/ignite-go-client/blob/master/LICENSE)
 
 ## Apache Ignite (GridGain) v2.5+ client for Go programming language
 
