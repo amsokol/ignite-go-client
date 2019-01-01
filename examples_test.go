@@ -19,9 +19,13 @@ func Test_SQL_Driver(t *testing.T) {
 	// open connection
 	db, err := sql.Open("ignite", "tcp://localhost:10800/ExampleDB?"+
 		"version=1.1.0"+
+		// Credentials are only needed if they're configured in your Ignite server.
 		"&username=ignite"+
 		"&password=ignite"+
+		// Don't set "tls=yes" if your Ignite server
+		// isn't configured with any TLS certificates.
 		"&tls=yes"+
+		// You should only set this to true for testing purposes.
 		"&tls-insecure-skip-verify=yes"+
 		"&page-size=10000"+
 		"&timeout=5000")
@@ -106,18 +110,22 @@ func Test_SQL_Driver(t *testing.T) {
 func Test_Key_Value(t *testing.T) {
 	// connect
 	c, err := ignite.Connect(ignite.ConnInfo{
-		Network:  "tcp",
-		Host:     "localhost",
-		Port:     10800,
-		Major:    1,
-		Minor:    1,
-		Patch:    0,
+		Network: "tcp",
+		Host:    "localhost",
+		Port:    10800,
+		Major:   1,
+		Minor:   1,
+		Patch:   0,
+		// Credentials are only needed if they're configured in your Ignite server.
 		Username: "ignite",
 		Password: "ignite",
 		Dialer: net.Dialer{
 			Timeout: 10 * time.Second,
 		},
+		// Don't set the TLSConfig if your Ignite server
+		// isn't configured with any TLS certificates.
 		TLSConfig: &tls.Config{
+			// You should only set this to true for testing purposes.
 			InsecureSkipVerify: true,
 		},
 	})
@@ -181,18 +189,22 @@ func Test_Key_Value(t *testing.T) {
 func Test_SQL_Queries(t *testing.T) {
 	// connect
 	c, err := ignite.Connect(ignite.ConnInfo{
-		Network:  "tcp",
-		Host:     "localhost",
-		Port:     10800,
-		Major:    1,
-		Minor:    1,
-		Patch:    0,
+		Network: "tcp",
+		Host:    "localhost",
+		Port:    10800,
+		Major:   1,
+		Minor:   1,
+		Patch:   0,
+		// Credentials are only needed if they're configured in your Ignite server.
 		Username: "ignite",
 		Password: "ignite",
 		Dialer: net.Dialer{
 			Timeout: 10 * time.Second,
 		},
+		// Don't set the TLSConfig if your Ignite server
+		// isn't configured with any TLS certificates.
 		TLSConfig: &tls.Config{
+			// You should only set this to true for testing purposes.
 			InsecureSkipVerify: true,
 		},
 	})
