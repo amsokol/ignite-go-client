@@ -2,7 +2,7 @@
 
 [![GoDoc](http://www.godoc.org/github.com/amsokol/ignite-go-client?status.svg)](http://www.godoc.org/github.com/amsokol/ignite-go-client)
 
-## Apache Ignite (GridGain) v2.4+ client for Go programming language
+## Apache Ignite (GridGain) v2.5+ client for Go programming language
 
 This library is production ready.
 
@@ -10,7 +10,7 @@ Version is less than v1.0 because not all functionality is implemented yet (see 
 
 ### Requirements
 
-- Apache Ignite v2.4+ (because of binary communication protocol is used)
+- Apache Ignite v2.5+ (because of binary communication protocol is used)
 - go v1.9+
 
 ### Road map
