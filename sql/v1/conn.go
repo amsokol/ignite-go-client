@@ -24,6 +24,7 @@ type conn struct {
 	driver.ExecerContext
 	driver.Pinger
 	driver.QueryerContext
+	driver.NamedValueChecker
 }
 
 // isConnected return true if connection to the cluster is active
@@ -38,6 +39,15 @@ func (c *conn) resourceClose(id int64) error {
 	}
 	return c.client.ResourceClose(id)
 }
+
+// <driver.NamedValueChecker>
+
+func (c *conn) CheckNamedValue(val *driver.NamedValue) error {
+	// Ignore and handle later
+	return nil
+}
+
+// </driver.NamedValueChecker>
 
 // <driver.Conn>
 
