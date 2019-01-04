@@ -40,15 +40,6 @@ func (c *conn) resourceClose(id int64) error {
 	return c.client.ResourceClose(id)
 }
 
-// <driver.NamedValueChecker>
-
-func (c *conn) CheckNamedValue(val *driver.NamedValue) error {
-	// Ignore and handle later
-	return nil
-}
-
-// </driver.NamedValueChecker>
-
 // <driver.Conn>
 
 // Prepare returns a prepared statement, bound to this connection.
@@ -224,6 +215,15 @@ func (c *conn) QueryContext(ctx context.Context, query string, args []driver.Nam
 }
 
 // </driver.QueryerContext>
+
+// <driver.NamedValueChecker>
+
+func (c *conn) CheckNamedValue(val *driver.NamedValue) error {
+	// Ignore and handle later
+	return nil
+}
+
+// </driver.NamedValueChecker>
 
 func (c *conn) QueryNexPageContext(ctx context.Context, cursorID int64) (*ignite.ResponseOperation, error) {
 	if !c.isConnected() {

@@ -310,6 +310,15 @@ func WriteOArrayLongs(w io.Writer, v []int64) error {
 	return binary.Write(w, binary.LittleEndian, v)
 }
 
+// WriteOArrayGoInts writes "Go int" array object value
+func WriteOArrayGoInts(w io.Writer, v []int) error {
+	a := make([]int64, len(v))
+	for i, j := range v {
+		a[i] = int64(j)
+	}
+	return WriteOArrayLongs(w, a)
+}
+
 // WriteOArrayFloats writes "float" array object value
 func WriteOArrayFloats(w io.Writer, v []float32) error {
 	if err := WriteType(w, typeFloatArray); err != nil {
@@ -550,6 +559,10 @@ func WriteObject(w io.Writer, o interface{}) error {
 		return WriteNull(w)
 	}
 
+	if v := reflect.ValueOf(o); v.Kind() == reflect.Ptr {
+		return WriteObject(w, v.Elem().Interface())
+	}
+
 	switch v := o.(type) {
 	case byte:
 		return WriteOByte(w, v)
@@ -559,6 +572,9 @@ func WriteObject(w io.Writer, o interface{}) error {
 		return WriteOInt(w, v)
 	case int64:
 		return WriteOLong(w, v)
+	case int:
+		// int converts to int64
+		return WriteOLong(w, int64(v))
 	case float32:
 		return WriteOFloat(w, v)
 	case float64:
@@ -581,6 +597,8 @@ func WriteObject(w io.Writer, o interface{}) error {
 		return WriteOArrayInts(w, v)
 	case []int64:
 		return WriteOArrayLongs(w, v)
+	case []int:
+		return WriteOArrayGoInts(w, v)
 	case []float32:
 		return WriteOArrayFloats(w, v)
 	case []float64:

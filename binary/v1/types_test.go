@@ -751,6 +751,37 @@ func TestWriteOArrayLongs(t *testing.T) {
 	}
 }
 
+func TestWriteOArrayGoInts(t *testing.T) {
+	type args struct {
+		v []int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []byte
+		wantErr bool
+	}{
+		{
+			name: "1",
+			args: args{
+				v: []int{1, 2, 3},
+			},
+			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := &bytes.Buffer{}
+			if err := WriteOArrayGoInts(w, tt.args.v); (err != nil) != tt.wantErr {
+				t.Errorf("WriteOArrayGoInts() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(w.Bytes(), tt.want) {
+				t.Errorf("WriteOArrayGoInts() = %#v, want %#v", w.Bytes(), tt.want)
+			}
+		})
+	}
+}
+
 func TestWriteOArrayFloats(t *testing.T) {
 	type args struct {
 		v []float32
@@ -1185,11 +1216,21 @@ func TestWriteOComplexObject(t *testing.T) {
 }
 
 func TestWriteObject(t *testing.T) {
-	uid, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
-	dm := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
-	uid1, _ := uuid.Parse("a0c07c4c-7e2e-43d3-8eda-176881477c81")
-	uid2, _ := uuid.Parse("4015b55f-72f0-48a4-8d01-64168d50f627")
-	uid3, _ := uuid.Parse("827d1bf0-c5d4-4443-8708-d8b5de31fe74")
+	byteVal := byte(123)
+	shortVal := int16(12345)
+	intVal := int32(1234567890)
+	longVal := int64(1234567890123456789)
+	goIntVal := int(1234567890)
+	floatVal := float32(123456.789)
+	doubleVal := float64(123456789.12345)
+	charVal := Char('A')
+	boolVal := true
+	stringVal := "test string"
+	uuidVal, _ := uuid.Parse("d6589da7-f8b1-4687-b5bd-2ddc7362a4a4")
+	dateVal := ToDate(time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC))
+	uuidVal1, _ := uuid.Parse("a0c07c4c-7e2e-43d3-8eda-176881477c81")
+	uuidVal2, _ := uuid.Parse("4015b55f-72f0-48a4-8d01-64168d50f627")
+	uuidVal3, _ := uuid.Parse("827d1bf0-c5d4-4443-8708-d8b5de31fe74")
 	dm1 := time.Date(2018, 4, 3, 0, 0, 0, 0, time.UTC)
 	dm2 := time.Date(2019, 5, 4, 0, 0, 0, 0, time.UTC)
 	dm3 := time.Date(2020, 6, 5, 0, 0, 0, 0, time.UTC)
@@ -1197,9 +1238,11 @@ func TestWriteObject(t *testing.T) {
 	tm2 := time.Date(2019, 5, 4, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	tm3 := time.Date(2020, 6, 5, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	tm := time.Date(2018, 4, 3, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	timeVal := ToTime(tm)
 	tm4 := time.Date(1, 1, 1, 14, 25, 32, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	tm5 := time.Date(1, 1, 1, 15, 26, 33, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
 	tm6 := time.Date(1, 1, 1, 16, 27, 34, int(time.Millisecond*123+time.Microsecond*456+789), time.UTC)
+	nullVal := interface{}(nil)
 
 	type args struct {
 		o interface{}
@@ -1213,70 +1256,155 @@ func TestWriteObject(t *testing.T) {
 		{
 			name: "byte",
 			args: args{
-				o: byte(123),
+				o: byteVal,
+			},
+			want: []byte{1, 123},
+		},
+		{
+			name: "pointer to byte",
+			args: args{
+				o: &byteVal,
 			},
 			want: []byte{1, 123},
 		},
 		{
 			name: "short",
 			args: args{
-				o: int16(12345),
+				o: shortVal,
+			},
+			want: []byte{2, 0x39, 0x30},
+		},
+		{
+			name: "pointer to short",
+			args: args{
+				o: &shortVal,
 			},
 			want: []byte{2, 0x39, 0x30},
 		},
 		{
 			name: "int",
 			args: args{
-				o: int32(1234567890),
+				o: intVal,
+			},
+			want: []byte{3, 0xD2, 0x02, 0x96, 0x49},
+		},
+		{
+			name: "pointer to int",
+			args: args{
+				o: &intVal,
 			},
 			want: []byte{3, 0xD2, 0x02, 0x96, 0x49},
 		},
 		{
 			name: "long",
 			args: args{
-				o: int64(1234567890123456789),
+				o: longVal,
 			},
 			want: []byte{4, 0x15, 0x81, 0xE9, 0x7D, 0xF4, 0x10, 0x22, 0x11},
 		},
 		{
+			name: "pointer to long",
+			args: args{
+				o: &longVal,
+			},
+			want: []byte{4, 0x15, 0x81, 0xE9, 0x7D, 0xF4, 0x10, 0x22, 0x11},
+		},
+		{
+			name: "golang int",
+			args: args{
+				o: goIntVal,
+			},
+			want: []byte{4, 0xd2, 0x2, 0x96, 0x49, 0x0, 0x0, 0x0, 0x0},
+		},
+		{
+			name: "pointer to golang int",
+			args: args{
+				o: &goIntVal,
+			},
+			want: []byte{4, 0xd2, 0x2, 0x96, 0x49, 0x0, 0x0, 0x0, 0x0},
+		},
+		{
 			name: "float",
 			args: args{
-				o: float32(123456.789),
+				o: floatVal,
+			},
+			want: []byte{5, 0x65, 0x20, 0xf1, 0x47},
+		},
+		{
+			name: "pointer to float",
+			args: args{
+				o: &floatVal,
 			},
 			want: []byte{5, 0x65, 0x20, 0xf1, 0x47},
 		},
 		{
 			name: "double",
 			args: args{
-				o: float64(123456789.12345),
+				o: doubleVal,
+			},
+			want: []byte{6, 0xad, 0x69, 0x7e, 0x54, 0x34, 0x6f, 0x9d, 0x41},
+		},
+		{
+			name: "pointer double",
+			args: args{
+				o: &doubleVal,
 			},
 			want: []byte{6, 0xad, 0x69, 0x7e, 0x54, 0x34, 0x6f, 0x9d, 0x41},
 		},
 		{
 			name: "char",
 			args: args{
-				o: Char('A'),
+				o: charVal,
+			},
+			want: []byte{7, 0x41, 0x0},
+		},
+		{
+			name: "pointer to char",
+			args: args{
+				o: &charVal,
 			},
 			want: []byte{7, 0x41, 0x0},
 		},
 		{
 			name: "bool",
 			args: args{
-				o: true,
+				o: boolVal,
+			},
+			want: []byte{8, 0x1},
+		},
+		{
+			name: "pointer to bool",
+			args: args{
+				o: &boolVal,
 			},
 			want: []byte{8, 0x1},
 		},
 		{
 			name: "String",
 			args: args{
-				o: "test string",
+				o: stringVal,
+			},
+			want: []byte{9, 0x0B, 0, 0, 0, 0x74, 0x65, 0x73, 0x74, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67},
+		},
+		{
+			name: "pointer to String",
+			args: args{
+				o: &stringVal,
 			},
 			want: []byte{9, 0x0B, 0, 0, 0, 0x74, 0x65, 0x73, 0x74, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67},
 		},
 		{
 			name: "UUID",
 			args: args{
-				o: uid,
+				o: uuidVal,
+			},
+			want: []byte{10, 0xd6, 0x58, 0x9d, 0xa7, 0xf8, 0xb1, 0x46, 0x87, 0xb5,
+				0xbd, 0x2d, 0xdc, 0x73, 0x62, 0xa4, 0xa4},
+		},
+		{
+			name: "pointer to UUID",
+			args: args{
+				o: &uuidVal,
 			},
 			want: []byte{10, 0xd6, 0x58, 0x9d, 0xa7, 0xf8, 0xb1, 0x46, 0x87, 0xb5,
 				0xbd, 0x2d, 0xdc, 0x73, 0x62, 0xa4, 0xa4},
@@ -1284,7 +1412,14 @@ func TestWriteObject(t *testing.T) {
 		{
 			name: "Date",
 			args: args{
-				o: ToDate(dm),
+				o: dateVal,
+			},
+			want: []byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0},
+		},
+		{
+			name: "pointer to Date",
+			args: args{
+				o: &dateVal,
 			},
 			want: []byte{11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0},
 		},
@@ -1296,9 +1431,23 @@ func TestWriteObject(t *testing.T) {
 			want: []byte{12, 3, 0, 0, 0, 1, 2, 3},
 		},
 		{
+			name: "pointer to byte array",
+			args: args{
+				o: &[]byte{1, 2, 3},
+			},
+			want: []byte{12, 3, 0, 0, 0, 1, 2, 3},
+		},
+		{
 			name: "short array",
 			args: args{
 				o: []int16{1, 2, 3},
+			},
+			want: []byte{13, 3, 0, 0, 0, 1, 0, 2, 0, 3, 0},
+		},
+		{
+			name: "pointer to short array",
+			args: args{
+				o: &[]int16{1, 2, 3},
 			},
 			want: []byte{13, 3, 0, 0, 0, 1, 0, 2, 0, 3, 0},
 		},
@@ -1310,6 +1459,13 @@ func TestWriteObject(t *testing.T) {
 			want: []byte{14, 3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0},
 		},
 		{
+			name: "pointer to int array",
+			args: args{
+				o: &[]int32{1, 2, 3},
+			},
+			want: []byte{14, 3, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 3, 0, 0, 0},
+		},
+		{
 			name: "long array",
 			args: args{
 				o: []int64{1, 2, 3},
@@ -1317,9 +1473,37 @@ func TestWriteObject(t *testing.T) {
 			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
 		},
 		{
+			name: "pointer to long array",
+			args: args{
+				o: &[]int64{1, 2, 3},
+			},
+			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+		},
+		{
+			name: "Go int array",
+			args: args{
+				o: []int{1, 2, 3},
+			},
+			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+		},
+		{
+			name: "pointer to Go int array",
+			args: args{
+				o: &[]int{1, 2, 3},
+			},
+			want: []byte{15, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+		},
+		{
 			name: "float array",
 			args: args{
 				o: []float32{1.1, 2.2, 3.3},
+			},
+			want: []byte{16, 0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40},
+		},
+		{
+			name: "pointer to float array",
+			args: args{
+				o: &[]float32{1.1, 2.2, 3.3},
 			},
 			want: []byte{16, 0x3, 0x0, 0x0, 0x0, 0xcd, 0xcc, 0x8c, 0x3f, 0xcd, 0xcc, 0xc, 0x40, 0x33, 0x33, 0x53, 0x40},
 		},
@@ -1332,6 +1516,14 @@ func TestWriteObject(t *testing.T) {
 				0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40},
 		},
 		{
+			name: "pointer to double array",
+			args: args{
+				o: &[]float64{1.1, 2.2, 3.3},
+			},
+			want: []byte{17, 3, 0, 0, 0, 0x9a, 0x99, 0x99, 0x99, 0x99, 0x99, 0xf1, 0x3f, 0x9a, 0x99,
+				0x99, 0x99, 0x99, 0x99, 0x1, 0x40, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0xa, 0x40},
+		},
+		{
 			name: "char array",
 			args: args{
 				o: []Char{'A', 'B', 'Я'},
@@ -1339,9 +1531,23 @@ func TestWriteObject(t *testing.T) {
 			want: []byte{18, 3, 0, 0, 0, 0x41, 0x0, 0x42, 0x0, 0x2f, 0x4},
 		},
 		{
+			name: "pointer to char array",
+			args: args{
+				o: &[]Char{'A', 'B', 'Я'},
+			},
+			want: []byte{18, 3, 0, 0, 0, 0x41, 0x0, 0x42, 0x0, 0x2f, 0x4},
+		},
+		{
 			name: "bool array",
 			args: args{
 				o: []bool{true, false, true},
+			},
+			want: []byte{19, 3, 0, 0, 0, 1, 0, 1},
+		},
+		{
+			name: "pointer to bool array",
+			args: args{
+				o: &[]bool{true, false, true},
 			},
 			want: []byte{19, 3, 0, 0, 0, 1, 0, 1},
 		},
@@ -1356,9 +1562,29 @@ func TestWriteObject(t *testing.T) {
 				0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8},
 		},
 		{
+			name: "pointer to string array",
+			args: args{
+				o: &[]string{"one", "two", "три"},
+			},
+			want: []byte{20, 3, 0, 0, 0,
+				0x9, 3, 0, 0, 0, 0x6f, 0x6e, 0x65,
+				0x9, 3, 0, 0, 0, 0x74, 0x77, 0x6f,
+				0x9, 6, 0, 0, 0, 0xd1, 0x82, 0xd1, 0x80, 0xd0, 0xb8},
+		},
+		{
 			name: "UUID array",
 			args: args{
-				o: []uuid.UUID{uid1, uid2, uid3},
+				o: []uuid.UUID{uuidVal1, uuidVal2, uuidVal3},
+			},
+			want: []byte{21, 3, 0, 0, 0,
+				10, 0xa0, 0xc0, 0x7c, 0x4c, 0x7e, 0x2e, 0x43, 0xd3, 0x8e, 0xda, 0x17, 0x68, 0x81, 0x47, 0x7c, 0x81,
+				10, 0x40, 0x15, 0xb5, 0x5f, 0x72, 0xf0, 0x48, 0xa4, 0x8d, 0x1, 0x64, 0x16, 0x8d, 0x50, 0xf6, 0x27,
+				10, 0x82, 0x7d, 0x1b, 0xf0, 0xc5, 0xd4, 0x44, 0x43, 0x87, 0x8, 0xd8, 0xb5, 0xde, 0x31, 0xfe, 0x74},
+		},
+		{
+			name: "pointer to UUID array",
+			args: args{
+				o: &[]uuid.UUID{uuidVal1, uuidVal2, uuidVal3},
 			},
 			want: []byte{21, 3, 0, 0, 0,
 				10, 0xa0, 0xc0, 0x7c, 0x4c, 0x7e, 0x2e, 0x43, 0xd3, 0x8e, 0xda, 0x17, 0x68, 0x81, 0x47, 0x7c, 0x81,
@@ -1376,9 +1602,26 @@ func TestWriteObject(t *testing.T) {
 				11, 0x0, 0xf8, 0xc6, 0x81, 0x72, 0x1, 0x0, 0x0},
 		},
 		{
+			name: "pointer to date array",
+			args: args{
+				o: []Date{ToDate(dm1), ToDate(dm2), ToDate(dm3)},
+			},
+			want: []byte{22, 3, 0, 0, 0,
+				11, 0x0, 0xa0, 0xcd, 0x88, 0x62, 0x1, 0x0, 0x0,
+				11, 0x0, 0xf0, 0x23, 0x80, 0x6a, 0x1, 0x0, 0x0,
+				11, 0x0, 0xf8, 0xc6, 0x81, 0x72, 0x1, 0x0, 0x0},
+		},
+		{
 			name: "Timestamp",
 			args: args{
 				o: tm,
+			},
+			want: []byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0},
+		},
+		{
+			name: "pointer to Timestamp",
+			args: args{
+				o: &tm,
 			},
 			want: []byte{33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0},
 		},
@@ -1393,9 +1636,26 @@ func TestWriteObject(t *testing.T) {
 				33, 0x6b, 0x1d, 0x4f, 0x85, 0x72, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0},
 		},
 		{
+			name: "pointer to Timestamp array",
+			args: args{
+				o: &[]time.Time{tm1, tm2, tm3},
+			},
+			want: []byte{34, 3, 0, 0, 0,
+				33, 0xdb, 0xb, 0xe6, 0x8b, 0x62, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+				33, 0xa3, 0x38, 0x74, 0x83, 0x6a, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0,
+				33, 0x6b, 0x1d, 0x4f, 0x85, 0x72, 0x1, 0x0, 0x0, 0x55, 0xf8, 0x6, 0x0},
+		},
+		{
 			name: "Time",
 			args: args{
-				o: ToTime(tm),
+				o: timeVal,
+			},
+			want: []byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0},
+		},
+		{
+			name: "pointer to Time",
+			args: args{
+				o: &timeVal,
 			},
 			want: []byte{36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0},
 		},
@@ -1410,9 +1670,26 @@ func TestWriteObject(t *testing.T) {
 				36, 0x6b, 0x25, 0x88, 0x3, 0x0, 0x0, 0x0, 0x0},
 		},
 		{
+			name: "pointer to Time array",
+			args: args{
+				o: &[]Time{ToTime(tm4), ToTime(tm5), ToTime(tm6)},
+			},
+			want: []byte{37, 3, 0, 0, 0,
+				36, 0xdb, 0x6b, 0x18, 0x3, 0x0, 0x0, 0x0, 0x0,
+				36, 0xa3, 0x48, 0x50, 0x3, 0x0, 0x0, 0x0, 0x0,
+				36, 0x6b, 0x25, 0x88, 0x3, 0x0, 0x0, 0x0, 0x0},
+		},
+		{
 			name: "NULL",
 			args: args{
 				o: nil,
+			},
+			want: []byte{101},
+		},
+		{
+			name: "pointer to NULL",
+			args: args{
+				o: &nullVal,
 			},
 			want: []byte{101},
 		},
