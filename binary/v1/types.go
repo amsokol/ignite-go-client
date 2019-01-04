@@ -122,6 +122,18 @@ func ToTime(t time.Time) Time {
 	return Time(t3)
 }
 
+// Flips a UUID buffer into the right order
+func uuidFlip(id *uuid.UUID) {
+	for i := 3; i >= 0; i-- {
+		opp := 7-i
+		id[i], id[opp] = id[opp], id[i]
+	}
+	for i := 3; i >= 0; i-- {
+		opp := 15-i
+		id[i+8], id[opp] = id[opp], id[i+8]
+	}
+}
+
 // WriteType writes object type code
 func WriteType(w io.Writer, code byte) error {
 	return WriteByte(w, code)
@@ -250,6 +262,7 @@ func WriteOUUID(w io.Writer, v uuid.UUID) error {
 	if err := WriteType(w, typeUUID); err != nil {
 		return err
 	}
+	uuidFlip(&v)
 	return binary.Write(w, binary.LittleEndian, v)
 }
 
@@ -714,6 +727,7 @@ func ReadOString(r io.Reader) (string, error) {
 func ReadUUID(r io.Reader) (uuid.UUID, error) {
 	var o uuid.UUID
 	err := binary.Read(r, binary.LittleEndian, &o)
+	uuidFlip(&o)
 	return o, err
 }
 
