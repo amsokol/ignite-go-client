@@ -188,7 +188,7 @@ go test ./...
 | byte               | byte                                                                   |
 | short              | int16                                                                  |
 | int                | int32                                                                  |
-| long               | int64                                                                  |
+| long               | int64, int                                                             |
 | float              | float32                                                                |
 | double             | float64                                                                |
 | char               | ignite.Char                                                            |
@@ -221,6 +221,8 @@ go test ./...
 | NULL               | nil                                                                    |
 | Complex Object     | ignite.ComplexObject                                                   |
 
+**Note:** pointers (*byte, *int32, *string, *uuid.UUID, *[]time.Time, etc.) are supported also.
+
 *`Date` is outdated type. It's recommended to use `Timestamp` type.
 If you still need `Date` type use `ignite.ToDate()` function when you **put** date:
 
@@ -232,7 +234,7 @@ err := c.CachePut("CacheGet", false, "Date", ignite.ToDate(t)) // ToDate() conve
 t, err = c.CacheGet("CacheGet", false, "Date") // 't' is time.Time, you don't need any converting
 ```
 
-*`Time` is outdated type. It's recommended to use `Timestamp` type.
+**`Time` is outdated type. It's recommended to use `Timestamp` type.
 If you still need `Time` type use `ignite.ToTime()` function when you **put** time:
 
 ```go
