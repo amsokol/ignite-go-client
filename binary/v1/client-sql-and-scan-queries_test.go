@@ -182,7 +182,7 @@ func Test_client_QuerySQLFields(t *testing.T) {
 				FieldCount: 1,
 				Fields:     []string{},
 				QuerySQLFieldsPage: QuerySQLFieldsPage{
-					Rows: [][]interface{}{[]interface{}{int64(3)}},
+					Rows: [][]interface{}{{int64(3)}},
 				},
 			},
 		},
@@ -211,7 +211,7 @@ func Test_client_QuerySQLFields(t *testing.T) {
 				FieldCount: 1,
 				Fields:     []string{},
 				QuerySQLFieldsPage: QuerySQLFieldsPage{
-					Rows: [][]interface{}{[]interface{}{int64(5)}},
+					Rows: [][]interface{}{{int64(5)}},
 				},
 			},
 		},
@@ -242,8 +242,8 @@ func Test_client_QuerySQLFields(t *testing.T) {
 				Fields:     []string{"NAME", "FOUND", "FIRSTNAME", "LASTNAME", "SALARY"},
 				QuerySQLFieldsPage: QuerySQLFieldsPage{
 					Rows: [][]interface{}{
-						[]interface{}{"Org 2", tm, "First name 3", "Last name 3", float64(300.0)},
-						[]interface{}{"Org 2", tm, "First name 4", "Last name 4", float64(400.0)},
+						{"Org 2", tm, "First name 3", "Last name 3", float64(300.0)},
+						{"Org 2", tm, "First name 4", "Last name 4", float64(400.0)},
 					},
 				},
 			},
@@ -316,7 +316,7 @@ func Test_client_QuerySQLFieldsCursorGetPage(t *testing.T) {
 			},
 			want: QuerySQLFieldsPage{
 				Rows: [][]interface{}{
-					[]interface{}{"Org 3", tm},
+					{"Org 3", tm},
 				},
 				HasMore: false,
 			},
