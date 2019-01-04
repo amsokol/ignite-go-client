@@ -125,11 +125,11 @@ func ToTime(t time.Time) Time {
 // Flips a UUID buffer into the right order
 func uuidFlip(id *uuid.UUID) {
 	for i := 3; i >= 0; i-- {
-		opp := 7-i
+		opp := 7 - i
 		id[i], id[opp] = id[opp], id[i]
 	}
 	for i := 3; i >= 0; i-- {
-		opp := 15-i
+		opp := 15 - i
 		id[i+8], id[opp] = id[opp], id[i+8]
 	}
 }
