@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"io"
 	"reflect"
+	"sort"
 	"time"
 
 	"github.com/google/uuid"
@@ -511,11 +512,18 @@ func WriteOComplexObject(w io.Writer, v ComplexObject) error {
 		return err
 	}
 
+	// sort fields to ensure consistent ordering
+	sorted := make([]int32, 0, len(v.Fields))
+	for field := range v.Fields {
+		sorted = append(sorted, field)
+	}
+	sort.Slice(sorted, func(i, j int) bool { return sorted[i] < sorted[j] })
+
 	// prepare schema & content
 	schema := &bytes.Buffer{}
 	fields := &bytes.Buffer{}
 	schemaID := uint32(0x811C9DC5)
-	for field, value := range v.Fields {
+	for _, field := range sorted {
 		fieldID := uint32(field)
 		schemaID = schemaID ^ (fieldID & 0xFF)
 		schemaID = schemaID * uint32(0x01000193)
@@ -531,7 +539,7 @@ func WriteOComplexObject(w io.Writer, v ComplexObject) error {
 		if err := WriteInt(schema, int32(ComplexObjectHeaderLength+fields.Len())); err != nil {
 			return errors.Wrapf(err, "failed to write field offset with hash %d", field)
 		}
-		if err := WriteObject(fields, value); err != nil {
+		if err := WriteObject(fields, v.Fields[field]); err != nil {
 			return errors.Wrapf(err, "failed to write field value with hash %d", field)
 		}
 	}
