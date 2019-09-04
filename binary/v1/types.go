@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"io"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -88,18 +89,18 @@ type ComplexObject struct {
 
 // Set sets field value
 func (c *ComplexObject) Set(field string, value interface{}) {
-	c.Fields[HashCode(field)] = value
+	c.Fields[HashCode(strings.ToLower(field))] = value
 }
 
 // Get gets field value
 func (c *ComplexObject) Get(field string) (interface{}, bool) {
-	v, ok := c.Fields[HashCode(field)]
+	v, ok := c.Fields[HashCode(strings.ToLower(field))]
 	return v, ok
 }
 
 // NewComplexObject is constructor for ComplexObject
 func NewComplexObject(typeName string) ComplexObject {
-	return ComplexObject{Type: HashCode(typeName), Fields: map[int32]interface{}{}}
+	return ComplexObject{Type: HashCode(strings.ToLower(typeName)), Fields: map[int32]interface{}{}}
 }
 
 // ToDate converts Golang time.Time to Apache Ignite Date
