@@ -95,9 +95,3 @@ const (
 	DurEternal   = -1
 	DurZero      = 0
 )
-const (
-	// ExpiryPolicy mode
-	ModeCreate int = iota << 1
-	ModeUpdate
-	ModeAccess
-)

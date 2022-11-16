@@ -49,6 +49,47 @@ func (c *client) CacheGet(cache string, binary bool, key interface{}) (interface
 	return ReadObject((res))
 }
 
+func (c *client) CacheGetAndExtendingTTL(cache string, key interface{}, ttl time.Duration) (interface{}, error) {
+	if ttl.Milliseconds() == 0 {
+		return nil, errors.NewError(1, "TTL should be more than a millisecond")
+	}
+
+	// request and response
+	req := NewRequestOperation(OpCacheGet)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := WriteInt(req, HashCode(cache)); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := WriteByte(req, WithExpiryPolicyFlagMask); err != nil {
+		return nil, errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := WriteLong(req, DurUnchanged); err != nil {
+		return nil, errors.Wrapf(err, "failed to write ttl")
+	}
+	if err := WriteLong(req, DurUnchanged); err != nil {
+		return nil, errors.Wrapf(err, "failed to write ttl")
+	}
+	if err := WriteLong(req, ttl.Milliseconds()); err != nil {
+		return nil, errors.Wrapf(err, "failed to write ttl")
+	}
+
+	if err := WriteObject(req, key); err != nil {
+		return nil, errors.Wrapf(err, "failed to write cache key")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return nil, errors.Wrapf(err, "failed to execute OP_CACHE_GET operation")
+	}
+	if err := res.CheckStatus(); err != nil {
+		return nil, err
+	}
+
+	return ReadObject(res)
+}
+
 // CacheGetAll retrieves multiple key-value pairs from cache.
 func (c *client) CacheGetAll(cache string, binary bool, keys []interface{}) (map[interface{}]interface{}, error) {
 	// request and response
@@ -128,47 +169,7 @@ func (c *client) CachePut(cache string, binary bool, key interface{}, value inte
 	return res.CheckStatus()
 }
 
-func (c *client) CachePutAllWithTTL(cache string, data map[interface{}]interface{}, ttl time.Duration, mode int) error {
-	if ttl.Milliseconds() == 0 {
-		return errors.NewError(1, "TTL should be more than a millisecond")
-	}
-
-	// request and response
-	req := NewRequestOperation(OpCachePutAll)
-	res := NewResponseOperation(req.UID)
-
-	// set parameters
-	if err := WriteInt(req, HashCode(cache)); err != nil {
-		return errors.Wrapf(err, "failed to write cache name")
-	}
-	if err := WriteByte(req, WithExpiryPolicyFlagMask); err != nil {
-		return errors.Wrapf(err, "failed to write binary flag")
-	}
-	if err := applyMode(req, ttl, mode); err != nil {
-		return err
-	}
-
-	if err := WriteInt(req, int32(len(data))); err != nil {
-		return errors.Wrapf(err, "failed to write key count")
-	}
-	for k, v := range data {
-		if err := WriteObject(req, k); err != nil {
-			return errors.Wrapf(err, "failed to write cache key")
-		}
-		if err := WriteObject(req, v); err != nil {
-			return errors.Wrapf(err, "failed to write cache value")
-		}
-	}
-
-	// execute operation
-	if err := c.Do(req, res); err != nil {
-		return errors.Wrapf(err, "failed to execute OP_CACHE_PUT_ALL operation")
-	}
-
-	return res.CheckStatus()
-}
-
-func (c *client) CachePutWithTTL(cache string, key interface{}, value interface{}, ttl time.Duration, mode int) error {
+func (c *client) CachePutWithTTL(cache string, key interface{}, value interface{}, ttl time.Duration) error {
 	if ttl.Milliseconds() == 0 {
 		return errors.NewError(1, "TTL should be more than a millisecond")
 	}
@@ -184,8 +185,15 @@ func (c *client) CachePutWithTTL(cache string, key interface{}, value interface{
 	if err := WriteByte(req, WithExpiryPolicyFlagMask); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
-	if err := applyMode(req, ttl, mode); err != nil {
-		return err
+
+	if err := WriteLong(req, ttl.Milliseconds()); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+	if err := WriteLong(req, DurUnchanged); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+	if err := WriteLong(req, DurUnchanged); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
 	}
 
 	if err := WriteObject(req, key); err != nil {
@@ -216,6 +224,53 @@ func (c *client) CachePutAll(cache string, binary bool, data map[interface{}]int
 	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
+	if err := WriteInt(req, int32(len(data))); err != nil {
+		return errors.Wrapf(err, "failed to write key count")
+	}
+	for k, v := range data {
+		if err := WriteObject(req, k); err != nil {
+			return errors.Wrapf(err, "failed to write cache key")
+		}
+		if err := WriteObject(req, v); err != nil {
+			return errors.Wrapf(err, "failed to write cache value")
+		}
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_PUT_ALL operation")
+	}
+
+	return res.CheckStatus()
+}
+
+func (c *client) CachePutAllWithTTL(cache string, data map[interface{}]interface{}, ttl time.Duration) error {
+	if ttl.Milliseconds() == 0 {
+		return errors.NewError(1, "TTL should be more than a millisecond")
+	}
+
+	// request and response
+	req := NewRequestOperation(OpCachePutAll)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := WriteInt(req, HashCode(cache)); err != nil {
+		return errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := WriteByte(req, WithExpiryPolicyFlagMask); err != nil {
+		return errors.Wrapf(err, "failed to write binary flag")
+	}
+
+	if err := WriteLong(req, ttl.Milliseconds()); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+	if err := WriteLong(req, DurUnchanged); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+	if err := WriteLong(req, DurUnchanged); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+
 	if err := WriteInt(req, int32(len(data))); err != nil {
 		return errors.Wrapf(err, "failed to write key count")
 	}
@@ -740,30 +795,4 @@ func (c *client) CacheRemoveAll(cache string, binary bool) error {
 	}
 
 	return res.CheckStatus()
-}
-
-func applyMode(req *RequestOperation, ttl time.Duration, mode int) error {
-	if mode&ModeCreate == ModeCreate {
-		if err := WriteLong(req, ttl.Milliseconds()); err != nil {
-			return errors.Wrapf(err, "failed to write ttl")
-		}
-	} else if err := WriteLong(req, DurUnchanged); err != nil {
-		return errors.Wrapf(err, "failed to write ttl")
-	}
-	if mode&ModeUpdate == ModeUpdate {
-		if err := WriteLong(req, ttl.Milliseconds()); err != nil {
-			return errors.Wrapf(err, "failed to write ttl")
-		}
-	} else if err := WriteLong(req, DurUnchanged); err != nil {
-		return errors.Wrapf(err, "failed to write ttl")
-	}
-	if mode&ModeAccess == ModeAccess {
-		if err := WriteLong(req, ttl.Milliseconds()); err != nil {
-			return errors.Wrapf(err, "failed to write ttl")
-		}
-	} else if err := WriteLong(req, DurUnchanged); err != nil {
-		return errors.Wrapf(err, "failed to write ttl")
-	}
-
-	return nil
 }
