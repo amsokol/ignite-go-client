@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/amsokol/ignite-go-client/binary/errors"
 	"github.com/amsokol/ignite-go-client/debug"
@@ -90,9 +91,13 @@ type Client interface {
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put
 	CachePut(cache string, binary bool, key interface{}, value interface{}) error
 
+	CachePutWithTTL(cache string, key interface{}, value interface{}, ttl time.Duration, mode int) error
+
 	// CachePutAll puts a value with a given key to cache (overwriting existing value if any).
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_put_all
 	CachePutAll(cache string, binary bool, data map[interface{}]interface{}) error
+
+	CachePutAllWithTTL(cache string, data map[interface{}]interface{}, ttl time.Duration, mode int) error
 
 	// CacheContainsKey returns a value indicating whether given key is present in cache.
 	// https://apacheignite.readme.io/docs/binary-client-protocol-key-value-operations#section-op_cache_contains_key

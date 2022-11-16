@@ -84,4 +84,20 @@ const (
 	OpQueryScanCursorGetPage = 2001
 	// OpResourceClose closes a resource, such as query cursor.
 	OpResourceClose = 0
+
+	// flags
+	KeepBinaryFlagMask       = 0x01
+	TransactionalFlagMask    = 0x02
+	WithExpiryPolicyFlagMask = 0x04
+
+	// ExpiryPolicy
+	DurUnchanged = -2
+	DurEternal   = -1
+	DurZero      = 0
+)
+const (
+	// ExpiryPolicy mode
+	ModeCreate int = iota << 1
+	ModeUpdate
+	ModeAccess
 )

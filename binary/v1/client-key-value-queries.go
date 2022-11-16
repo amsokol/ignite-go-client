@@ -1,6 +1,8 @@
 package ignite
 
 import (
+	"time"
+
 	"github.com/amsokol/ignite-go-client/binary/errors"
 )
 
@@ -111,6 +113,81 @@ func (c *client) CachePut(cache string, binary bool, key interface{}, value inte
 	if err := WriteBool(req, binary); err != nil {
 		return errors.Wrapf(err, "failed to write binary flag")
 	}
+	if err := WriteObject(req, key); err != nil {
+		return errors.Wrapf(err, "failed to write cache key")
+	}
+	if err := WriteObject(req, value); err != nil {
+		return errors.Wrapf(err, "failed to write cache value")
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_PUT operation")
+	}
+
+	return res.CheckStatus()
+}
+
+func (c *client) CachePutAllWithTTL(cache string, data map[interface{}]interface{}, ttl time.Duration, mode int) error {
+	if ttl.Milliseconds() == 0 {
+		return errors.NewError(1, "TTL should be more than a millisecond")
+	}
+
+	// request and response
+	req := NewRequestOperation(OpCachePutAll)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := WriteInt(req, HashCode(cache)); err != nil {
+		return errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := WriteByte(req, WithExpiryPolicyFlagMask); err != nil {
+		return errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := applyMode(req, ttl, mode); err != nil {
+		return err
+	}
+
+	if err := WriteInt(req, int32(len(data))); err != nil {
+		return errors.Wrapf(err, "failed to write key count")
+	}
+	for k, v := range data {
+		if err := WriteObject(req, k); err != nil {
+			return errors.Wrapf(err, "failed to write cache key")
+		}
+		if err := WriteObject(req, v); err != nil {
+			return errors.Wrapf(err, "failed to write cache value")
+		}
+	}
+
+	// execute operation
+	if err := c.Do(req, res); err != nil {
+		return errors.Wrapf(err, "failed to execute OP_CACHE_PUT_ALL operation")
+	}
+
+	return res.CheckStatus()
+}
+
+func (c *client) CachePutWithTTL(cache string, key interface{}, value interface{}, ttl time.Duration, mode int) error {
+	if ttl.Milliseconds() == 0 {
+		return errors.NewError(1, "TTL should be more than a millisecond")
+	}
+
+	// request and response
+	req := NewRequestOperation(OpCachePut)
+	res := NewResponseOperation(req.UID)
+
+	// set parameters
+	if err := WriteInt(req, HashCode(cache)); err != nil {
+		return errors.Wrapf(err, "failed to write cache name")
+	}
+	if err := WriteByte(req, WithExpiryPolicyFlagMask); err != nil {
+		return errors.Wrapf(err, "failed to write binary flag")
+	}
+	if err := applyMode(req, ttl, mode); err != nil {
+		return err
+	}
+
 	if err := WriteObject(req, key); err != nil {
 		return errors.Wrapf(err, "failed to write cache key")
 	}
@@ -663,4 +740,30 @@ func (c *client) CacheRemoveAll(cache string, binary bool) error {
 	}
 
 	return res.CheckStatus()
+}
+
+func applyMode(req *RequestOperation, ttl time.Duration, mode int) error {
+	if mode&ModeCreate == ModeCreate {
+		if err := WriteLong(req, ttl.Milliseconds()); err != nil {
+			return errors.Wrapf(err, "failed to write ttl")
+		}
+	} else if err := WriteLong(req, DurUnchanged); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+	if mode&ModeUpdate == ModeUpdate {
+		if err := WriteLong(req, ttl.Milliseconds()); err != nil {
+			return errors.Wrapf(err, "failed to write ttl")
+		}
+	} else if err := WriteLong(req, DurUnchanged); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+	if mode&ModeAccess == ModeAccess {
+		if err := WriteLong(req, ttl.Milliseconds()); err != nil {
+			return errors.Wrapf(err, "failed to write ttl")
+		}
+	} else if err := WriteLong(req, DurUnchanged); err != nil {
+		return errors.Wrapf(err, "failed to write ttl")
+	}
+
+	return nil
 }
